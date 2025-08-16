@@ -1,0 +1,10 @@
+frontend/dist
+frontend/node_modules
+.gradle
+.idea
+.kotlin
+build
+gradle
+.gitignore
+README.md
+LICENSE.md
