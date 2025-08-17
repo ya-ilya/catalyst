@@ -64,6 +64,7 @@ class ConfigService(
                 files,
                 isPublic,
                 date,
+                date,
                 user
             )
         )
@@ -77,6 +78,27 @@ class ConfigService(
         )
 
         return config
+    }
+
+    fun updateConfig(
+        id: UUID,
+        name: String,
+        files: List<ConfigFile>,
+        user: User
+    ): Config {
+        val config = getConfigById(id)
+
+        if (config.user.id != user.id) {
+            throw ResponseStatusException(HttpStatus.FORBIDDEN)
+        }
+
+        return configRepository.save(
+            config.apply {
+                this.name = name
+                this.files = files
+                this.lastUpdated = LocalDateTime.now(ZoneOffset.UTC)
+            }
+        )
     }
 
     fun deleteConfig(config: Config) {

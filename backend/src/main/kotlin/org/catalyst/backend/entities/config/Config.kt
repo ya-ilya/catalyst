@@ -13,10 +13,11 @@ import java.util.UUID
 
 @Entity
 class Config(
-    val name: String,
+    var name: String,
     @ElementCollection
-    val files: List<ConfigFile>,
+    var files: List<ConfigFile>,
     val isPublic: Boolean,
+    var lastUpdated: LocalDateTime,
     val createdAt: LocalDateTime,
     @ManyToOne
     val user: User,

@@ -2,11 +2,13 @@ package org.catalyst.backend.controllers
 
 import org.catalyst.backend.entities.user.User
 import org.catalyst.backend.requests.CreateConfigRequest
+import org.catalyst.backend.requests.UpdateConfigRequest
 import org.catalyst.backend.responses.ConfigResponse
 import org.catalyst.backend.services.ConfigService
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -44,6 +46,17 @@ class ConfigController(private val configService: ConfigService) {
     ): ConfigResponse {
         return configService
             .createConfig(request.name, request.files, request.isPublic, user)
+            .toResponse()
+    }
+
+    @PatchMapping("/{id}")
+    fun updateConfig(
+        @AuthenticationPrincipal user: User,
+        @PathVariable id: UUID,
+        @RequestBody request: UpdateConfigRequest
+    ): ConfigResponse {
+        return configService
+            .updateConfig(id, request.name, request.files, user)
             .toResponse()
     }
 
