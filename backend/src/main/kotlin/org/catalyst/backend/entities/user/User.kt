@@ -24,7 +24,7 @@ class User(
     val password: String,
     val createdAt: LocalDateTime,
     var refreshToken: String? = null,
-    @OneToMany(mappedBy = "subscription", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
     val subscriptions: List<Subscription> = emptyList(),
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
     val configs: MutableList<Config> = mutableListOf(),
