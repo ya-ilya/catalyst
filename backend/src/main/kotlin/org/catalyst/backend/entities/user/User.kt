@@ -8,7 +8,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.OneToMany
 import org.catalyst.backend.entities.config.Config
-import org.catalyst.backend.entities.config.subscription.Subscription
+import org.catalyst.backend.entities.subscription.Subscription
 import org.catalyst.backend.responses.UserResponse
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails

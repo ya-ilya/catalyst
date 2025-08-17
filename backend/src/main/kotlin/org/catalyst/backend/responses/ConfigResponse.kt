@@ -6,7 +6,6 @@ import java.util.UUID
 class ConfigResponse(
     val id: UUID,
     val name: String,
-    val data: String,
     val isPublic: Boolean,
     val createdAt: LocalDateTime
 )

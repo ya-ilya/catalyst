@@ -43,7 +43,7 @@ class ConfigController(private val configService: ConfigService) {
         @RequestBody request: CreateConfigRequest
     ): ConfigResponse {
         return configService
-            .createConfig(request.name, request.data, request.isPublic, user)
+            .createConfig(request.name, request.parts, request.isPublic, user)
             .toResponse()
     }
 

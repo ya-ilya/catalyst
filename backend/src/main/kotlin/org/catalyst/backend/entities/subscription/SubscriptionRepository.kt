@@ -1,4 +1,4 @@
-package org.catalyst.backend.entities.config.subscription
+package org.catalyst.backend.entities.subscription
 
 import org.catalyst.backend.entities.config.Config
 import org.catalyst.backend.entities.user.User

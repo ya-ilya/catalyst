@@ -1,4 +1,4 @@
-package org.catalyst.backend.entities.config.subscription
+package org.catalyst.backend.entities.subscription
 
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue

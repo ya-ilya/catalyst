@@ -1,5 +1,6 @@
 package org.catalyst.backend.entities.config
 
+import jakarta.persistence.ElementCollection
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
@@ -13,7 +14,8 @@ import java.util.UUID
 @Entity
 class Config(
     val name: String,
-    val data: String,
+    @ElementCollection
+    val parts: List<ConfigPart>,
     val isPublic: Boolean,
     val createdAt: LocalDateTime,
     @ManyToOne
@@ -25,7 +27,6 @@ class Config(
     fun toResponse() = ConfigResponse(
         id!!,
         name,
-        data,
         isPublic,
         createdAt
     )

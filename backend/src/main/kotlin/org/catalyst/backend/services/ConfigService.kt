@@ -1,9 +1,10 @@
 package org.catalyst.backend.services
 
 import org.catalyst.backend.entities.config.Config
+import org.catalyst.backend.entities.config.ConfigPart
 import org.catalyst.backend.entities.config.ConfigRepository
-import org.catalyst.backend.entities.config.subscription.Subscription
-import org.catalyst.backend.entities.config.subscription.SubscriptionRepository
+import org.catalyst.backend.entities.subscription.Subscription
+import org.catalyst.backend.entities.subscription.SubscriptionRepository
 import org.catalyst.backend.entities.user.User
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -49,13 +50,18 @@ class ConfigService(
         return config
     }
 
-    fun createConfig(name: String, data: String, isPublic: Boolean, user: User): Config {
+    fun createConfig(
+        name: String,
+        parts: List<ConfigPart>,
+        isPublic: Boolean,
+        user: User
+    ): Config {
         val date = LocalDateTime.now(ZoneOffset.UTC)
 
         val config = configRepository.save(
             Config(
                 name,
-                data,
+                parts,
                 isPublic,
                 date,
                 user
