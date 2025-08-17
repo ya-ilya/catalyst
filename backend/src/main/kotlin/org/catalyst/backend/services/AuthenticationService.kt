@@ -25,9 +25,9 @@ class AuthenticationService(
     @Value("\${token.signing.key}")
     private val jwtSigningKey: String? = null
 
-    fun signIn(email: String, password: String): AuthenticationResponse {
+    fun signIn(username: String, password: String): AuthenticationResponse {
         val user = userService
-            .findUserByEmail(email)
+            .findUserByUsername(username)
             .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND) }
 
         if (!passwordEncoder.matches(password, user.password)) {
@@ -47,42 +47,14 @@ class AuthenticationService(
         )
     }
 
-    fun signUp(username: String, email: String, password: String): AuthenticationResponse {
-        if (userService.findUserByUsername(username).isPresent) {
-            throw ResponseStatusException(HttpStatus.CONFLICT)
-        }
-
-        if (userService.findUserByEmail(email).isPresent) {
-            throw ResponseStatusException(HttpStatus.CONFLICT)
-        }
-
-        val user = userService.createUser(
-            username,
-            email,
-            password
-        )
-
-        SecurityContextHolder.getContext().authentication = UsernamePasswordAuthenticationToken(
-            user,
-            user.password
-        )
-
-        return AuthenticationResponse(
-            generateAccessToken(user)!!,
-            generateRefreshToken(user)!!,
-            user.id!!,
-            user.username
-        )
-    }
-
     fun refreshToken(refreshToken: String): AuthenticationResponse {
         if (isTokenExpired(refreshToken)) {
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
         }
 
-        val email = extractEmail(refreshToken)
+        val username = extractUsername(refreshToken)
         val user = userService
-            .findUserByEmail(email)
+            .findUserByUsername(username)
             .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND) }
 
         if (!isRefreshTokenValid(refreshToken, user)) {
@@ -117,8 +89,8 @@ class AuthenticationService(
     }
 
     fun isAccessTokenValid(accessToken: String, user: User): Boolean {
-        val email = extractEmail(accessToken)
-        if (email != user.email) return false
+        val username = extractUsername(accessToken)
+        if (username != user.username) return false
         if (isTokenExpired(accessToken)) {
             return false
         }
@@ -126,8 +98,8 @@ class AuthenticationService(
     }
 
     fun isRefreshTokenValid(refreshToken: String, user: User): Boolean {
-        val email = extractEmail(refreshToken)
-        if (email != user.email) return false
+        val username = extractUsername(refreshToken)
+        if (username != user.username) return false
         if (!passwordEncoder.matches(refreshToken, user.refreshToken)) return false
         if (isTokenExpired(refreshToken)) {
             user.refreshToken = null
@@ -136,7 +108,7 @@ class AuthenticationService(
         return true
     }
 
-    fun extractEmail(token: String): String {
+    fun extractUsername(token: String): String {
         return extractClaim<String>(token) { it.subject }
     }
 
@@ -152,7 +124,7 @@ class AuthenticationService(
     ): String? {
         return Jwts.builder()
             .claims(extraClaims)
-            .subject(user.email)
+            .subject(user.username)
             .issuedAt(Date(System.currentTimeMillis()))
             .expiration(Date(System.currentTimeMillis() + timeInMilliseconds))
             .signWith(getSigningKey())

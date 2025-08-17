@@ -42,14 +42,14 @@ class AuthenticationFilter(
             return
         }
 
-        val email = try {
-            authenticationService.extractEmail(token)
+        val username = try {
+            authenticationService.extractUsername(token)
         } catch (ex: Exception) {
             ""
         }
 
-        if (email.isNotEmpty() && SecurityContextHolder.getContext().authentication == null) {
-            userService.findUserByEmail(email).ifPresent { user ->
+        if (username.isNotEmpty() && SecurityContextHolder.getContext().authentication == null) {
+            userService.findUserByUsername(username).ifPresent { user ->
                 if (authenticationService.isAccessTokenValid(token, user)) {
                     val context = SecurityContextHolder.createEmptyContext()
                     val authToken = UsernamePasswordAuthenticationToken(

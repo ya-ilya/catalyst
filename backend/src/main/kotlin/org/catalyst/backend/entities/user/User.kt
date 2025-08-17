@@ -1,6 +1,9 @@
 package org.catalyst.backend.entities.user
 
-import jakarta.persistence.*
+import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
 import org.catalyst.backend.responses.UserResponse
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
@@ -11,10 +14,10 @@ import java.util.*
 class User(
     @get:JvmName("usernameField")
     val username: String,
-    val email: String,
+    // password is the key
     @get:JvmName("passwordField")
     val password: String,
-    val registeredOn: LocalDateTime,
+    val createdAt: LocalDateTime,
     var refreshToken: String? = null,
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -29,7 +32,7 @@ class User(
     }
 
     override fun getUsername(): String {
-        return email
+        return username
     }
 
     override fun isAccountNonExpired(): Boolean {
@@ -51,7 +54,7 @@ class User(
     fun toResponse(): UserResponse {
         return UserResponse(
             username,
-            registeredOn,
+            createdAt,
             id!!
         )
     }

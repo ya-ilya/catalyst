@@ -21,15 +21,13 @@ class UserService(
         return userRepository.findByUsername(username)
     }
 
-    fun findUserByEmail(email: String): Optional<User> {
-        return userRepository.findByEmail(email)
-    }
-
-    fun createUser(username: String, email: String, password: String): User {
+    fun createUser(
+        username: String,
+        password: String
+    ): User {
         return userRepository.save(
             User(
                 username,
-                email,
                 passwordEncoder.encode(password),
                 LocalDateTime.now(ZoneOffset.UTC)
             )
@@ -42,7 +40,7 @@ class UserService(
 
     override fun loadUserByUsername(username: String): UserDetails {
         return userRepository
-            .findByEmail(username)
+            .findByUsername(username)
             .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND) }
     }
 }

@@ -5,6 +5,4 @@ import java.util.*
 
 interface UserRepository : JpaRepository<User, UUID> {
     fun findByUsername(username: String): Optional<User>
-    fun findByEmail(email: String): Optional<User>
-    fun findByRefreshToken(refreshToken: String): Optional<User>
 }
