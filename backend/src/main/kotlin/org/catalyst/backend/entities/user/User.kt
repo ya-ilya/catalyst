@@ -1,9 +1,14 @@
 package org.catalyst.backend.entities.user
 
+import jakarta.persistence.CascadeType
 import jakarta.persistence.Entity
+import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.OneToMany
+import org.catalyst.backend.entities.config.Config
+import org.catalyst.backend.entities.config.subscription.Subscription
 import org.catalyst.backend.responses.UserResponse
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
@@ -19,6 +24,10 @@ class User(
     val password: String,
     val createdAt: LocalDateTime,
     var refreshToken: String? = null,
+    @OneToMany(mappedBy = "subscription", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+    val subscriptions: List<Subscription> = emptyList(),
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+    val createdConfigs: MutableList<Config> = mutableListOf(),
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     val id: UUID? = null
@@ -53,9 +62,9 @@ class User(
 
     fun toResponse(): UserResponse {
         return UserResponse(
+            id!!,
             username,
-            createdAt,
-            id!!
+            createdAt
         )
     }
 }

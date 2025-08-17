@@ -4,7 +4,7 @@ import java.time.LocalDateTime
 import java.util.*
 
 class UserResponse(
+    val id: UUID,
     val username: String,
-    val registeredOn: LocalDateTime,
-    val id: UUID
+    val registeredOn: LocalDateTime
 )
