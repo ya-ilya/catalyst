@@ -4,6 +4,6 @@ import jakarta.persistence.Embeddable
 
 @Embeddable
 class ConfigPart(
-    val name: String,
-    val data: String
+    val fileName: String,
+    val fileData: String
 )

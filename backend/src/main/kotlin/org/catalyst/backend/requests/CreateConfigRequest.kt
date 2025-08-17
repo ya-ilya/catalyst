@@ -6,6 +6,6 @@ import org.catalyst.backend.entities.config.ConfigPart
 class CreateConfigRequest(
     @Size(min = 4, max = 32)
     val name: String,
-    val parts: List<ConfigPart>,
+    val files: List<ConfigPart>,
     val isPublic: Boolean
 )

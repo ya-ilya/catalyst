@@ -52,7 +52,7 @@ class ConfigService(
 
     fun createConfig(
         name: String,
-        parts: List<ConfigPart>,
+        files: List<ConfigPart>,
         isPublic: Boolean,
         user: User
     ): Config {
@@ -61,7 +61,7 @@ class ConfigService(
         val config = configRepository.save(
             Config(
                 name,
-                parts,
+                files,
                 isPublic,
                 date,
                 user

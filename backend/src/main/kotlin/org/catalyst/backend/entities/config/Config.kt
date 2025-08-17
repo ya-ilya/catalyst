@@ -15,7 +15,7 @@ import java.util.UUID
 class Config(
     val name: String,
     @ElementCollection
-    val parts: List<ConfigPart>,
+    val files: List<ConfigPart>,
     val isPublic: Boolean,
     val createdAt: LocalDateTime,
     @ManyToOne
