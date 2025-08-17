@@ -22,7 +22,7 @@ class UserService(
     fun getUserById(id: UUID): User {
         return userRepository
             .findById(id)
-            .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND) }
+            .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "User not found") }
     }
 
     fun findUserByUsername(username: String): Optional<User> {
@@ -77,6 +77,6 @@ class UserService(
     override fun loadUserByUsername(username: String): UserDetails {
         return userRepository
             .findByUsername(username)
-            .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND) }
+            .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "User not found") }
     }
 }

@@ -38,7 +38,7 @@ class MeController(private val userService: UserService) {
         @RequestBody request: ChangePasswordRequest
     ) {
         if (!userService.checkPassword(user, request.oldPassword)) {
-            throw ResponseStatusException(HttpStatus.FORBIDDEN)
+            throw ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid old password")
         }
 
         userService.changePassword(user, request.newPassword)

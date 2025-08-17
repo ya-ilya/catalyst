@@ -21,14 +21,14 @@ class ConfigService(
     fun getConfigById(id: UUID): Config {
         return configRepository
             .findById(id)
-            .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND) }
+            .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "Config not found") }
     }
 
     fun getConfigForUser(id: UUID, user: User): Config {
         val config = getConfigById(id)
 
         if (!config.isPublic && config.user.id != user.id) {
-            throw ResponseStatusException(HttpStatus.NOT_FOUND)
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Config not found")
         }
 
         return config
@@ -38,11 +38,11 @@ class ConfigService(
         val config = getConfigById(id)
 
         if (!config.isPublic) {
-            throw ResponseStatusException(HttpStatus.NOT_FOUND)
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Configuration not found")
         }
 
         if (subscriptionRepository.existsByUserAndConfig(user, config)) {
-            throw ResponseStatusException(HttpStatus.CONFLICT)
+            throw ResponseStatusException(HttpStatus.CONFLICT, "You already subscribed to this configuration")
         }
 
         subscriptionRepository.save(Subscription(user, config, LocalDateTime.now(ZoneOffset.UTC)))
@@ -52,12 +52,12 @@ class ConfigService(
         val config = getConfigById(id)
 
         if (config.user.id == user.id) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST)
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "You Cannot unsubscribe from your own configuration")
         }
 
         val subscription = subscriptionRepository
             .findByUserAndConfig(user, config)
-            .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND) }
+            .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found") }
 
         subscriptionRepository.delete(subscription)
     }
@@ -101,7 +101,7 @@ class ConfigService(
         val config = getConfigById(id)
 
         if (config.user.id != user.id) {
-            throw ResponseStatusException(HttpStatus.FORBIDDEN)
+            throw ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to edit this configuration")
         }
 
         return configRepository.save(
@@ -123,7 +123,7 @@ class ConfigService(
         val config = getConfigById(id)
 
         if (config.user.id != user.id) {
-            throw ResponseStatusException(HttpStatus.FORBIDDEN)
+            throw ResponseStatusException(HttpStatus.FORBIDDEN, "ou are not authorized to delete this configuration.")
         }
 
         deleteConfig(config)

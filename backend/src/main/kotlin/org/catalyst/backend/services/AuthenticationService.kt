@@ -28,10 +28,10 @@ class AuthenticationService(
     fun signIn(username: String, password: String): AuthenticationResponse {
         val user = userService
             .findUserByUsername(username)
-            .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND) }
+            .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "User not found") }
 
         if (!passwordEncoder.matches(password, user.password)) {
-            throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
+            throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid password")
         }
 
         SecurityContextHolder.getContext().authentication = UsernamePasswordAuthenticationToken(
@@ -49,7 +49,7 @@ class AuthenticationService(
 
     fun refreshToken(refreshToken: String): AuthenticationResponse {
         if (isTokenExpired(refreshToken)) {
-            throw ResponseStatusException(HttpStatus.FORBIDDEN)
+            throw ResponseStatusException(HttpStatus.FORBIDDEN, "Token expired")
         }
 
         val username = extractUsername(refreshToken)
