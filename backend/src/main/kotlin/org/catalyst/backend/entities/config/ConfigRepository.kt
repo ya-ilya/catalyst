@@ -1,6 +1,6 @@
 package org.catalyst.backend.entities.config
 
 import org.springframework.data.jpa.repository.JpaRepository
-import java.util.UUID
+import java.util.*
 
 interface ConfigRepository : JpaRepository<Config, UUID>

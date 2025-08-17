@@ -1,16 +1,12 @@
 package org.catalyst.backend.entities.user
 
-import jakarta.persistence.CascadeType
-import jakarta.persistence.Entity
-import jakarta.persistence.FetchType
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.OneToMany
+import jakarta.persistence.*
 import org.catalyst.backend.entities.config.Config
 import org.catalyst.backend.entities.subscription.Subscription
+import org.catalyst.backend.entities.user.role.Role
 import org.catalyst.backend.responses.UserResponse
 import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import java.time.LocalDateTime
 import java.util.*
@@ -21,9 +17,17 @@ class User(
     val username: String,
     // password is the key
     @get:JvmName("passwordField")
-    val password: String,
+    var password: String,
     val createdAt: LocalDateTime,
+    var isPasswordChangeRequired: Boolean = true,
     var refreshToken: String? = null,
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "user_roles",
+        joinColumns = [JoinColumn(name = "user_id")],
+        inverseJoinColumns = [JoinColumn(name = "role_id")]
+    )
+    var roles: Set<Role> = emptySet(),
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
     val subscriptions: List<Subscription> = emptyList(),
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
@@ -32,9 +36,8 @@ class User(
     @GeneratedValue(strategy = GenerationType.UUID)
     val id: UUID? = null
 ) : UserDetails {
-    override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
-        return mutableSetOf()
-    }
+    override fun getAuthorities(): MutableCollection<out GrantedAuthority> =
+        roles.map { SimpleGrantedAuthority(it.name) }.toMutableList()
 
     override fun getPassword(): String {
         return password
@@ -64,6 +67,7 @@ class User(
         return UserResponse(
             id!!,
             username,
+            isPasswordChangeRequired,
             createdAt
         )
     }

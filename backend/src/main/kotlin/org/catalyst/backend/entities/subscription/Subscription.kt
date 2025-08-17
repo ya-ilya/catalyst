@@ -1,14 +1,10 @@
 package org.catalyst.backend.entities.subscription
 
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.ManyToOne
+import jakarta.persistence.*
 import org.catalyst.backend.entities.config.Config
 import org.catalyst.backend.entities.user.User
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
 @Entity
 class Subscription(

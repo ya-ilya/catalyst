@@ -6,5 +6,6 @@ import java.util.*
 class UserResponse(
     val id: UUID,
     val username: String,
-    val registeredOn: LocalDateTime
+    val isPasswordChangeRequired: Boolean,
+    val createdAt: LocalDateTime
 )

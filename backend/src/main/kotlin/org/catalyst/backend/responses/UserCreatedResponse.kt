@@ -3,9 +3,9 @@ package org.catalyst.backend.responses
 import java.time.LocalDateTime
 import java.util.*
 
-class ConfigResponse(
+class UserCreatedResponse(
     val id: UUID,
-    val name: String,
-    val isPublic: Boolean,
+    val username: String,
+    val temporaryPassword: String,
     val createdAt: LocalDateTime
 )
