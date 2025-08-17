@@ -33,10 +33,16 @@ class ConfigController(private val configService: ConfigService) {
     fun subscribe(
         @AuthenticationPrincipal user: User,
         @PathVariable id: UUID
-    ): ConfigResponse {
-        return configService
-            .subscribe(id, user)
-            .toResponse()
+    ) {
+        configService.subscribe(id, user)
+    }
+
+    @GetMapping("/{id}/unsubscribe")
+    fun unsubscribe(
+        @AuthenticationPrincipal user: User,
+        @PathVariable id: UUID
+    ) {
+        configService.unsubscribe(id, user)
     }
 
     @PostMapping

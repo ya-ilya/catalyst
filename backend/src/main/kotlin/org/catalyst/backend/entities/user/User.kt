@@ -27,7 +27,7 @@ class User(
     @OneToMany(mappedBy = "subscription", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
     val subscriptions: List<Subscription> = emptyList(),
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
-    val createdConfigs: MutableList<Config> = mutableListOf(),
+    val configs: MutableList<Config> = mutableListOf(),
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     val id: UUID? = null

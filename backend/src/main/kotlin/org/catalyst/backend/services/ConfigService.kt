@@ -34,20 +34,32 @@ class ConfigService(
         return config
     }
 
-    fun subscribe(id: UUID, user: User): Config {
+    fun subscribe(id: UUID, user: User) {
         val config = getConfigById(id)
 
         if (!config.isPublic) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST)
+            throw ResponseStatusException(HttpStatus.NOT_FOUND)
         }
 
         if (subscriptionRepository.existsByUserAndConfig(user, config)) {
-            return config
+            throw ResponseStatusException(HttpStatus.CONFLICT)
         }
 
         subscriptionRepository.save(Subscription(user, config, LocalDateTime.now(ZoneOffset.UTC)))
+    }
 
-        return config
+    fun unsubscribe(id: UUID, user: User) {
+        val config = getConfigById(id)
+
+        if (config.user.id == user.id) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST)
+        }
+
+        val subscription = subscriptionRepository
+            .findByUserAndConfig(user, config)
+            .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND) }
+
+        subscriptionRepository.delete(subscription)
     }
 
     fun createConfig(
@@ -102,7 +114,7 @@ class ConfigService(
     }
 
     fun deleteConfig(config: Config) {
-        config.user.createdConfigs.removeIf { it.id == config.id }
+        config.user.configs.removeIf { it.id == config.id }
         configRepository.deleteById(config.id!!)
         configRepository.flush()
     }
