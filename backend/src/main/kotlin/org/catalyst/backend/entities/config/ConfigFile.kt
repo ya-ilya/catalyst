@@ -3,7 +3,7 @@ package org.catalyst.backend.entities.config
 import jakarta.persistence.Embeddable
 
 @Embeddable
-class ConfigPart(
+class ConfigFile(
     val name: String,
     val data: String
 )

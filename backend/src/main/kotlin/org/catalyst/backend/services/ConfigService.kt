@@ -1,7 +1,7 @@
 package org.catalyst.backend.services
 
 import org.catalyst.backend.entities.config.Config
-import org.catalyst.backend.entities.config.ConfigPart
+import org.catalyst.backend.entities.config.ConfigFile
 import org.catalyst.backend.entities.config.ConfigRepository
 import org.catalyst.backend.entities.subscription.Subscription
 import org.catalyst.backend.entities.subscription.SubscriptionRepository
@@ -52,7 +52,7 @@ class ConfigService(
 
     fun createConfig(
         name: String,
-        parts: List<ConfigPart>,
+        files: List<ConfigFile>,
         isPublic: Boolean,
         user: User
     ): Config {
@@ -61,7 +61,7 @@ class ConfigService(
         val config = configRepository.save(
             Config(
                 name,
-                parts,
+                files,
                 isPublic,
                 date,
                 user
