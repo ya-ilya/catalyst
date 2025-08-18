@@ -1,4 +1,4 @@
-package org.catalyst.backend.controllers
+package org.catalyst.backend.exceptions
 
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -13,7 +13,25 @@ class GlobalExceptionHandler {
         val status = ex.statusCode as HttpStatus
         val message = ex.reason
 
-        return ResponseEntity(ErrorResponse(status.value(), message), status)
+        return ResponseEntity(
+            ErrorResponse(status.value(), message),
+            status
+        )
+    }
+
+    @ExceptionHandler(Exception::class)
+    fun handleAnyException(ex: Exception): ResponseEntity<ErrorResponse> {
+        val status = HttpStatus.INTERNAL_SERVER_ERROR
+
+        ex.printStackTrace()
+
+        return ResponseEntity(
+            ErrorResponse(
+                status.value(),
+                "An internal error occurred. Please try again later"
+            ),
+            status
+        )
     }
 
     data class ErrorResponse(val status: Int, val message: String?)
