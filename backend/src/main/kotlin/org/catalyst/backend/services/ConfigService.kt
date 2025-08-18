@@ -52,7 +52,7 @@ class ConfigService(
         val config = getConfigById(id)
 
         if (config.user.id == user.id) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "You Cannot unsubscribe from your own configuration")
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot unsubscribe from your own configuration")
         }
 
         val subscription = subscriptionRepository

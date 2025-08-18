@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController
 class AuthenticationController(private val authenticationService: AuthenticationService) {
     @PostMapping("/sign-in")
     fun signIn(@Valid @RequestBody request: SignInRequest) =
-        authenticationService.signIn(request.email, request.password)
+        authenticationService.signIn(request.username, request.password)
 
     @PostMapping("/refreshToken")
     fun refreshToken(@Valid @RequestBody request: RefreshTokenRequest) =

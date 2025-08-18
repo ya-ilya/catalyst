@@ -1,9 +1,11 @@
 package org.catalyst.backend.entities.user.role
 
 import org.springframework.boot.CommandLineRunner
+import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
 
 @Component
+@Order(1)
 class RoleCreator(private val roleRepository: RoleRepository) : CommandLineRunner {
     override fun run(vararg args: String?) {
         createRoleIfNotFound("ROLE_USER")

@@ -37,6 +37,10 @@ class MeController(private val userService: UserService) {
         @AuthenticationPrincipal user: User,
         @RequestBody request: ChangePasswordRequest
     ) {
+        if (request.oldPassword == request.newPassword) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Old and new passwords mustn't be the same")
+        }
+
         if (!userService.checkPassword(user, request.oldPassword)) {
             throw ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid old password")
         }
