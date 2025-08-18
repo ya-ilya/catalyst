@@ -14,6 +14,7 @@ import org.springframework.scheduling.annotation.EnableScheduling
 class CatalystApplication(private val userService: UserService) : CommandLineRunner {
     @Value("\${catalyst.admin.username}")
     private val adminUsername: String? = null
+
     @Value("\${catalyst.admin.password}")
     private val adminPassword: String? = null
 

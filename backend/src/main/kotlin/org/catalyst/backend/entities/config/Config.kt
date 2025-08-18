@@ -9,13 +9,13 @@ import java.util.*
 @Entity
 class Config(
     var name: String,
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     var files: List<ConfigFile>,
     val isPublic: Boolean,
     var lastUpdated: LocalDateTime,
     val createdAt: LocalDateTime,
     @ManyToOne
-    val user: User,
+    val author: User,
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     val id: UUID? = null
@@ -24,6 +24,8 @@ class Config(
         id!!,
         name,
         isPublic,
+        author.toResponse(),
+        lastUpdated,
         createdAt
     )
 }

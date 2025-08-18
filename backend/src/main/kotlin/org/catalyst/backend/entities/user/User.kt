@@ -30,7 +30,7 @@ class User(
     var roles: Set<Role> = emptySet(),
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
     val subscriptions: List<Subscription> = emptyList(),
-    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "author", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
     val configs: MutableList<Config> = mutableListOf(),
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -63,12 +63,11 @@ class User(
         return true
     }
 
-    fun toResponse(): UserResponse {
-        return UserResponse(
-            id!!,
-            username,
-            isPasswordChangeRequired,
-            createdAt
-        )
-    }
+    fun toResponse() = UserResponse(
+        id!!,
+        username,
+        roles.any { it.name == "ROLE_ADMIN" },
+        isPasswordChangeRequired,
+        createdAt
+    )
 }

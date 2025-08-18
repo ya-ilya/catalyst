@@ -37,6 +37,10 @@ class UserService(
         username: String,
         password: String
     ): User {
+        if (findUserByUsername(username).isPresent) {
+            throw ResponseStatusException(HttpStatus.CONFLICT, "User with same name already exists")
+        }
+
         val userRole = roleRepository
             .findByName("ROLE_USER")
             .orElseThrow { IllegalStateException("Role ROLE_USER not found!") }
@@ -77,17 +81,6 @@ class UserService(
 
     fun updateUser(user: User): User {
         return userRepository.save(user)
-    }
-
-    fun changePassword(user: User, password: String) {
-        updateUser(user.apply {
-            this.password = password
-            this.isPasswordChangeRequired = false
-        })
-    }
-
-    fun checkPassword(user: User, password: String): Boolean {
-        return passwordEncoder.matches(password, user.password)
     }
 
     fun deleteUser(user: User) {

@@ -5,37 +5,59 @@ import { Card } from "primereact/card";
 import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { Password } from "primereact/password";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Navigate, useNavigate } from "react-router";
 
+import * as api from "../../api";
 import { Header } from "../../components";
 
 export function Account() {
+  const meController = api.useMeController();
+
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const user = {
-    id: "11846151-d0a9-413e-8179-6ee39c36057a",
-    username: "Username",
-    isPasswordChangeRequired: true, // Имитируем обязательную смену
-    createdAt: "2024-08-18T10:00:00Z",
-  };
+  const [session, setSession] = api.useAuthenticationContext();
+  const [user, setUser] = useState<api.User | null>(null);
 
-  const handlePasswordChange = () => {
-    // TODO: Добавить валидацию (пароли должны совпадать)
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    meController
+      ?.getUser()
+      .then((user) => {
+        setUser(user);
+      })
+      .catch((error) => {
+        console.error("Failed to fetch user data:", error);
+      });
+  }, [meController]);
+
+  const handlePasswordChange = async () => {
+    if (!meController) {
+      return;
+    }
+
     if (newPassword !== confirmPassword) {
       console.error("New passwords do not match!");
       return;
     }
-    // TODO: Отправить запрос на бэкенд
-    console.log("Password change requested...");
+
+    try {
+      setSession(await meController.changePassword({ oldPassword, newPassword }));
+    } catch (error) {
+      console.error("Failed to change password:", error);
+    }
+
     setIsDialogVisible(false);
   };
 
   const handleLogout = () => {
-    // TODO: Логика для выхода из системы
     console.log("Logging out...");
+    setSession(null);
+    navigate("/");
   };
 
   const dialogFooter = (
@@ -54,6 +76,15 @@ export function Account() {
     </div>
   );
 
+  if (!session) {
+    return (
+      <Navigate
+        to="/sign-in"
+        replace
+      />
+    );
+  }
+
   return (
     <div className="account-container">
       <Header />
@@ -62,7 +93,7 @@ export function Account() {
           title="Account"
           className="account-card"
         >
-          {user.isPasswordChangeRequired && (
+          {user?.isPasswordChangeRequired && (
             <div className="password-change-warning">
               <i className="pi pi-exclamation-triangle mr-2"></i>
               <span>Password change is required!</span>
@@ -71,11 +102,11 @@ export function Account() {
           <div className="p-grid p-dir-col">
             <div className="p-col">
               <h5 className="info-label">Username:</h5>
-              <p className="info-value">{user.username}</p>
+              <p className="info-value">{user?.username}</p>
             </div>
             <div className="p-col">
               <h5 className="info-label">Joined:</h5>
-              <p className="info-value">{new Date(user.createdAt).toLocaleDateString()}</p>
+              <p className="info-value">{user ? new Date(user?.createdAt).toLocaleDateString() : ""}</p>
             </div>
           </div>
           <div className="actions p-d-flex p-jc-between mt-4">

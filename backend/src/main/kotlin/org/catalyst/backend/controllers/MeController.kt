@@ -2,29 +2,26 @@ package org.catalyst.backend.controllers
 
 import org.catalyst.backend.entities.user.User
 import org.catalyst.backend.requests.ChangePasswordRequest
+import org.catalyst.backend.responses.AuthenticationResponse
 import org.catalyst.backend.responses.ConfigResponse
+import org.catalyst.backend.responses.SubscriptionResponse
 import org.catalyst.backend.responses.UserResponse
+import org.catalyst.backend.services.AuthenticationService
 import org.catalyst.backend.services.UserService
-import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.server.ResponseStatusException
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/me")
-class MeController(private val userService: UserService) {
+class MeController(private val userService: UserService, private val authenticationService: AuthenticationService) {
     @GetMapping
     fun getUser(@AuthenticationPrincipal user: User): UserResponse {
         return user.toResponse()
     }
 
     @GetMapping("/subscriptions")
-    fun getSubscriptions(@AuthenticationPrincipal user: User): List<ConfigResponse> {
-        return user.subscriptions.map { it.config.toResponse() }
+    fun getSubscriptions(@AuthenticationPrincipal user: User): List<SubscriptionResponse> {
+        return user.subscriptions.map { it.toResponse() }
     }
 
     @GetMapping("/configs")
@@ -36,15 +33,7 @@ class MeController(private val userService: UserService) {
     fun changePassword(
         @AuthenticationPrincipal user: User,
         @RequestBody request: ChangePasswordRequest
-    ) {
-        if (request.oldPassword == request.newPassword) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Old and new passwords mustn't be the same")
-        }
-
-        if (!userService.checkPassword(user, request.oldPassword)) {
-            throw ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid old password")
-        }
-
-        userService.changePassword(user, request.newPassword)
+    ): AuthenticationResponse {
+        return authenticationService.changePassword(user, request.oldPassword, request.newPassword)
     }
 }

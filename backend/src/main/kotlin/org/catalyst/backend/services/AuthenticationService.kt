@@ -42,8 +42,7 @@ class AuthenticationService(
         return AuthenticationResponse(
             generateAccessToken(user)!!,
             generateRefreshToken(user)!!,
-            user.id!!,
-            user.username
+            user.toResponse()
         )
     }
 
@@ -64,8 +63,28 @@ class AuthenticationService(
         return AuthenticationResponse(
             generateAccessToken(user)!!,
             generateRefreshToken(user)!!,
-            user.id!!,
-            user.username
+            user.toResponse()
+        )
+    }
+
+    fun changePassword(user: User, oldPassword: String, newPassword: String): AuthenticationResponse {
+        if (oldPassword == newPassword) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Old and new passwords mustn't be the same")
+        }
+
+        if (!passwordEncoder.matches(oldPassword, user.password)) {
+            throw ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid old password")
+        }
+
+        userService.updateUser(user.apply {
+            this.password = passwordEncoder.encode(newPassword)
+            this.isPasswordChangeRequired = false
+        })
+
+        return AuthenticationResponse(
+            generateAccessToken(user)!!,
+            generateRefreshToken(user)!!,
+            user.toResponse()
         )
     }
 

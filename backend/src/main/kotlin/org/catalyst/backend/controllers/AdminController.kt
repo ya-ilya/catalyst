@@ -1,11 +1,15 @@
 package org.catalyst.backend.controllers
 
+import org.catalyst.backend.entities.user.User
 import org.catalyst.backend.requests.CreateUserRequest
 import org.catalyst.backend.responses.UserCreatedResponse
 import org.catalyst.backend.responses.UserResponse
 import org.catalyst.backend.services.UserService
+import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
 import java.security.SecureRandom
 import java.util.*
 import kotlin.streams.asSequence
@@ -55,7 +59,11 @@ class AdminController(private val userService: UserService) {
     }
 
     @DeleteMapping("/users/{id}")
-    fun deleteUser(@PathVariable id: UUID) {
+    fun deleteUser(@AuthenticationPrincipal user: User, @PathVariable id: UUID) {
+        if (user.id == id) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot delete yourself")
+        }
+
         userService.deleteUserById(id)
     }
 }
