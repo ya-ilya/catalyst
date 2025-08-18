@@ -8,7 +8,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router";
 
-import { App } from "./pages/app/App";
+import { Account, App, Configs } from "./pages";
 
 export * from "./axios-config";
 export * from "./i18n-config";
@@ -17,6 +17,14 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
+  },
+  {
+    path: "/configs",
+    element: <Configs />,
+  },
+  {
+    path: "/account",
+    element: <Account />,
   },
 ]);
 

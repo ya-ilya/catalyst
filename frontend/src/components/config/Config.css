@@ -1,0 +1,41 @@
+.config {
+  margin-bottom: 16px;
+  max-width: 100%;
+  width: 100%;
+  height: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+.config .p-card-content {
+  padding: 0px !important;
+}
+
+.config .config-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.config .config-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.config .config-header .config-name {
+  font-weight: 700;
+}
+
+.config .config-header .config-author,
+.config .config-header .config-id {
+  font-size: 0.875rem;
+  color: var(--text-color-secondary);
+}
+
+.config .config-footer .add-button {
+  color: var(--green-500);
+}

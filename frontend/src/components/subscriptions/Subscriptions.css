@@ -1,0 +1,19 @@
+.subscriptions {
+  flex-basis: 350px;
+  border-right: 1px solid var(--surface-border);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.subscriptions .subscriptions-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--text-color);
+}
+
+.subscriptions .subscriptions-content {
+  overflow-y: auto;
+  padding-right: 8px;
+}

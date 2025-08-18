@@ -1,0 +1,38 @@
+.header {
+  background-color: var(--surface-card);
+  border-bottom: 1px solid var(--surface-border);
+  border-radius: 0;
+  padding: 8px 16px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  height: 64px;
+}
+
+.header .header-start {
+  display: flex;
+  align-items: center;
+}
+
+.header .header-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-right: 32px;
+}
+
+.header .header-end {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header .p-menubar-root-list {
+  align-items: center;
+}
+
+.header .header-button {
+  font-weight: 600;
+}

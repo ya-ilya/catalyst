@@ -1,0 +1,44 @@
+.account-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.account-content {
+  display: flex;
+  flex-grow: 1;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  padding-top: 64px;
+}
+
+.account-card {
+  max-width: 600px;
+  width: 100%;
+}
+
+.account-card .info-label {
+  margin: 0;
+  font-weight: bold;
+}
+
+.account-card .info-value {
+  margin-top: 5px;
+  font-size: 1.1rem;
+}
+
+.account-card .actions {
+  display: flex;
+  gap: 16px;
+}
+
+.account-card .password-change-warning {
+  background-color: #ffe0b2;
+  color: #fb8c00;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+}

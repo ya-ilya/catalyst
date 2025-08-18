@@ -1,0 +1,12 @@
+.configs-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.configs-content {
+  display: flex;
+  flex-grow: 1;
+  box-sizing: border-box;
+  padding-top: 64px;
+}
