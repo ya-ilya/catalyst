@@ -1,5 +1,6 @@
 package org.catalyst.backend.controllers
 
+import jakarta.validation.Valid
 import org.catalyst.backend.entities.user.User
 import org.catalyst.backend.requests.ChangePasswordRequest
 import org.catalyst.backend.responses.AuthenticationResponse
@@ -32,7 +33,7 @@ class MeController(private val userService: UserService, private val authenticat
     @PostMapping("/change-password")
     fun changePassword(
         @AuthenticationPrincipal user: User,
-        @RequestBody request: ChangePasswordRequest
+        @Valid @RequestBody request: ChangePasswordRequest
     ): AuthenticationResponse {
         return authenticationService.changePassword(user, request.oldPassword, request.newPassword)
     }

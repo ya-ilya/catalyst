@@ -3,6 +3,7 @@ package org.catalyst.backend.exceptions
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.AccessDeniedException
+import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.server.ResponseStatusException
@@ -13,9 +14,18 @@ class GlobalExceptionHandler {
     fun handleResponseStatusException(ex: ResponseStatusException): ResponseEntity<ErrorResponse> {
         val status = ex.statusCode as HttpStatus
         val message = ex.reason
+        val fields = if (ex is FieldedResponseStatusException) {
+            ex.fields
+        } else {
+            null
+        }
 
         return ResponseEntity(
-            ErrorResponse(status.value(), message),
+            ErrorResponse(
+                status.value(),
+                message,
+                fields
+            ),
             status
         )
     }
@@ -27,6 +37,23 @@ class GlobalExceptionHandler {
 
         return ResponseEntity(
             ErrorResponse(status.value(), message),
+            status
+        )
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException::class)
+    fun handleMethodArgumentNotValidException(ex: MethodArgumentNotValidException): ResponseEntity<ErrorResponse> {
+        val status = HttpStatus.BAD_REQUEST
+        val fields = ex.bindingResult.fieldErrors.map {
+            it.field
+        }
+
+        return ResponseEntity(
+            ErrorResponse(
+                status.value(),
+                "Validation failed",
+                fields = fields
+            ),
             status
         )
     }
@@ -46,5 +73,9 @@ class GlobalExceptionHandler {
         )
     }
 
-    data class ErrorResponse(val status: Int, val message: String?)
+    data class ErrorResponse(
+        val status: Int,
+        val message: String? = null,
+        val fields: List<String>? = null
+    )
 }

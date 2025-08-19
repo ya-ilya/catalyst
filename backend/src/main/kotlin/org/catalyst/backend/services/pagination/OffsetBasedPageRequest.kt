@@ -37,11 +37,11 @@ class OffsetBasedPageRequest(offset: Int, limit: Int, private val sort: Sort = S
     }
 
     override fun next(): Pageable {
-        return OffsetBasedPageRequest((offset + pageSize).toInt(), pageSize, sort)
+        return OffsetBasedPageRequest(offset + pageSize, pageSize, sort)
     }
 
     fun previous(): OffsetBasedPageRequest {
-        return if (hasPrevious()) OffsetBasedPageRequest((offset - pageSize).toInt(), pageSize, sort) else this
+        return if (hasPrevious()) OffsetBasedPageRequest(offset - pageSize, pageSize, sort) else this
     }
 
     override fun previousOrFirst(): Pageable {

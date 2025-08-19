@@ -12,10 +12,10 @@ import org.springframework.scheduling.annotation.EnableScheduling
 @EnableScheduling
 @SpringBootApplication(scanBasePackages = ["org.catalyst.backend"])
 class CatalystApplication(private val userService: UserService) : CommandLineRunner {
-    @Value("\${catalyst.admin.username}")
+    @Value($$"${catalyst.admin.username}")
     private val adminUsername: String? = null
 
-    @Value("\${catalyst.admin.password}")
+    @Value($$"${catalyst.admin.password}")
     private val adminPassword: String? = null
 
     override fun run(vararg args: String?) {

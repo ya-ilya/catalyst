@@ -96,7 +96,7 @@ export function Config(props: ConfigProps) {
       <div className="config-header">
         <span className="config-name">{props.config.name}</span>
         <span className="config-author">by {props.config.author.username}</span>
-        <span className="config-id">id: {props.config.id.slice(0, 4)}...</span>
+        <span className="config-id">id: {props.config.id.slice(0, 8)}</span>
       </div>
       <div className="config-footer">
         <Button

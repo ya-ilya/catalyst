@@ -6,6 +6,7 @@ import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.security.Keys
 import org.catalyst.backend.entities.user.User
+import org.catalyst.backend.exceptions.FieldedResponseStatusException
 import org.catalyst.backend.responses.AuthenticationResponse
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
@@ -22,7 +23,7 @@ class AuthenticationService(
     private val userService: UserService,
     private val passwordEncoder: PasswordEncoder
 ) {
-    @Value("\${token.signing.key}")
+    @Value($$"${token.signing.key}")
     private val jwtSigningKey: String? = null
 
     fun signIn(username: String, password: String): AuthenticationResponse {
@@ -31,7 +32,11 @@ class AuthenticationService(
             .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "User not found") }
 
         if (!passwordEncoder.matches(password, user.password)) {
-            throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid password")
+            throw FieldedResponseStatusException(
+                HttpStatus.UNAUTHORIZED,
+                "Invalid password",
+                listOf("password")
+            )
         }
 
         SecurityContextHolder.getContext().authentication = UsernamePasswordAuthenticationToken(
@@ -54,10 +59,10 @@ class AuthenticationService(
         val username = extractUsername(refreshToken)
         val user = userService
             .findUserByUsername(username)
-            .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND) }
+            .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "User not found") }
 
         if (!isRefreshTokenValid(refreshToken, user)) {
-            throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
+            throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token invalid")
         }
 
         return AuthenticationResponse(
@@ -69,11 +74,19 @@ class AuthenticationService(
 
     fun changePassword(user: User, oldPassword: String, newPassword: String): AuthenticationResponse {
         if (oldPassword == newPassword) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Old and new passwords mustn't be the same")
+            throw FieldedResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "New password must be different from the old one",
+                listOf("newPassword")
+            )
         }
 
         if (!passwordEncoder.matches(oldPassword, user.password)) {
-            throw ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid old password")
+            throw FieldedResponseStatusException(
+                HttpStatus.FORBIDDEN,
+                "Invalid old password",
+                listOf("oldPassword")
+            )
         }
 
         userService.updateUser(user.apply {

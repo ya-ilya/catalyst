@@ -1,5 +1,6 @@
 package org.catalyst.backend.controllers
 
+import jakarta.validation.Valid
 import org.catalyst.backend.entities.user.User
 import org.catalyst.backend.requests.CreateUserRequest
 import org.catalyst.backend.responses.UserCreatedResponse
@@ -43,7 +44,7 @@ class AdminController(private val userService: UserService) {
     }
 
     @PostMapping("/users")
-    fun createUser(@RequestBody request: CreateUserRequest): UserCreatedResponse {
+    fun createUser(@Valid @RequestBody request: CreateUserRequest): UserCreatedResponse {
         val temporaryPassword = generateRandomPassword()
         val user = userService.createUser(
             request.username,

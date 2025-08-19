@@ -3,6 +3,7 @@ package org.catalyst.backend.services
 import org.catalyst.backend.entities.user.User
 import org.catalyst.backend.entities.user.UserRepository
 import org.catalyst.backend.entities.user.role.RoleRepository
+import org.catalyst.backend.exceptions.FieldedResponseStatusException
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -38,7 +39,11 @@ class UserService(
         password: String
     ): User {
         if (findUserByUsername(username).isPresent) {
-            throw ResponseStatusException(HttpStatus.CONFLICT, "User with same name already exists")
+            throw FieldedResponseStatusException(
+                HttpStatus.CONFLICT,
+                "User with same name already exists",
+                listOf("username")
+            )
         }
 
         val userRole = roleRepository

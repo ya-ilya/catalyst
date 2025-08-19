@@ -1,5 +1,6 @@
 import "./Admin.css";
 
+import { AxiosError } from "axios";
 import { Button } from "primereact/button";
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
@@ -70,6 +71,25 @@ export function Admin() {
       })
       .catch((error) => {
         console.error("Failed to create user:", error);
+
+        if (error instanceof AxiosError && error.response) {
+          if (error.status === 400) {
+            showToast({
+              severity: "error",
+              summary: "Error",
+              detail: "Invalid format for username.",
+            });
+            return;
+          } else if (error.status === 409) {
+            showToast({
+              severity: "error",
+              summary: "Error",
+              detail: "User with same name already exists.",
+            });
+            return;
+          }
+        }
+
         showToast({
           severity: "error",
           summary: "Error",
@@ -99,18 +119,45 @@ export function Admin() {
     [adminController, users]
   );
 
-  const actionBodyTemplate = (rowData: api.User) => {
+  const actionBodyTemplate = (user: api.User) => {
     return (
       <Button
         icon="pi pi-trash"
         className="p-button-danger p-button-sm"
         rounded
         text
-        onClick={() => handleDeleteUser(rowData.id)}
-        disabled={rowData.id === session?.user.id}
+        onClick={() => handleDeleteUser(user.id)}
+        disabled={user.id === session?.user.id}
       />
     );
   };
+
+  const adminTableHeader = (
+    <div className="flex flex-wrap align-items-center justify-content-between gap-2">
+      <span className="text-xl text-900 font-bold">User Management</span>
+      <div className="flex align-items-center gap-4">
+        <Button
+          label="Create User"
+          icon="pi pi-user-plus"
+          className="p-button-sm"
+          onClick={() => {
+            setUsername("");
+            setTemporaryPassword(null);
+            setIsCreateUserDialogVisible(true);
+          }}
+          outlined
+        />
+        <Button
+          icon="pi pi-refresh"
+          onClick={fetchUsers}
+          rounded
+          raised
+        />
+      </div>
+    </div>
+  );
+
+  const adminTableFooter = `In total there are ${users ? users.length : 0} users.`;
 
   const createUserDialogFooter = (
     <div>
@@ -142,29 +189,19 @@ export function Admin() {
       <Toast ref={toast} />
       <Header />
       <div className="admin-content">
-        <div className="p-d-flex p-jc-between p-ai-center w-full mb-3">
-          <h2 className="m-0">User Management</h2>
-          <Button
-            label="Create User"
-            icon="pi pi-user-plus"
-            className="p-button-sm mt-2"
-            onClick={() => {
-              setUsername("");
-              setTemporaryPassword(null);
-              setIsCreateUserDialogVisible(true);
-            }}
-          />
-        </div>
         <DataTable
+          header={adminTableHeader}
+          footer={adminTableFooter}
           value={users}
           loading={loading}
-          responsiveLayout="scroll"
-          className="admin-table"
+          className="users-table"
+          scrollable
+          scrollHeight="100%"
         >
           <Column
             field="id"
             header="ID"
-            body={(rowData) => rowData.id.slice(0, 8)}
+            body={(user: api.User) => user.id.slice(0, 8)}
           />
           <Column
             field="username"
@@ -173,12 +210,12 @@ export function Admin() {
           <Column
             field="isAdmin"
             header="Admin"
-            body={(rowData) => (rowData.isAdmin ? "Yes" : "No")}
+            body={(user: api.User) => (user.isAdmin ? "Yes" : "No")}
           />
           <Column
             field="createdAt"
             header="Joined"
-            body={(rowData) => new Date(rowData.createdAt).toLocaleDateString()}
+            body={(user: api.User) => new Date(user.createdAt).toLocaleDateString()}
           />
           <Column
             header="Actions"

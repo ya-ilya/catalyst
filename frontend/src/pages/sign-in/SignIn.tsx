@@ -1,5 +1,6 @@
 import "./SignIn.css";
 
+import { AxiosError } from "axios";
 import { Button } from "primereact/button";
 import { Card } from "primereact/card";
 import { InputText } from "primereact/inputtext";
@@ -32,10 +33,36 @@ export function SignIn() {
       navigate("/");
     } catch (error) {
       console.error("Login failed:", error);
+
+      if (error instanceof AxiosError && error.response) {
+        if (error.status == 401 && error.response.data.fields.contains("password")) {
+          showToast({
+            severity: "error",
+            summary: "Login Error",
+            detail: "Invalid password.",
+          });
+          return;
+        } else if (error.status == 404) {
+          showToast({
+            severity: "error",
+            summary: "Login Error",
+            detail: "User not found.",
+          });
+          return;
+        } else if (error.status == 400) {
+          showToast({
+            severity: "error",
+            summary: "Login Error",
+            detail: "Invalid username or password.",
+          });
+          return;
+        }
+      }
+
       showToast({
         severity: "error",
-        summary: "Login Failed",
-        detail: "Invalid username or password.",
+        summary: "Login Error",
+        detail: "Failed to sign in.",
       });
     } finally {
       setLoading(false);

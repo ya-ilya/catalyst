@@ -1,5 +1,6 @@
 package org.catalyst.backend.controllers
 
+import jakarta.validation.Valid
 import org.catalyst.backend.entities.user.User
 import org.catalyst.backend.requests.CreateConfigRequest
 import org.catalyst.backend.requests.UpdateConfigRequest
@@ -72,7 +73,7 @@ class ConfigController(private val configService: ConfigService) {
     @PostMapping
     fun createConfig(
         @AuthenticationPrincipal user: User,
-        @RequestBody request: CreateConfigRequest
+        @Valid @RequestBody request: CreateConfigRequest
     ): ConfigResponse {
         return configService
             .createConfig(request.name, request.files, request.isPublic, user)
@@ -83,7 +84,7 @@ class ConfigController(private val configService: ConfigService) {
     fun updateConfig(
         @AuthenticationPrincipal user: User,
         @PathVariable id: UUID,
-        @RequestBody request: UpdateConfigRequest
+        @Valid @RequestBody request: UpdateConfigRequest
     ): ConfigResponse {
         return configService
             .updateConfig(id, request.name, request.files, user)

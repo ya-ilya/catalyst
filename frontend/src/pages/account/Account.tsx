@@ -1,5 +1,6 @@
 import "./Account.css";
 
+import { AxiosError } from "axios";
 import { Button } from "primereact/button";
 import { Card } from "primereact/card";
 import { Dialog } from "primereact/dialog";
@@ -49,12 +50,32 @@ export function Account() {
       return;
     }
 
+    if (newPassword.length < 8) {
+      console.error("New password must be at least 8 characters long!");
+      showToast({
+        severity: "error",
+        summary: "Error",
+        detail: "New password must be at least 8 characters long.",
+      });
+      return;
+    }
+
     if (newPassword !== confirmPassword) {
       console.error("New passwords do not match!");
       showToast({
         severity: "error",
         summary: "Error",
         detail: "New passwords do not match.",
+      });
+      return;
+    }
+
+    if (newPassword == oldPassword) {
+      console.error("New password cannot be the same as the old password!");
+      showToast({
+        severity: "error",
+        summary: "Error",
+        detail: "New password cannot be the same as the old password.",
       });
       return;
     }
@@ -68,6 +89,35 @@ export function Account() {
       });
     } catch (error) {
       console.error("Failed to change password:", error);
+
+      if (error instanceof AxiosError && error.response) {
+        if (error.status == 400 && error.response.data.fields.contains("newPassword")) {
+          showToast({
+            severity: "error",
+            summary: "Error",
+            detail: "New password cannot be the same as the old password.",
+          });
+
+          return;
+        } else if (error.status == 400 && error.response.data.fields.contains("oldPassword")) {
+          showToast({
+            severity: "error",
+            summary: "Error",
+            detail: "Old password is incorrect.",
+          });
+
+          return;
+        } else if (error.status == 400) {
+          showToast({
+            severity: "error",
+            summary: "Error",
+            detail: "Invalid password format.",
+          });
+
+          return;
+        }
+      }
+
       showToast({
         severity: "error",
         summary: "Error",
