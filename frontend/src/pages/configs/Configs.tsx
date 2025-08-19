@@ -1,10 +1,12 @@
 import "./Configs.css";
 
-import { useEffect, useState } from "react";
+import { Toast } from "primereact/toast";
+import { useCallback, useEffect, useState } from "react";
 import { Navigate } from "react-router";
 
 import * as api from "../../api";
 import { Header, Library, Subscriptions } from "../../components";
+import { useToast } from "../../hooks";
 
 export function Configs() {
   const meControler = api.useMeController();
@@ -15,7 +17,9 @@ export function Configs() {
 
   const [session] = api.useAuthenticationContext();
 
-  useEffect(() => {
+  const [toast, showToast] = useToast();
+
+  const updateConfigs = useCallback(() => {
     configController
       ?.getPublicConfigs()
       .then((configs) => {
@@ -23,10 +27,19 @@ export function Configs() {
       })
       .catch((error) => {
         console.error("Failed to fetch configs:", error);
+        showToast({
+          severity: "error",
+          summary: "Error",
+          detail: "Failed to fetch configs.",
+        });
       });
   }, [configController]);
 
   useEffect(() => {
+    updateConfigs();
+  }, [updateConfigs]);
+
+  const updateSubscriptions = useCallback(() => {
     meControler
       ?.getSubscriptions()
       .then((subscriptions) => {
@@ -34,8 +47,17 @@ export function Configs() {
       })
       .catch((error) => {
         console.error("Failed to fetch subscriptions:", error);
+        showToast({
+          severity: "error",
+          summary: "Error",
+          detail: "Failed to fetch subscriptions.",
+        });
       });
   }, [meControler]);
+
+  useEffect(() => {
+    updateSubscriptions();
+  }, [updateSubscriptions]);
 
   if (!session) {
     return (
@@ -48,12 +70,21 @@ export function Configs() {
 
   return (
     <div className="configs-container">
+      <Toast ref={toast} />
       <Header />
       <div className="configs-content">
-        <Subscriptions subscriptions={subscriptions} />
+        <Subscriptions
+          showToast={showToast}
+          subscriptions={subscriptions}
+          updateSubscriptions={updateSubscriptions}
+          updateConfigs={updateConfigs}
+        />
         <Library
+          showToast={showToast}
           configs={configs}
           subscriptions={subscriptions}
+          updateSubscriptions={updateSubscriptions}
+          updateConfigs={updateConfigs}
         />
       </div>
     </div>

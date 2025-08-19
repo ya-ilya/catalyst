@@ -15,7 +15,6 @@ import java.util.*
 class User(
     @get:JvmName("usernameField")
     val username: String,
-    // password is the key
     @get:JvmName("passwordField")
     var password: String,
     val createdAt: LocalDateTime,
@@ -28,9 +27,18 @@ class User(
         inverseJoinColumns = [JoinColumn(name = "role_id")]
     )
     var roles: Set<Role> = emptySet(),
-    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+    @OneToMany(
+        mappedBy = "user",
+        cascade = [CascadeType.REMOVE],
+        orphanRemoval = true,
+        fetch = FetchType.EAGER
+    )
     val subscriptions: List<Subscription> = emptyList(),
-    @OneToMany(mappedBy = "author", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+    @OneToMany(
+        mappedBy = "author",
+        cascade = [CascadeType.REMOVE],
+        orphanRemoval = true
+    )
     val configs: MutableList<Config> = mutableListOf(),
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

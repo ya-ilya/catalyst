@@ -4,11 +4,13 @@ import { Button } from "primereact/button";
 import { Card } from "primereact/card";
 import { InputText } from "primereact/inputtext";
 import { Password } from "primereact/password";
+import { Toast } from "primereact/toast";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 
 import * as api from "../../api";
 import { Header } from "../../components";
+import { useToast } from "../../hooks";
 
 export function SignIn() {
   const authenticationController = api.useAuthenticationController();
@@ -19,6 +21,8 @@ export function SignIn() {
 
   const [, setSession] = api.useAuthenticationContext();
 
+  const [toast, showToast] = useToast();
+
   const navigate = useNavigate();
 
   const handleLogin = async () => {
@@ -28,6 +32,11 @@ export function SignIn() {
       navigate("/");
     } catch (error) {
       console.error("Login failed:", error);
+      showToast({
+        severity: "error",
+        summary: "Login Failed",
+        detail: "Invalid username or password.",
+      });
     } finally {
       setLoading(false);
     }
@@ -35,6 +44,7 @@ export function SignIn() {
 
   return (
     <div className="signin-container">
+      <Toast ref={toast} />
       <Header />
       <div className="signin-content">
         <Card

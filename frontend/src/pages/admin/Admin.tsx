@@ -6,11 +6,13 @@ import { DataTable } from "primereact/datatable";
 import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { Panel } from "primereact/panel";
-import { useEffect, useState } from "react";
+import { Toast } from "primereact/toast";
+import { useCallback, useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router";
 
 import * as api from "../../api";
 import { Header } from "../../components";
+import { useToast } from "../../hooks";
 
 export function Admin() {
   const adminController = api.useAdminController();
@@ -19,10 +21,12 @@ export function Admin() {
   const [loading, setLoading] = useState(true);
 
   const [isCreateUserDialogVisible, setIsCreateUserDialogVisible] = useState(false);
-  const [newUsername, setNewUsername] = useState("");
-  const [newTemporaryPassword, setTemporaryPassword] = useState<string | null>(null);
+  const [username, setUsername] = useState("");
+  const [temporaryPassword, setTemporaryPassword] = useState<string | null>(null);
 
   const [session] = api.useAuthenticationContext();
+
+  const [toast, showToast] = useToast();
 
   const navigate = useNavigate();
 
@@ -32,49 +36,68 @@ export function Admin() {
     }
   }, [session, navigate]);
 
-  const fetchUsers = async () => {
-    try {
-      setLoading(true);
-      const fetchedUsers = await adminController?.getUsers();
-      if (fetchedUsers) {
-        setUsers((await adminController?.getUsers()) || []);
-      }
-    } catch (error) {
-      console.error("Failed to fetch users:", error);
-    } finally {
-      setLoading(false);
-    }
+  const fetchUsers = () => {
+    setLoading(true);
+
+    adminController
+      ?.getUsers()
+      .then((users) => {
+        setUsers(users);
+      })
+      .catch((error) => {
+        console.error("Failed to fetch users:", error);
+        showToast({
+          severity: "error",
+          summary: "Error",
+          detail: "Failed to fetch users.",
+        });
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [adminController]);
 
-  const handleCreateUser = async () => {
-    try {
-      if (newUsername.length === 0) {
-        return;
-      }
-      const createdUser = await adminController?.createUser({ username: newUsername });
-      if (createdUser) {
+  const handleCreateUser = useCallback(() => {
+    adminController
+      ?.createUser({ username: username })
+      .then((createdUser) => {
         setTemporaryPassword(createdUser.temporaryPassword);
         fetchUsers();
-      }
-    } catch (error) {
-      console.error("Failed to create user:", error);
-    }
-  };
+      })
+      .catch((error) => {
+        console.error("Failed to create user:", error);
+        showToast({
+          severity: "error",
+          summary: "Error",
+          detail: "Failed to create user.",
+        });
+      });
+  }, [adminController, username]);
 
-  const handleDeleteUser = async (userId: string) => {
-    if (window.confirm("Are you sure you want to delete this user?")) {
-      try {
-        await adminController?.deleteUser(userId);
-        setUsers(users.filter((u) => u.id !== userId));
-      } catch (error) {
-        console.error("Failed to delete user:", error);
+  const handleDeleteUser = useCallback(
+    (userId: string) => {
+      if (window.confirm("Are you sure you want to delete this user?")) {
+        adminController
+          ?.deleteUser(userId)
+          .then(() => {
+            setUsers(users.filter((user) => user.id !== userId));
+          })
+          .catch((error) => {
+            console.error("Failed to delete user:", error);
+            showToast({
+              severity: "error",
+              summary: "Error",
+              detail: "Failed to delete user.",
+            });
+          });
       }
-    }
-  };
+    },
+    [adminController, users]
+  );
 
   const actionBodyTemplate = (rowData: api.User) => {
     return (
@@ -84,6 +107,7 @@ export function Admin() {
         rounded
         text
         onClick={() => handleDeleteUser(rowData.id)}
+        disabled={rowData.id === session?.user.id}
       />
     );
   };
@@ -115,6 +139,7 @@ export function Admin() {
 
   return (
     <div className="admin-container">
+      <Toast ref={toast} />
       <Header />
       <div className="admin-content">
         <div className="p-d-flex p-jc-between p-ai-center w-full mb-3">
@@ -122,9 +147,9 @@ export function Admin() {
           <Button
             label="Create User"
             icon="pi pi-user-plus"
-            className="p-button-sm mb-5"
+            className="p-button-sm mt-2"
             onClick={() => {
-              setNewUsername("");
+              setUsername("");
               setTemporaryPassword(null);
               setIsCreateUserDialogVisible(true);
             }}
@@ -174,14 +199,14 @@ export function Admin() {
             <label htmlFor="new-username">Username</label>
             <InputText
               id="new-username"
-              value={newUsername}
-              onChange={(e) => setNewUsername(e.target.value)}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
             />
           </div>
-          {newTemporaryPassword && (
+          {temporaryPassword && (
             <div className="mt-3">
               <Panel header="Temporary Password">
-                <p className="m-0 p-0 text-break">{newTemporaryPassword}</p>
+                <p className="m-0 p-0 text-break">{temporaryPassword}</p>
               </Panel>
             </div>
           )}

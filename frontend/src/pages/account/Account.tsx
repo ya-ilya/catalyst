@@ -5,11 +5,13 @@ import { Card } from "primereact/card";
 import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { Password } from "primereact/password";
-import { useEffect, useState } from "react";
+import { Toast } from "primereact/toast";
+import { useCallback, useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router";
 
 import * as api from "../../api";
 import { Header } from "../../components";
+import { useToast } from "../../hooks";
 
 export function Account() {
   const meController = api.useMeController();
@@ -22,6 +24,8 @@ export function Account() {
   const [session, setSession] = api.useAuthenticationContext();
   const [user, setUser] = useState<api.User | null>(null);
 
+  const [toast, showToast] = useToast();
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,33 +36,52 @@ export function Account() {
       })
       .catch((error) => {
         console.error("Failed to fetch user data:", error);
+        showToast({
+          severity: "error",
+          summary: "Error",
+          detail: "Failed to fetch user data.",
+        });
       });
   }, [meController]);
 
-  const handlePasswordChange = async () => {
+  const handlePasswordChange = useCallback(async () => {
     if (!meController) {
       return;
     }
 
     if (newPassword !== confirmPassword) {
       console.error("New passwords do not match!");
+      showToast({
+        severity: "error",
+        summary: "Error",
+        detail: "New passwords do not match.",
+      });
       return;
     }
 
     try {
       setSession(await meController.changePassword({ oldPassword, newPassword }));
+      showToast({
+        severity: "success",
+        summary: "Password Changed",
+        detail: "Your password has been successfully changed.",
+      });
     } catch (error) {
       console.error("Failed to change password:", error);
+      showToast({
+        severity: "error",
+        summary: "Error",
+        detail: "Failed to change password.",
+      });
     }
 
     setIsDialogVisible(false);
-  };
+  }, [meController, oldPassword, newPassword, confirmPassword, setSession]);
 
-  const handleLogout = () => {
-    console.log("Logging out...");
+  const handleLogout = useCallback(() => {
     setSession(null);
     navigate("/");
-  };
+  }, [setSession, navigate]);
 
   const dialogFooter = (
     <div>
@@ -87,6 +110,7 @@ export function Account() {
 
   return (
     <div className="account-container">
+      <Toast ref={toast} />
       <Header />
       <div className="account-content">
         <Card
@@ -128,7 +152,7 @@ export function Account() {
       <Dialog
         header="Change Password"
         visible={isDialogVisible}
-        style={{ width: "400px" }}
+        style={{ maxWidth: "400px", width: "90vw" }}
         footer={dialogFooter}
         onHide={() => setIsDialogVisible(false)}
       >

@@ -5,6 +5,7 @@ import org.catalyst.backend.requests.CreateConfigRequest
 import org.catalyst.backend.requests.UpdateConfigRequest
 import org.catalyst.backend.responses.ConfigFileResponse
 import org.catalyst.backend.responses.ConfigResponse
+import org.catalyst.backend.responses.SubscriptionResponse
 import org.catalyst.backend.services.ConfigService
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
@@ -56,8 +57,8 @@ class ConfigController(private val configService: ConfigService) {
     fun subscribe(
         @AuthenticationPrincipal user: User,
         @PathVariable id: UUID
-    ) {
-        configService.subscribe(id, user)
+    ): SubscriptionResponse {
+        return configService.subscribe(id, user).toResponse()
     }
 
     @GetMapping("/{id}/unsubscribe")

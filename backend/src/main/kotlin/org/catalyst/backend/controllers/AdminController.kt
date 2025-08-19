@@ -61,7 +61,7 @@ class AdminController(private val userService: UserService) {
     @DeleteMapping("/users/{id}")
     fun deleteUser(@AuthenticationPrincipal user: User, @PathVariable id: UUID) {
         if (user.id == id) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot delete yourself")
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot delete self")
         }
 
         userService.deleteUserById(id)

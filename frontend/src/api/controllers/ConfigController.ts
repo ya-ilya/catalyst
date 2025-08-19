@@ -2,7 +2,8 @@ import { Axios } from "axios";
 import { useEffect, useState } from "react";
 
 import {
-    Config, ConfigFile, CreateConfigRequest, Session, UpdateConfigRequest, useAuthenticationContext
+    Config, ConfigFile, CreateConfigRequest, Session, Subscription, UpdateConfigRequest,
+    useAuthenticationContext
 } from "../";
 import { axiosClient } from "../../";
 import { Controller } from "./Controller";
@@ -49,8 +50,8 @@ export class ConfigController extends Controller {
     return (await this.client.get(`/${id}/files/${name}`)).data;
   }
 
-  async subscribe(id: string) {
-    await this.client.get(`/${id}/subscribe`);
+  async subscribe(id: string): Promise<Subscription> {
+    return (await this.client.get(`/${id}/subscribe`)).data;
   }
 
   async unsubscribe(id: string) {

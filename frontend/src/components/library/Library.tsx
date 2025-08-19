@@ -1,11 +1,16 @@
 import "./Library.css";
 
+import { ToastMessage } from "primereact/toast";
+
 import { Config } from "../";
 import * as api from "../../api";
 
 type LibraryProps = {
+  showToast: (message: ToastMessage) => void;
   configs: api.Config[];
   subscriptions: api.Subscription[];
+  updateSubscriptions: () => void;
+  updateConfigs: () => void;
 };
 
 export function Library(props: LibraryProps) {
@@ -17,8 +22,11 @@ export function Library(props: LibraryProps) {
           return (
             <Config
               key={config.id}
-              subscriptions={props.subscriptions}
+              showToast={props.showToast}
               config={config}
+              subscriptions={props.subscriptions}
+              updateSubscriptions={props.updateSubscriptions}
+              updateConfigs={props.updateConfigs}
             />
           );
         })}

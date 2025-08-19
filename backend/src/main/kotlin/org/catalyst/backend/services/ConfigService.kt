@@ -8,6 +8,7 @@ import org.catalyst.backend.entities.subscription.SubscriptionRepository
 import org.catalyst.backend.entities.user.User
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -38,7 +39,7 @@ class ConfigService(
         return config
     }
 
-    fun subscribe(id: UUID, user: User) {
+    fun subscribe(id: UUID, user: User): Subscription {
         val config = getConfigById(id)
 
         if (!config.isPublic) {
@@ -49,7 +50,7 @@ class ConfigService(
             throw ResponseStatusException(HttpStatus.CONFLICT, "You already subscribed to this configuration")
         }
 
-        subscriptionRepository.save(Subscription(user, config, LocalDateTime.now(ZoneOffset.UTC)))
+        return subscriptionRepository.save(Subscription(user, config, LocalDateTime.now(ZoneOffset.UTC)))
     }
 
     fun unsubscribe(id: UUID, user: User) {
@@ -117,19 +118,15 @@ class ConfigService(
         )
     }
 
-    fun deleteConfig(config: Config) {
-        config.author.configs.removeIf { it.id == config.id }
-        configRepository.deleteById(config.id!!)
-        configRepository.flush()
-    }
-
+    @Transactional
     fun deleteConfigForUser(id: UUID, user: User) {
         val config = getConfigById(id)
 
         if (config.author.id != user.id) {
-            throw ResponseStatusException(HttpStatus.FORBIDDEN, "ou are not authorized to delete this configuration.")
+            throw ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to delete this configuration.")
         }
 
-        deleteConfig(config)
+        configRepository.deleteById(id)
+        configRepository.flush()
     }
 }
