@@ -26,7 +26,16 @@
 .header .header-end {
   display: flex;
   align-items: center;
-  gap: 8px;
+}
+
+@media (max-width: 480px) {
+  .header .header-end .p-button-label {
+    display: none;
+  }
+
+  .header .header-end .p-button-icon {
+    margin-right: 0 !important;
+  }
 }
 
 .header .p-menubar-root-list {

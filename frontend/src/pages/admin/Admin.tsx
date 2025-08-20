@@ -37,7 +37,7 @@ export function Admin() {
     }
   }, [session, navigate]);
 
-  const fetchUsers = () => {
+  const fetchUsers = useCallback(() => {
     setLoading(true);
 
     adminController
@@ -56,11 +56,11 @@ export function Admin() {
       .finally(() => {
         setLoading(false);
       });
-  };
+  }, [adminController, showToast]);
 
   useEffect(() => {
     fetchUsers();
-  }, [adminController]);
+  }, [fetchUsers]);
 
   const handleCreateUser = useCallback(() => {
     adminController

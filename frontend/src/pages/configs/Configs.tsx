@@ -1,11 +1,12 @@
 import "./Configs.css";
 
+import { TabMenu } from "primereact/tabmenu";
 import { Toast } from "primereact/toast";
 import { useCallback, useEffect, useState } from "react";
 import { Navigate } from "react-router";
 
 import * as api from "../../api";
-import { Header, Library, Subscriptions } from "../../components";
+import { Config, Header } from "../../components";
 import { useToast } from "../../hooks";
 
 export function Configs() {
@@ -14,6 +15,12 @@ export function Configs() {
 
   const [subscriptions, setSubscriptions] = useState<api.Subscription[]>([]);
   const [configs, setConfigs] = useState<api.Config[]>([]);
+
+  const [activeIndex, setActiveIndex] = useState(0);
+  const items = [
+    { label: "Subscriptions", icon: "pi pi-star" },
+    { label: "Library", icon: "pi pi-th-large" },
+  ];
 
   const [session] = api.useAuthenticationContext();
 
@@ -73,19 +80,41 @@ export function Configs() {
       <Toast ref={toast} />
       <Header />
       <div className="configs-content">
-        <Subscriptions
-          showToast={showToast}
-          subscriptions={subscriptions}
-          updateSubscriptions={updateSubscriptions}
-          updateConfigs={updateConfigs}
+        <TabMenu
+          model={items}
+          activeIndex={activeIndex}
+          onTabChange={(e) => setActiveIndex(e.index)}
         />
-        <Library
-          showToast={showToast}
-          configs={configs}
-          subscriptions={subscriptions}
-          updateSubscriptions={updateSubscriptions}
-          updateConfigs={updateConfigs}
-        />
+        {activeIndex === 0 && (
+          <div className="subscriptions">
+            {subscriptions.map((subscription) => (
+              <Config
+                key={subscription.id}
+                showToast={showToast}
+                config={subscription.config}
+                subscriptions={subscriptions}
+                updateSubscriptions={updateSubscriptions}
+                updateConfigs={updateConfigs}
+              />
+            ))}
+          </div>
+        )}
+        {activeIndex === 1 && (
+          <div className="library">
+            {configs.map((config) => {
+              return (
+                <Config
+                  key={config.id}
+                  showToast={showToast}
+                  config={config}
+                  subscriptions={subscriptions}
+                  updateSubscriptions={updateSubscriptions}
+                  updateConfigs={updateConfigs}
+                />
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );
