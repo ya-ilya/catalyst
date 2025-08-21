@@ -15,6 +15,16 @@
   width: 100%;
 }
 
+.admin-content .users-table {
+  margin-top: 16px;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--primary-color);
+}
+
+.admin-content .users-table .p-datatable-loading-overlay {
+  border-radius: var(--border-radius);
+}
+
 .admin-content .users-table .p-datatable-thead > tr > th {
   background-color: var(--surface-d);
   color: var(--text-color);
@@ -22,4 +32,12 @@
 
 .admin-content .users-table .p-datatable-thead {
   z-index: 1;
+}
+
+.admin-content .users-table .p-datatable-header {
+  border-radius: var(--border-radius) var(--border-radius) 0px 0px;
+}
+
+.admin-content .users-table .p-datatable-footer {
+  border-radius: 0px 0px var(--border-radius) var(--border-radius);
 }

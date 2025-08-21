@@ -11,6 +11,10 @@
   height: 64px;
 }
 
+.header .p-menubar-button {
+  display: none !important; /* because we don't have any menu YET */
+}
+
 .header .header-start {
   display: flex;
   align-items: center;
@@ -26,6 +30,7 @@
 .header .header-end {
   display: flex;
   align-items: center;
+  gap: 8px;
 }
 
 @media (max-width: 480px) {
