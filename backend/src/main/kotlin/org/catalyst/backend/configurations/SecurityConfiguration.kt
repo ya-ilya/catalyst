@@ -49,7 +49,7 @@ class SecurityConfiguration(
             }
             .authorizeHttpRequests { request ->
                 request
-                    .requestMatchers(HttpMethod.GET, "/api/pastes", "/api/pastes/{id}").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/capes/{id}/image").permitAll()
                     .requestMatchers("/api/**").authenticated()
                     .anyRequest().permitAll()
             }

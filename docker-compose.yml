@@ -28,6 +28,8 @@ services:
     ports:
       - "3000:3000"
       - "5005:5005"
+    volumes:
+      - catalyst_data:/catalyst
     networks:
       - net
     depends_on:
@@ -48,5 +50,6 @@ services:
         condition: service_started
 volumes:
   mysql_data:
+  catalyst_data:
 networks:
   net:

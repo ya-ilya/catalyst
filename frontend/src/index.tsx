@@ -9,7 +9,7 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router";
 
 import { AuthenticationRoute } from "./api";
-import { Account, Admin, App, Configs, SignIn } from "./pages";
+import { Account, Admin, App, Capes, Configs, SignIn } from "./pages";
 
 export * from "./axios-config";
 export * from "./i18n-config";
@@ -21,6 +21,10 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <App />,
+      },
+      {
+        path: "/capes",
+        element: <Capes />,
       },
       {
         path: "/configs",

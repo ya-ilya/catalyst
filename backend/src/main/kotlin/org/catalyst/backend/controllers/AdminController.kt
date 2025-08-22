@@ -1,15 +1,20 @@
 package org.catalyst.backend.controllers
 
 import jakarta.validation.Valid
+import jakarta.validation.constraints.Size
+import org.catalyst.backend.entities.cape.Cape
 import org.catalyst.backend.entities.user.User
 import org.catalyst.backend.requests.CreateUserRequest
+import org.catalyst.backend.responses.CapeResponse
 import org.catalyst.backend.responses.UserCreatedResponse
 import org.catalyst.backend.responses.UserResponse
+import org.catalyst.backend.services.CapeService
 import org.catalyst.backend.services.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.server.ResponseStatusException
 import java.security.SecureRandom
 import java.util.*
@@ -18,7 +23,10 @@ import kotlin.streams.asSequence
 @RestController
 @RequestMapping("/api/admin")
 @PreAuthorize("hasRole('ADMIN')")
-class AdminController(private val userService: UserService) {
+class AdminController(
+    private val userService: UserService,
+    private val capeService: CapeService
+) {
     private companion object {
         const val CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-="
 
@@ -66,5 +74,23 @@ class AdminController(private val userService: UserService) {
         }
 
         userService.deleteUserById(id)
+    }
+
+    @PostMapping("/capes", consumes = ["multipart/form-data"])
+    fun createCape(
+        @RequestParam("name") @Size(min = 4, max = 32) name: String,
+        @RequestParam("description") @Size(min = 4, max = 256) description: String,
+        @RequestParam("image") image: MultipartFile
+    ): CapeResponse {
+        return capeService.createCape(
+            name,
+            description,
+            image
+        ).toResponse()
+    }
+
+    @DeleteMapping("/capes/{id}")
+    fun deleteCape(@PathVariable id: UUID) {
+        capeService.deleteCapeById(id)
     }
 }

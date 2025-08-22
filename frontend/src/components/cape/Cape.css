@@ -1,0 +1,19 @@
+.cape {
+  margin-bottom: 16px;
+  max-width: 100%;
+  width: 100%;
+  height: 350px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cape .p-card-content,
+.cape .p-card-body {
+  padding: 0px !important;
+}
+
+.cape .viewer {
+  display: flex;
+}
