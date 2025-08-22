@@ -2,7 +2,7 @@ import { Axios } from "axios";
 import { useEffect, useState } from "react";
 
 import {
-    AuthenticationResponse, ChangePasswordRequest, Config, Session, Subscription,
+    AuthenticationResponse, Cape, ChangePasswordRequest, Config, Session, Subscription,
     useAuthenticationContext, User
 } from "../";
 import { axiosClient } from "../..";
@@ -44,6 +44,10 @@ export class MeController extends Controller {
 
   async getConfigs(): Promise<Config[]> {
     return (await this.client.get("/configs")).data;
+  }
+
+  async getCape(): Promise<Cape> {
+    return (await this.client.get("/cape")).data;
   }
 
   async changePassword(body: ChangePasswordRequest): Promise<AuthenticationResponse> {

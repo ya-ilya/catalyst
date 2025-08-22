@@ -1,7 +1,7 @@
-import "./index.css";
 import "primeflex/primeflex.css";
-import "primereact/resources/primereact.css";
 import "primeicons/primeicons.css";
+import "primereact/resources/primereact.css";
+import "./index.css";
 
 import { PrimeReactProvider } from "primereact/api";
 import { StrictMode } from "react";

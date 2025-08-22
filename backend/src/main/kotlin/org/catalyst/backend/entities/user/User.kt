@@ -1,6 +1,7 @@
 package org.catalyst.backend.entities.user
 
 import jakarta.persistence.*
+import org.catalyst.backend.entities.cape.Cape
 import org.catalyst.backend.entities.config.Config
 import org.catalyst.backend.entities.subscription.Subscription
 import org.catalyst.backend.entities.user.role.Role
@@ -20,6 +21,8 @@ class User(
     val createdAt: LocalDateTime,
     var isPasswordChangeRequired: Boolean = true,
     var refreshToken: String? = null,
+    @ManyToOne
+    var cape: Cape? = null,
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "user_roles",

@@ -10,17 +10,18 @@ const DEFAULT_SKIN_URL =
 
 type CapeProps = {
   cape: api.Cape;
+  isSelected: boolean;
 };
 
 export function Cape(props: CapeProps) {
   return (
-    <Card className="cape">
+    <Card className={`cape ${props.isSelected ? "--selected-cape" : ""}`}>
       <ReactSkinview3d
-        className="viewer"
+        className={`viewer`}
         skinUrl={DEFAULT_SKIN_URL}
         capeUrl={`http://127.0.0.1:3000/api/capes/${props.cape.id}/image`}
-        width={250}
-        height={350}
+        width={220}
+        height={300}
         onReady={(params) => {
           params.viewer.playerWrapper.rotation.y += 3.92699;
         }}

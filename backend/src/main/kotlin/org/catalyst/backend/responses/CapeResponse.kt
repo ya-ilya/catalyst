@@ -1,6 +1,6 @@
 package org.catalyst.backend.responses
 
-import java.util.UUID
+import java.util.*
 
 class CapeResponse(
     val id: UUID,

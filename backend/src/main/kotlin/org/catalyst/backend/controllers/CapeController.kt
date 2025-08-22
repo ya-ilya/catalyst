@@ -1,11 +1,13 @@
 package org.catalyst.backend.controllers
 
+import org.catalyst.backend.entities.user.User
 import org.catalyst.backend.responses.CapeResponse
 import org.catalyst.backend.services.CapeService
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
@@ -25,6 +27,14 @@ class CapeController(private val capeService: CapeService) {
     @GetMapping("/{id}")
     fun getCapeById(@PathVariable id: UUID): CapeResponse {
         return capeService.getCapeById(id).toResponse()
+    }
+
+    @GetMapping("/{id}/select")
+    fun select(
+        @AuthenticationPrincipal user: User,
+        @PathVariable id: UUID
+    ) {
+        capeService.select(id, user)
     }
 
     @GetMapping("/{id}/image", produces = ["image/png"])

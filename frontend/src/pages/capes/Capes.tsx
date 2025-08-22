@@ -9,12 +9,19 @@ import { Cape } from "../../components/cape/Cape";
 import { useToast } from "../../hooks";
 
 export function Capes() {
-  // const [cape, setCape] = useState<string | null>(null);
   const capeController = api.useCapeController();
+  const meController = api.useMeController();
 
+  const [selectedCape, setSelectedCape] = useState<api.Cape | null>(null);
   const [capes, setCapes] = useState<api.Cape[]>([]);
 
   const [toast, showToast] = useToast();
+
+  useEffect(() => {
+    meController?.getCape().then((cape) => {
+      setSelectedCape(cape);
+    });
+  });
 
   useEffect(() => {
     capeController
@@ -38,7 +45,12 @@ export function Capes() {
       <Header />
       <div className="capes-content">
         {capes.map((cape) => {
-          return <Cape cape={cape} />;
+          return (
+            <Cape
+              cape={cape}
+              isSelected={cape.id == selectedCape?.id}
+            />
+          );
         })}
       </div>
     </div>

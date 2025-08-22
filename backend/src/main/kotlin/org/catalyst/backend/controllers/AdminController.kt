@@ -2,7 +2,6 @@ package org.catalyst.backend.controllers
 
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Size
-import org.catalyst.backend.entities.cape.Cape
 import org.catalyst.backend.entities.user.User
 import org.catalyst.backend.requests.CreateUserRequest
 import org.catalyst.backend.responses.CapeResponse

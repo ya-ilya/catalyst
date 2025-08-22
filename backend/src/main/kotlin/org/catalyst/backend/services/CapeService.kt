@@ -2,19 +2,21 @@ package org.catalyst.backend.services
 
 import org.catalyst.backend.entities.cape.Cape
 import org.catalyst.backend.entities.cape.CapeRepository
+import org.catalyst.backend.entities.user.User
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.core.io.ByteArrayResource
 import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.server.ResponseStatusException
 import java.io.File
 import java.io.IOException
-import java.util.UUID
+import java.util.*
 
 @Service
-class CapeService(private val capeRepository: CapeRepository) {
+class CapeService(
+    private val capeRepository: CapeRepository,
+    private val userService: UserService
+) {
     @Value($$"${catalyst.capes.directory}")
     private val capesDirectory: String? = null
 
@@ -26,6 +28,18 @@ class CapeService(private val capeRepository: CapeRepository) {
 
     fun getCapes(): List<Cape> {
         return capeRepository.findAll()
+    }
+
+    fun select(id: UUID, user: User) {
+        val cape = getCapeById(id)
+
+        if (user.cape?.id == id) {
+            throw ResponseStatusException(HttpStatus.CONFLICT, "This cape already selected by you")
+        }
+
+        userService.updateUser(user.apply {
+            this.cape = cape
+        })
     }
 
     fun createCape(

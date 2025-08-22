@@ -2,18 +2,23 @@ import "./Header.css";
 
 import { Button } from "primereact/button";
 import { Menubar } from "primereact/menubar";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
 import { useAuthenticationContext } from "../../api";
 import { useLocalStorage } from "../../hooks";
 
 export function Header() {
+  const [isReady, setIsReady] = useState(false);
   const [isDarkMode, setIsDarkMode] = useLocalStorage("isDarkMode", false);
 
   const navigate = useNavigate();
 
   const [session] = useAuthenticationContext();
+
+  useEffect(() => {
+    setIsReady(true);
+  }, []);
 
   useEffect(() => {
     const themeLink = document.getElementById("theme-link") as HTMLLinkElement;
@@ -86,6 +91,7 @@ export function Header() {
       start={start}
       end={end}
       className="header"
+      style={{visibility: isReady ? "visible" : "hidden"}}
     />
   );
 }

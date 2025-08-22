@@ -3,14 +3,13 @@ package org.catalyst.backend.controllers
 import jakarta.validation.Valid
 import org.catalyst.backend.entities.user.User
 import org.catalyst.backend.requests.ChangePasswordRequest
-import org.catalyst.backend.responses.AuthenticationResponse
-import org.catalyst.backend.responses.ConfigResponse
-import org.catalyst.backend.responses.SubscriptionResponse
-import org.catalyst.backend.responses.UserResponse
+import org.catalyst.backend.responses.*
 import org.catalyst.backend.services.AuthenticationService
 import org.catalyst.backend.services.UserService
+import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
 
 @RestController
 @RequestMapping("/api/me")
@@ -28,6 +27,11 @@ class MeController(private val userService: UserService, private val authenticat
     @GetMapping("/configs")
     fun getConfigs(@AuthenticationPrincipal user: User): List<ConfigResponse> {
         return user.configs.map { it.toResponse() }
+    }
+
+    @GetMapping("/cape")
+    fun getCape(@AuthenticationPrincipal user: User): CapeResponse {
+        return user.cape?.toResponse() ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "You didn't select cape")
     }
 
     @PostMapping("/change-password")
