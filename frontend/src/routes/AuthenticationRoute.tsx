@@ -1,8 +1,9 @@
 import { useEffect } from "react";
 import { Outlet } from "react-router";
 
-import { AuthenticationContext, createAuthenticationController, Session } from "../";
-import { useLocalStorage } from "../../hooks";
+import { createAuthenticationController } from "../api";
+import { AuthenticationContext, Session } from "../contexts";
+import { useLocalStorage } from "../hooks";
 
 function isTokenExpired(token: string): boolean {
   try {

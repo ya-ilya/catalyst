@@ -13,6 +13,7 @@ import { Navigate, useNavigate } from "react-router";
 
 import * as api from "../../api";
 import { Header } from "../../components";
+import { useAuthenticationContext } from "../../contexts";
 import { useToast } from "../../hooks";
 
 export function Admin() {
@@ -25,7 +26,7 @@ export function Admin() {
   const [username, setUsername] = useState("");
   const [temporaryPassword, setTemporaryPassword] = useState<string | null>(null);
 
-  const [session] = api.useAuthenticationContext();
+  const [session] = useAuthenticationContext();
 
   const [toast, showToast] = useToast();
 
@@ -132,10 +133,10 @@ export function Admin() {
     );
   };
 
-  const adminTableHeader = (
-    <div className="flex flex-wrap align-items-center justify-content-between gap-2">
-      <span className="text-xl text-900 font-bold">User Management</span>
-      <div className="flex align-items-center gap-4">
+  const usersTableHeader = (
+    <div className="users-table-header">
+      <span className="title">User Management</span>
+      <div className="actions">
         <Button
           label="Create User"
           icon="pi pi-user-plus"
@@ -157,7 +158,7 @@ export function Admin() {
     </div>
   );
 
-  const adminTableFooter = `In total there are ${users ? users.length : 0} users.`;
+  const usersTableFooter = `In total there are ${users ? users.length : 0} users.`;
 
   const createUserDialogFooter = (
     <div>
@@ -190,8 +191,8 @@ export function Admin() {
       <Header />
       <div className="admin-content">
         <DataTable
-          header={adminTableHeader}
-          footer={adminTableFooter}
+          header={usersTableHeader}
+          footer={usersTableFooter}
           value={users}
           loading={loading}
           className="users-table"
@@ -237,7 +238,7 @@ export function Admin() {
             <InputText
               id="new-username"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={(event) => setUsername(event.target.value)}
             />
           </div>
           {temporaryPassword && (

@@ -1,6 +1,3 @@
-export * from "./context/AuthenticationContext";
-export * from "./context/AuthenticationRoute";
-
 export * from "./models/AuthenticationResponse";
 export * from "./models/Cape";
 export * from "./models/ChangePasswordRequest";

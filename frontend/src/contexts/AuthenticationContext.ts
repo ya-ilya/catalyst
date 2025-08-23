@@ -1,6 +1,6 @@
 import React from "react";
 
-import { User } from "../models/User";
+import { User } from "../api";
 
 export function useAuthenticationContext() {
   return React.useContext(AuthenticationContext);

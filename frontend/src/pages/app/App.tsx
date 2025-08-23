@@ -13,7 +13,7 @@ export function App() {
           title="Hello, Catalyst!"
           className="hello-card"
         >
-          <p className="m-0">Hello from PrimeReact application!</p>
+          <p style={{ margin: 0 }}>Hello from PrimeReact application!</p>
         </Card>
       </div>
     </div>

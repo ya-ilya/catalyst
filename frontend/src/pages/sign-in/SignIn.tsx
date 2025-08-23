@@ -11,6 +11,7 @@ import { useNavigate } from "react-router";
 
 import * as api from "../../api";
 import { Header } from "../../components";
+import { useAuthenticationContext } from "../../contexts";
 import { useToast } from "../../hooks";
 
 export function SignIn() {
@@ -20,7 +21,7 @@ export function SignIn() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const [, setSession] = api.useAuthenticationContext();
+  const [, setSession] = useAuthenticationContext();
 
   const [toast, showToast] = useToast();
 
@@ -84,20 +85,23 @@ export function SignIn() {
               <InputText
                 id="username"
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                onChange={(event) => setUsername(event.target.value)}
               />
             </div>
-            <div className="p-field mt-3">
+            <div
+              className="p-field"
+              style={{ marginTop: 3 }}
+            >
               <label htmlFor="password">Password</label>
               <Password
                 id="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(event) => setPassword(event.target.value)}
                 toggleMask
                 feedback={false}
               />
             </div>
-            <div className="mt-4">
+            <div style={{ marginTop: 4 }}>
               <Button
                 label="Sign In"
                 icon="pi pi-sign-in"

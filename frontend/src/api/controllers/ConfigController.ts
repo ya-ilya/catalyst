@@ -1,11 +1,9 @@
 import { Axios } from "axios";
 import { useEffect, useState } from "react";
 
-import {
-    Config, ConfigFile, CreateConfigRequest, Session, Subscription, UpdateConfigRequest,
-    useAuthenticationContext
-} from "../";
+import { Config, ConfigFile, CreateConfigRequest, Subscription, UpdateConfigRequest } from "../";
 import { axiosClient } from "../../";
+import { Session, useAuthenticationContext } from "../../contexts";
 import { Controller } from "./Controller";
 
 export function useConfigController() {

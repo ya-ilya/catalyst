@@ -12,6 +12,7 @@ import { Navigate, useNavigate } from "react-router";
 
 import * as api from "../../api";
 import { Header } from "../../components";
+import { useAuthenticationContext } from "../../contexts";
 import { useToast } from "../../hooks";
 
 export function Account() {
@@ -22,7 +23,7 @@ export function Account() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const [session, setSession] = api.useAuthenticationContext();
+  const [session, setSession] = useAuthenticationContext();
   const [user, setUser] = useState<api.User | null>(null);
 
   const [toast, showToast] = useToast();
@@ -169,7 +170,10 @@ export function Account() {
         >
           {user?.isPasswordChangeRequired && (
             <div className="password-change-warning">
-              <i className="pi pi-exclamation-triangle mr-2"></i>
+              <i
+                className="pi pi-exclamation-triangle"
+                style={{ marginRight: 2 }}
+              ></i>
               <span>Password change is required!</span>
             </div>
           )}
@@ -183,7 +187,10 @@ export function Account() {
               <p className="info-value">{user ? new Date(user?.createdAt).toLocaleDateString() : ""}</p>
             </div>
           </div>
-          <div className="actions p-d-flex p-jc-between mt-4">
+          <div
+            className="actions p-d-flex p-jc-between"
+            style={{ marginTop: 16 }}
+          >
             <Button
               label="Change Password"
               icon="pi pi-lock"
@@ -212,7 +219,7 @@ export function Account() {
             <Password
               id="old-password"
               value={oldPassword}
-              onChange={(e) => setOldPassword(e.target.value)}
+              onChange={(event) => setOldPassword(event.target.value)}
               toggleMask
               feedback={false}
             />
@@ -222,7 +229,7 @@ export function Account() {
             <Password
               id="new-password"
               value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
+              onChange={(event) => setNewPassword(event.target.value)}
               toggleMask
             />
           </div>
@@ -232,7 +239,7 @@ export function Account() {
               id="confirm-password"
               type="password"
               value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              onChange={(event) => setConfirmPassword(event.target.value)}
             />
           </div>
         </div>

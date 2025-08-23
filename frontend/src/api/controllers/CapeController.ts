@@ -1,8 +1,8 @@
 import { Axios } from "axios";
 import { useEffect, useState } from "react";
 
-import { Session, useAuthenticationContext } from "../";
 import { axiosClient } from "../../";
+import { Session, useAuthenticationContext } from "../../contexts";
 import { Cape } from "../models/Cape";
 import { Controller } from "./Controller";
 

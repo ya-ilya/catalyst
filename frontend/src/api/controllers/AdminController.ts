@@ -1,10 +1,9 @@
 import { Axios } from "axios";
 import { useEffect, useState } from "react";
 
-import {
-    CreateUserRequest, Session, useAuthenticationContext, User, UserCreatedResponse
-} from "../";
+import { CreateUserRequest, User, UserCreatedResponse } from "../";
 import { axiosClient } from "../../axios-config";
+import { Session, useAuthenticationContext } from "../../contexts";
 import { Controller } from "./Controller";
 
 export function useAdminController() {

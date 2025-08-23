@@ -12,6 +12,10 @@
   padding-top: 64px;
 }
 
+.configs-content .p-tabmenu .p-menuitem-link {
+  background: transparent;
+}
+
 .configs-content .subscriptions {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(200px, 80vw), 1fr));

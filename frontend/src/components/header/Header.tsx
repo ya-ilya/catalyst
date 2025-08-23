@@ -2,35 +2,15 @@ import "./Header.css";
 
 import { Button } from "primereact/button";
 import { Menubar } from "primereact/menubar";
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
-import { useAuthenticationContext } from "../../api";
-import { useLocalStorage } from "../../hooks";
+import { useAuthenticationContext, useThemeContext } from "../../contexts";
 
 export function Header() {
-  const [isReady, setIsReady] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useLocalStorage("isDarkMode", false);
-
   const navigate = useNavigate();
 
   const [session] = useAuthenticationContext();
-
-  useEffect(() => {
-    setIsReady(true);
-  }, []);
-
-  useEffect(() => {
-    const themeLink = document.getElementById("theme-link") as HTMLLinkElement;
-
-    if (!themeLink) {
-      console.error("Theme link element not found");
-      return;
-    }
-
-    const theme = isDarkMode ? "lara-dark-indigo" : "lara-light-indigo";
-    themeLink.href = `themes/${theme}/theme.css`;
-  }, [isDarkMode]);
+  const [isDarkMode, toggleTheme] = useThemeContext();
 
   const start = (
     <div className="header-start">
@@ -47,7 +27,7 @@ export function Header() {
       <Button
         className="header-button"
         icon={isDarkMode ? "pi pi-sun" : "pi pi-moon"}
-        onClick={() => setIsDarkMode(!isDarkMode)}
+        onClick={() => toggleTheme()}
         rounded
         text
       />
@@ -91,7 +71,6 @@ export function Header() {
       start={start}
       end={end}
       className="header"
-      style={{visibility: isReady ? "visible" : "hidden"}}
     />
   );
 }

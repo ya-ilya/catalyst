@@ -2,10 +2,10 @@ import { Axios } from "axios";
 import { useEffect, useState } from "react";
 
 import {
-    AuthenticationResponse, Cape, ChangePasswordRequest, Config, Session, Subscription,
-    useAuthenticationContext, User
+    AuthenticationResponse, Cape, ChangePasswordRequest, Config, Subscription, User
 } from "../";
 import { axiosClient } from "../..";
+import { Session, useAuthenticationContext } from "../../contexts";
 import { Controller } from "./Controller";
 
 export function useMeController() {

@@ -41,3 +41,23 @@
 .admin-content .users-table .p-datatable-footer {
   border-radius: 0px 0px var(--border-radius) var(--border-radius);
 }
+
+.admin-content .users-table .users-table-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2px;
+}
+
+.admin-content .users-table .users-table-header .title {
+  font-size: x-large;
+  font-weight: 900;
+  font-style: bold;
+}
+
+.admin-content .users-table .users-table-header .actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}

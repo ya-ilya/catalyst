@@ -6,6 +6,7 @@ import { ToastMessage } from "primereact/toast";
 import { useCallback } from "react";
 
 import * as api from "../../api";
+import { useAuthenticationContext } from "../../contexts";
 
 type ConfigProps = {
   showToast: (message: ToastMessage) => void;
@@ -18,7 +19,7 @@ type ConfigProps = {
 export function Config(props: ConfigProps) {
   const configController = api.useConfigController();
 
-  const [session] = api.useAuthenticationContext();
+  const [session] = useAuthenticationContext();
 
   const isAuthor = session && props.config.author.id === session?.user?.id;
   const isSubscribed = props.subscriptions?.some((subscription) => subscription.config.id === props.config.id);

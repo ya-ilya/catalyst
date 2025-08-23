@@ -7,6 +7,7 @@ import { Navigate } from "react-router";
 
 import * as api from "../../api";
 import { Config, Header } from "../../components";
+import { useAuthenticationContext } from "../../contexts";
 import { useToast } from "../../hooks";
 
 export function Configs() {
@@ -22,7 +23,7 @@ export function Configs() {
     { label: "Library", icon: "pi pi-th-large" },
   ];
 
-  const [session] = api.useAuthenticationContext();
+  const [session] = useAuthenticationContext();
 
   const [toast, showToast] = useToast();
 
@@ -42,10 +43,6 @@ export function Configs() {
       });
   }, [configController]);
 
-  useEffect(() => {
-    updateConfigs();
-  }, [updateConfigs]);
-
   const updateSubscriptions = useCallback(() => {
     meControler
       ?.getSubscriptions()
@@ -63,8 +60,9 @@ export function Configs() {
   }, [meControler]);
 
   useEffect(() => {
+    updateConfigs();
     updateSubscriptions();
-  }, [updateSubscriptions]);
+  }, [updateConfigs, updateSubscriptions]);
 
   if (!session) {
     return (
@@ -83,7 +81,7 @@ export function Configs() {
         <TabMenu
           model={items}
           activeIndex={activeIndex}
-          onTabChange={(e) => setActiveIndex(e.index)}
+          onTabChange={(event) => setActiveIndex(event.index)}
         />
         {activeIndex === 0 && (
           <div className="subscriptions">
