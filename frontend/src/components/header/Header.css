@@ -11,16 +11,12 @@
   height: 64px;
 }
 
-.header .p-menubar-button {
-  display: none !important; /* because we don't have any menu YET */
-}
-
 .header .header-start {
   display: flex;
   align-items: center;
 }
 
-.header .header-title {
+.header .header-start .title {
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--primary-color);

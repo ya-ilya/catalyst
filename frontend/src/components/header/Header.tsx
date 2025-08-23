@@ -2,24 +2,36 @@ import "./Header.css";
 
 import { Button } from "primereact/button";
 import { Menubar } from "primereact/menubar";
+import { memo, useEffect } from "react";
 import { useNavigate } from "react-router";
 
 import { useAuthenticationContext, useThemeContext } from "../../contexts";
 
-export function Header() {
+export const Header = memo(() => {
   const navigate = useNavigate();
 
   const [session] = useAuthenticationContext();
   const [isDarkMode, toggleTheme] = useThemeContext();
 
+  useEffect(() => {
+    try {
+      // Because we don't have any menu YET. And this thing is interfering with accessibility
+      (document.getElementsByClassName("p-menubar-button")[0] as HTMLElement).remove();
+      (document.getElementsByClassName("p-menubar-root-list")[0] as HTMLElement).remove();
+    } catch (error) {
+      // Ignore
+    }
+  }, []);
+
   const start = (
     <div className="header-start">
-      <a
-        href="/"
-        className="header-title"
-      >
-        Catalyst
-      </a>
+      <Button
+        className="title"
+        label="Catalyst"
+        onClick={() => navigate("/")}
+        link
+        text
+      />
     </div>
   );
   const end = (
@@ -73,4 +85,4 @@ export function Header() {
       className="header"
     />
   );
-}
+});
