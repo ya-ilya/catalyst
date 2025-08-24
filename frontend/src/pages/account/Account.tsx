@@ -11,8 +11,7 @@ import { Navigate, useLocation, useNavigate } from "react-router";
 
 import * as api from "../../api";
 import { Header } from "../../components";
-import { useAuthenticationContext } from "../../contexts";
-import { useToastContext } from "../../contexts/ToastContext";
+import { useAuthenticationContext, useToastContext } from "../../contexts";
 
 export function Account() {
   const meController = api.useMeController();
@@ -24,7 +23,6 @@ export function Account() {
 
   const [session, setSession] = useAuthenticationContext();
   const [user, setUser] = useState<api.User | null>(null);
-
   const [showToast] = useToastContext();
 
   const navigate = useNavigate();

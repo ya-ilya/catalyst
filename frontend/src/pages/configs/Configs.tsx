@@ -1,14 +1,12 @@
 import "./Configs.css";
 
 import { TabMenu } from "primereact/tabmenu";
-import { Toast } from "primereact/toast";
 import { useCallback, useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router";
 
 import * as api from "../../api";
 import { Config, Header } from "../../components";
-import { useAuthenticationContext } from "../../contexts";
-import { useToast } from "../../hooks";
+import { useAuthenticationContext, useToastContext } from "../../contexts";
 
 export function Configs() {
   const meControler = api.useMeController();
@@ -24,8 +22,7 @@ export function Configs() {
   ];
 
   const [session] = useAuthenticationContext();
-
-  const [toast, showToast] = useToast();
+  const [showToast] = useToastContext();
 
   const location = useLocation();
 
@@ -77,7 +74,6 @@ export function Configs() {
 
   return (
     <div className="configs-container">
-      <Toast ref={toast} />
       <Header />
       <div className="configs-content">
         <TabMenu
@@ -90,7 +86,6 @@ export function Configs() {
             {subscriptions.map((subscription) => (
               <Config
                 key={subscription.id}
-                showToast={showToast}
                 config={subscription.config}
                 subscriptions={subscriptions}
                 updateSubscriptions={updateSubscriptions}
@@ -105,7 +100,6 @@ export function Configs() {
               return (
                 <Config
                   key={config.id}
-                  showToast={showToast}
                   config={config}
                   subscriptions={subscriptions}
                   updateSubscriptions={updateSubscriptions}

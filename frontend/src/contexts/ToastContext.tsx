@@ -14,5 +14,10 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
     toast.current?.show(message);
   }, []);
 
-  return <ToastContext.Provider value={[showToast]}>{children}</ToastContext.Provider>;
+  return (
+    <ToastContext.Provider value={[showToast]}>
+      <Toast ref={toast} />
+      {children}
+    </ToastContext.Provider>
+  );
 };

@@ -7,14 +7,12 @@ import { DataTable } from "primereact/datatable";
 import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { Panel } from "primereact/panel";
-import { Toast } from "primereact/toast";
 import { useCallback, useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router";
 
 import * as api from "../../api";
 import { Header } from "../../components";
-import { useAuthenticationContext } from "../../contexts";
-import { useToast } from "../../hooks";
+import { useAuthenticationContext, useToastContext } from "../../contexts";
 
 export function Admin() {
   const adminController = api.useAdminController();
@@ -27,8 +25,7 @@ export function Admin() {
   const [temporaryPassword, setTemporaryPassword] = useState<string | null>(null);
 
   const [session] = useAuthenticationContext();
-
-  const [toast, showToast] = useToast();
+  const [showToast] = useToastContext();
 
   const location = useLocation();
 
@@ -190,7 +187,6 @@ export function Admin() {
 
   return (
     <div className="admin-container">
-      <Toast ref={toast} />
       <Header />
       <div className="admin-content">
         <DataTable

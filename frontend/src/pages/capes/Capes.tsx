@@ -1,14 +1,11 @@
 import "./Capes.css";
 
-import { Toast } from "primereact/toast";
 import { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router";
 
 import * as api from "../../api";
-import { Header } from "../../components";
-import { Cape } from "../../components/cape/Cape";
-import { useAuthenticationContext } from "../../contexts";
-import { useToast } from "../../hooks";
+import { Cape, Header } from "../../components";
+import { useAuthenticationContext, useToastContext } from "../../contexts";
 
 export function Capes() {
   const capeController = api.useCapeController();
@@ -18,8 +15,7 @@ export function Capes() {
   const [capes, setCapes] = useState<api.Cape[]>([]);
 
   const [session] = useAuthenticationContext();
-
-  const [toast, showToast] = useToast();
+  const [showToast] = useToastContext();
 
   const location = useLocation();
 
@@ -56,7 +52,6 @@ export function Capes() {
 
   return (
     <div className="capes-container">
-      <Toast ref={toast} />
       <Header />
       <div className="capes-content">
         {capes.map((cape) => {

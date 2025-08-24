@@ -2,14 +2,12 @@ import "./Config.css";
 
 import { Button } from "primereact/button";
 import { Card } from "primereact/card";
-import { ToastMessage } from "primereact/toast";
 import { useCallback } from "react";
 
 import * as api from "../../api";
-import { useAuthenticationContext } from "../../contexts";
+import { useAuthenticationContext, useToastContext } from "../../contexts";
 
 type ConfigProps = {
-  showToast: (message: ToastMessage) => void;
   config: api.Config;
   subscriptions: api.Subscription[];
   updateSubscriptions: () => void;
@@ -20,6 +18,7 @@ export function Config(props: ConfigProps) {
   const configController = api.useConfigController();
 
   const [session] = useAuthenticationContext();
+  const [showToast] = useToastContext();
 
   const isAuthor = session && props.config.author.id === session?.user?.id;
   const isSubscribed = props.subscriptions?.some((subscription) => subscription.config.id === props.config.id);
@@ -33,7 +32,7 @@ export function Config(props: ConfigProps) {
       .subscribe(props.config.id)
       .then(() => {
         props.updateSubscriptions();
-        props.showToast({
+        showToast({
           severity: "success",
           summary: "Subscribed",
           detail: "You have successfully subscribed to the config.",
@@ -41,13 +40,13 @@ export function Config(props: ConfigProps) {
       })
       .catch((error) => {
         console.error("Failed to subscribe:", error);
-        props.showToast({
+        showToast({
           severity: "error",
           summary: "Error",
           detail: "Failed to subscribe to the config.",
         });
       });
-  }, [configController, props.config.id, props.updateSubscriptions, props.showToast]);
+  }, [configController, props.config.id, props.updateSubscriptions]);
 
   const handleUnsubscribe = useCallback(() => {
     if (!configController) {
@@ -58,7 +57,7 @@ export function Config(props: ConfigProps) {
       .unsubscribe(props.config.id)
       .then(() => {
         props.updateSubscriptions();
-        props.showToast({
+        showToast({
           severity: "success",
           summary: "Unsubscribed",
           detail: "You have successfully unsubscribed from the config.",
@@ -66,13 +65,13 @@ export function Config(props: ConfigProps) {
       })
       .catch((error) => {
         console.error("Failed to unsubscribe:", error);
-        props.showToast({
+        showToast({
           severity: "error",
           summary: "Error",
           detail: "Failed to unsubscribe from the config.",
         });
       });
-  }, [configController, props.config.id, props.updateSubscriptions, props.showToast]);
+  }, [configController, props.config.id, props.updateSubscriptions]);
 
   const handleDelete = useCallback(() => {
     configController
@@ -80,7 +79,7 @@ export function Config(props: ConfigProps) {
       .then(() => {
         props.updateConfigs();
         props.updateSubscriptions();
-        props.showToast({
+        showToast({
           severity: "success",
           summary: "Deleted",
           detail: "Config has been successfully deleted.",
@@ -88,9 +87,9 @@ export function Config(props: ConfigProps) {
       })
       .catch((error) => {
         console.error("Failed to delete config:", error);
-        props.showToast({ severity: "error", summary: "Error", detail: "Failed to delete the config." });
+        showToast({ severity: "error", summary: "Error", detail: "Failed to delete the config." });
       });
-  }, [configController, props.config.id, props.showToast]);
+  }, [configController, props.config.id]);
 
   return (
     <Card className="config">

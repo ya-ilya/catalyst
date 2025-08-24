@@ -5,14 +5,12 @@ import { Button } from "primereact/button";
 import { Card } from "primereact/card";
 import { InputText } from "primereact/inputtext";
 import { Password } from "primereact/password";
-import { Toast } from "primereact/toast";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 
 import * as api from "../../api";
 import { Header } from "../../components";
-import { useAuthenticationContext } from "../../contexts";
-import { useToast } from "../../hooks";
+import { useAuthenticationContext, useToastContext } from "../../contexts";
 
 export function SignIn() {
   const authenticationController = api.useAuthenticationController();
@@ -22,59 +20,60 @@ export function SignIn() {
   const [loading, setLoading] = useState(false);
 
   const [, setSession] = useAuthenticationContext();
-
-  const [toast, showToast] = useToast();
+  const [showToast] = useToastContext();
 
   const navigate = useNavigate();
-  const [params] = useSearchParams();
+  const [searchParams] = useSearchParams();
 
-  const handleLogin = async () => {
+  const handleLogin = useCallback(() => {
     setLoading(true);
-    try {
-      const redirectTo = params.get("redirectTo");
-      setSession(await authenticationController.signIn({ username, password }));
-      navigate(redirectTo ? decodeURIComponent(redirectTo) : "/");
-    } catch (error) {
-      console.error("Login failed:", error);
 
-      if (error instanceof AxiosError && error.response) {
-        if (error.status == 401 && error.response.data.fields.contains("password")) {
-          showToast({
-            severity: "error",
-            summary: "Login Error",
-            detail: "Invalid password.",
-          });
-          return;
-        } else if (error.status == 404) {
-          showToast({
-            severity: "error",
-            summary: "Login Error",
-            detail: "User not found.",
-          });
-          return;
-        } else if (error.status == 400) {
-          showToast({
-            severity: "error",
-            summary: "Login Error",
-            detail: "Invalid username or password.",
-          });
-          return;
+    authenticationController
+      .signIn({ username, password })
+      .then((response) => {
+        const redirectTo = searchParams.get("redirectTo");
+        setSession(response);
+        navigate(redirectTo ? decodeURIComponent(redirectTo) : "/");
+      })
+      .catch((error) => {
+        console.error("Login failed:", error);
+
+        if (error instanceof AxiosError && error.response) {
+          if (error.status == 401 && error.response.data.fields.contains("password")) {
+            showToast({
+              severity: "error",
+              summary: "Login Error",
+              detail: "Invalid password.",
+            });
+            return;
+          } else if (error.status == 404) {
+            showToast({
+              severity: "error",
+              summary: "Login Error",
+              detail: "User not found.",
+            });
+            return;
+          } else if (error.status == 400) {
+            showToast({
+              severity: "error",
+              summary: "Login Error",
+              detail: "Invalid username or password.",
+            });
+            return;
+          }
         }
-      }
 
-      showToast({
-        severity: "error",
-        summary: "Login Error",
-        detail: "Failed to sign in.",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+        showToast({
+          severity: "error",
+          summary: "Login Error",
+          detail: "Failed to sign in.",
+        });
+      })
+      .finally(() => setLoading(false));
+  }, [username, password, searchParams, authenticationController]);
 
   return (
     <div className="signin-container">
-      <Toast ref={toast} />
       <Header />
       <div className="signin-content">
         <Card
