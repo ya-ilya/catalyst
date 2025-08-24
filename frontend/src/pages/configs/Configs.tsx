@@ -60,8 +60,105 @@ export function Configs() {
 
   useEffect(() => {
     updateConfigs();
+  }, [updateConfigs]);
+
+  useEffect(() => {
     updateSubscriptions();
-  }, [updateConfigs, updateSubscriptions]);
+  }, [updateSubscriptions]);
+
+  const handleSubscribe = useCallback(
+    (config: api.Config) => {
+      if (!configController) {
+        return;
+      }
+
+      configController
+        .subscribe(config.id)
+        .then(() => {
+          updateSubscriptions();
+          showToast({
+            severity: "success",
+            summary: "Subscribed",
+            detail: "You have successfully subscribed to the config.",
+          });
+        })
+        .catch((error) => {
+          console.error("Failed to subscribe:", error);
+          showToast({
+            severity: "error",
+            summary: "Error",
+            detail: "Failed to subscribe to the config.",
+          });
+        });
+    },
+    [configController]
+  );
+
+  const handleUnsubscribe = useCallback(
+    (config: api.Config) => {
+      if (!configController) {
+        return;
+      }
+
+      configController
+        .unsubscribe(config.id)
+        .then(() => {
+          updateSubscriptions();
+          showToast({
+            severity: "success",
+            summary: "Unsubscribed",
+            detail: "You have successfully unsubscribed from the config.",
+          });
+        })
+        .catch((error) => {
+          console.error("Failed to unsubscribe:", error);
+          showToast({
+            severity: "error",
+            summary: "Error",
+            detail: "Failed to unsubscribe from the config.",
+          });
+        });
+    },
+    [configController]
+  );
+
+  const handleDelete = useCallback(
+    (config: api.Config) => {
+      configController
+        ?.deleteConfig(config.id)
+        .then(() => {
+          updateConfigs();
+          updateSubscriptions();
+          showToast({
+            severity: "success",
+            summary: "Deleted",
+            detail: "Config has been successfully deleted.",
+          });
+        })
+        .catch((error) => {
+          console.error("Failed to delete config:", error);
+          showToast({ severity: "error", summary: "Error", detail: "Failed to delete the config." });
+        });
+    },
+    [configController]
+  );
+
+  const configMapper = useCallback(
+    (key: string, config: api.Config) => {
+      return (
+        <Config
+          key={key}
+          config={config}
+          isAuthor={session !== null && config.author.id === session.user.id}
+          isSubscribed={subscriptions?.some((other) => other.config.id === config.id)}
+          subscribe={() => handleSubscribe(config)}
+          unsubscribe={() => handleUnsubscribe(config)}
+          delete={() => handleDelete(config)}
+        />
+      );
+    },
+    [session, subscriptions, handleSubscribe, handleUnsubscribe, handleDelete]
+  );
 
   if (!session) {
     return (
@@ -83,32 +180,10 @@ export function Configs() {
         />
         {activeIndex === 0 && (
           <div className="subscriptions">
-            {subscriptions.map((subscription) => (
-              <Config
-                key={subscription.id}
-                config={subscription.config}
-                subscriptions={subscriptions}
-                updateSubscriptions={updateSubscriptions}
-                updateConfigs={updateConfigs}
-              />
-            ))}
+            {subscriptions.map((subscription) => configMapper(subscription.id, subscription.config))}
           </div>
         )}
-        {activeIndex === 1 && (
-          <div className="library">
-            {configs.map((config) => {
-              return (
-                <Config
-                  key={config.id}
-                  config={config}
-                  subscriptions={subscriptions}
-                  updateSubscriptions={updateSubscriptions}
-                  updateConfigs={updateConfigs}
-                />
-              );
-            })}
-          </div>
-        )}
+        {activeIndex === 1 && <div className="library">{configs.map((config) => configMapper(config.id, config))}</div>}
       </div>
     </div>
   );

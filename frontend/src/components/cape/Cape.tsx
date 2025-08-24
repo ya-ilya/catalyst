@@ -1,7 +1,7 @@
 import "./Cape.css";
 
+import { Button } from "primereact/button";
 import { Card } from "primereact/card";
-import { SelectButton } from "primereact/selectbutton";
 import { useEffect, useState } from "react";
 import ReactSkinview3d from "react-skinview3d";
 
@@ -13,6 +13,8 @@ const DEFAULT_SKIN_URL =
 type CapeProps = {
   cape: api.Cape;
   isSelected: boolean;
+  select: () => void;
+  unselect: () => void;
 };
 
 export function Cape(props: CapeProps) {
@@ -51,15 +53,27 @@ export function Cape(props: CapeProps) {
         onReady={(params) => {
           params.viewer.controls.enableZoom = false;
           params.viewer.playerWrapper.rotation.y += 3.92699;
+          params.canvasRef.oncontextmenu = () => {
+            setBackEquipment(backEquipment == "cape" ? "elytra" : "cape");
+          };
           setViewer(params.viewer);
         }}
       />
-      <div className="back-equipment-switcher">
-        <SelectButton
-          value={backEquipment}
-          onChange={(event) => setBackEquipment(event.value)}
-          options={backEquipments}
-        />
+      <div className="actions">
+        {props.isSelected ? (
+          <Button
+            icon="pi pi-minus"
+            label="Unselect"
+            onClick={props.unselect}
+            outlined
+          />
+        ) : (
+          <Button
+            icon="pi pi-plus"
+            label="Select"
+            onClick={props.select}
+          />
+        )}
       </div>
     </Card>
   );

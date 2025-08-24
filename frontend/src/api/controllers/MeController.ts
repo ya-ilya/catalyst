@@ -15,6 +15,8 @@ export function useMeController() {
   useEffect(() => {
     if (session) {
       setMeController(createMeController(session));
+    } else {
+      setMeController(undefined);
     }
   }, [session]);
 
@@ -48,6 +50,15 @@ export class MeController extends Controller {
 
   async getCape(): Promise<Cape> {
     return (await this.client.get("/cape")).data;
+  }
+
+  async getCapeImage(): Promise<Blob> {
+    const response = await this.client.get(`/cape/image`, { responseType: "blob" });
+    return response.data;
+  }
+
+  async unselectCape(): Promise<void> {
+    await this.client.get("/cape/unselect");
   }
 
   async changePassword(body: ChangePasswordRequest): Promise<AuthenticationResponse> {

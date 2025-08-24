@@ -13,6 +13,8 @@ export function useCapeController() {
   useEffect(() => {
     if (session) {
       setCapeController(createCapeController(session));
+    } else {
+      setCapeController(undefined);
     }
   }, [session]);
 
@@ -38,6 +40,10 @@ export class CapeController extends Controller {
 
   async getCapeById(id: string): Promise<Cape> {
     return (await this.client.get(`/${id}`)).data;
+  }
+
+  async select(id: string) {
+    await this.client.get(`/${id}/select`);
   }
 
   async getCapeImage(id: string): Promise<Blob> {

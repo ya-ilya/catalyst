@@ -13,6 +13,8 @@ export function useAdminController() {
   useEffect(() => {
     if (session) {
       setAdminController(createAdminController(session));
+    } else {
+      setAdminController(undefined);
     }
   }, [session]);
 

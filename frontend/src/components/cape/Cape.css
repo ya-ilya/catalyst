@@ -21,9 +21,11 @@
   display: flex;
 }
 
-.cape .back-equipment-switcher {
+.cape .actions {
   width: 220px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 16px;
 }

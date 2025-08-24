@@ -42,6 +42,12 @@ class CapeService(
         })
     }
 
+    fun unselect(user: User) {
+        userService.updateUser(user.apply {
+            this.cape = null
+        })
+    }
+
     fun createCape(
         name: String,
         description: String,

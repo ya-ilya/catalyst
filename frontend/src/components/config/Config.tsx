@@ -2,95 +2,19 @@ import "./Config.css";
 
 import { Button } from "primereact/button";
 import { Card } from "primereact/card";
-import { useCallback } from "react";
 
 import * as api from "../../api";
-import { useAuthenticationContext, useToastContext } from "../../contexts";
 
 type ConfigProps = {
   config: api.Config;
-  subscriptions: api.Subscription[];
-  updateSubscriptions: () => void;
-  updateConfigs: () => void;
+  isAuthor: boolean;
+  isSubscribed: boolean;
+  subscribe: () => void;
+  unsubscribe: () => void;
+  delete: () => void;
 };
 
 export function Config(props: ConfigProps) {
-  const configController = api.useConfigController();
-
-  const [session] = useAuthenticationContext();
-  const [showToast] = useToastContext();
-
-  const isAuthor = session && props.config.author.id === session?.user?.id;
-  const isSubscribed = props.subscriptions?.some((subscription) => subscription.config.id === props.config.id);
-
-  const handleSubscribe = useCallback(() => {
-    if (!configController) {
-      return;
-    }
-
-    configController
-      .subscribe(props.config.id)
-      .then(() => {
-        props.updateSubscriptions();
-        showToast({
-          severity: "success",
-          summary: "Subscribed",
-          detail: "You have successfully subscribed to the config.",
-        });
-      })
-      .catch((error) => {
-        console.error("Failed to subscribe:", error);
-        showToast({
-          severity: "error",
-          summary: "Error",
-          detail: "Failed to subscribe to the config.",
-        });
-      });
-  }, [configController, props.config.id, props.updateSubscriptions]);
-
-  const handleUnsubscribe = useCallback(() => {
-    if (!configController) {
-      return;
-    }
-
-    configController
-      .unsubscribe(props.config.id)
-      .then(() => {
-        props.updateSubscriptions();
-        showToast({
-          severity: "success",
-          summary: "Unsubscribed",
-          detail: "You have successfully unsubscribed from the config.",
-        });
-      })
-      .catch((error) => {
-        console.error("Failed to unsubscribe:", error);
-        showToast({
-          severity: "error",
-          summary: "Error",
-          detail: "Failed to unsubscribe from the config.",
-        });
-      });
-  }, [configController, props.config.id, props.updateSubscriptions]);
-
-  const handleDelete = useCallback(() => {
-    configController
-      ?.deleteConfig(props.config.id)
-      .then(() => {
-        props.updateConfigs();
-        props.updateSubscriptions();
-        showToast({
-          severity: "success",
-          summary: "Deleted",
-          detail: "Config has been successfully deleted.",
-        });
-      })
-      .catch((error) => {
-        console.error("Failed to delete config:", error);
-        showToast({ severity: "error", summary: "Error", detail: "Failed to delete the config." });
-      });
-  }, [configController, props.config.id]);
-
   return (
     <Card className="config">
       <div className="config-header">
@@ -105,29 +29,29 @@ export function Config(props: ConfigProps) {
           rounded
           text
         />
-        {!isAuthor && isSubscribed && (
+        {!props.isAuthor && props.isSubscribed && (
           <Button
             icon="pi pi-minus-circle"
             className="p-button-danger p-button-sm"
-            onClick={handleUnsubscribe}
+            onClick={props.unsubscribe}
             rounded
             text
           />
         )}
-        {!isSubscribed && (
+        {!props.isSubscribed && (
           <Button
             icon="pi pi-plus-circle"
             className="add-button p-button-sm"
-            onClick={handleSubscribe}
+            onClick={props.subscribe}
             rounded
             text
           />
         )}
-        {isAuthor && (
+        {props.isAuthor && (
           <Button
             icon="pi pi-trash"
             className="p-button-danger p-button-sm"
-            onClick={handleDelete}
+            onClick={props.delete}
             rounded
             text
           />

@@ -62,6 +62,15 @@ class MeController(
             .body(resource)
     }
 
+    @GetMapping("/cape/unselect")
+    fun unselectCape(@AuthenticationPrincipal user: User) {
+        if (user.cape == null) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "You didn't select cape")
+        }
+
+        capeService.unselect(user)
+    }
+
     @PostMapping("/change-password")
     fun changePassword(
         @AuthenticationPrincipal user: User,

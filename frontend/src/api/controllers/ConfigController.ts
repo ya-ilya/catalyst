@@ -13,6 +13,8 @@ export function useConfigController() {
   useEffect(() => {
     if (session) {
       setConfigController(createConfigController(session));
+    } else {
+      setConfigController(undefined)
     }
   }, [session]);
 

@@ -10,6 +10,7 @@
   flex-grow: 1;
   box-sizing: border-box;
   padding-top: 64px;
+  height: 100vh;
 }
 
 .configs-content .p-tabmenu .p-menuitem-link {
