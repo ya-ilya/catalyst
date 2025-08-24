@@ -3,7 +3,7 @@ import "./Configs.css";
 import { TabMenu } from "primereact/tabmenu";
 import { Toast } from "primereact/toast";
 import { useCallback, useEffect, useState } from "react";
-import { Navigate } from "react-router";
+import { Navigate, useLocation } from "react-router";
 
 import * as api from "../../api";
 import { Config, Header } from "../../components";
@@ -26,6 +26,8 @@ export function Configs() {
   const [session] = useAuthenticationContext();
 
   const [toast, showToast] = useToast();
+
+  const location = useLocation();
 
   const updateConfigs = useCallback(() => {
     configController
@@ -67,7 +69,7 @@ export function Configs() {
   if (!session) {
     return (
       <Navigate
-        to="/sign-in"
+        to={`/sign-in?redirectTo=${encodeURIComponent(location.pathname + location.search)}`}
         replace
       />
     );

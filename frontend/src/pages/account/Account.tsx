@@ -6,14 +6,13 @@ import { Card } from "primereact/card";
 import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { Password } from "primereact/password";
-import { Toast } from "primereact/toast";
 import { useCallback, useEffect, useState } from "react";
-import { Navigate, useNavigate } from "react-router";
+import { Navigate, useLocation, useNavigate } from "react-router";
 
 import * as api from "../../api";
 import { Header } from "../../components";
 import { useAuthenticationContext } from "../../contexts";
-import { useToast } from "../../hooks";
+import { useToastContext } from "../../contexts/ToastContext";
 
 export function Account() {
   const meController = api.useMeController();
@@ -26,9 +25,10 @@ export function Account() {
   const [session, setSession] = useAuthenticationContext();
   const [user, setUser] = useState<api.User | null>(null);
 
-  const [toast, showToast] = useToast();
+  const [showToast] = useToastContext();
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     meController
@@ -153,7 +153,7 @@ export function Account() {
   if (!session) {
     return (
       <Navigate
-        to="/sign-in"
+        to={`/sign-in?redirectTo=${encodeURIComponent(location.pathname + location.search)}`}
         replace
       />
     );
@@ -161,7 +161,6 @@ export function Account() {
 
   return (
     <div className="account-container">
-      <Toast ref={toast} />
       <Header />
       <div className="account-content">
         <Card

@@ -9,7 +9,7 @@ import { InputText } from "primereact/inputtext";
 import { Panel } from "primereact/panel";
 import { Toast } from "primereact/toast";
 import { useCallback, useEffect, useState } from "react";
-import { Navigate, useNavigate } from "react-router";
+import { Navigate, useLocation } from "react-router";
 
 import * as api from "../../api";
 import { Header } from "../../components";
@@ -30,13 +30,7 @@ export function Admin() {
 
   const [toast, showToast] = useToast();
 
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (session && !session.user.isAdmin) {
-      navigate("/");
-    }
-  }, [session, navigate]);
+  const location = useLocation();
 
   const fetchUsers = useCallback(() => {
     setLoading(true);
@@ -179,7 +173,16 @@ export function Admin() {
   if (!session) {
     return (
       <Navigate
-        to="/sign-in"
+        to={`/sign-in?redirectTo=${encodeURIComponent(location.pathname + location.search)}`}
+        replace
+      />
+    );
+  }
+
+  if (!session.user.isAdmin) {
+    return (
+      <Navigate
+        to="/"
         replace
       />
     );

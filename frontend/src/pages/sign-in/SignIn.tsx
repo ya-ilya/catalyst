@@ -7,7 +7,7 @@ import { InputText } from "primereact/inputtext";
 import { Password } from "primereact/password";
 import { Toast } from "primereact/toast";
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 
 import * as api from "../../api";
 import { Header } from "../../components";
@@ -26,12 +26,14 @@ export function SignIn() {
   const [toast, showToast] = useToast();
 
   const navigate = useNavigate();
+  const [params] = useSearchParams();
 
   const handleLogin = async () => {
     setLoading(true);
     try {
+      const redirectTo = params.get("redirectTo");
       setSession(await authenticationController.signIn({ username, password }));
-      navigate("/");
+      navigate(redirectTo ? decodeURIComponent(redirectTo) : "/");
     } catch (error) {
       console.error("Login failed:", error);
 
@@ -101,7 +103,7 @@ export function SignIn() {
                 feedback={false}
               />
             </div>
-            <div style={{ marginTop: 4 }}>
+            <div style={{ marginTop: 16 }}>
               <Button
                 label="Sign In"
                 icon="pi pi-sign-in"

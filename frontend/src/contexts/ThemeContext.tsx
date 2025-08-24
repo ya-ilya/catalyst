@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect } from "react";
+import { createContext, ReactNode, useContext, useEffect } from "react";
 
 import { useLocalStorage } from "../hooks";
 
@@ -8,7 +8,7 @@ export function useThemeContext() {
 
 export const ThemeContext = createContext<[isDarkMode: boolean | null, toggleTheme: () => void]>([null, () => {}]);
 
-export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [isDarkMode, setIsDarkMode] = useLocalStorage(
     "isDarkMode",
     window.matchMedia("(prefers-color-scheme: dark)").matches
