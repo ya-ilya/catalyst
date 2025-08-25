@@ -1,7 +1,7 @@
 import { Axios } from "axios";
 import { useEffect, useState } from "react";
 
-import { CreateUserRequest, User, UserCreatedResponse } from "../";
+import { Cape, CreateUserRequest, User, UserCreatedResponse } from "../";
 import { axiosClient } from "../../axios-config";
 import { Session, useAuthenticationContext } from "../../contexts";
 import { Controller } from "./Controller";
@@ -48,5 +48,24 @@ export class AdminController extends Controller {
 
   async deleteUser(id: string) {
     await this.client.delete(`/users/${id}`);
+  }
+
+  async createCape(name: string, description: string, image: File | Blob): Promise<Cape> {
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("description", description);
+    formData.append("image", image, "cape.png");
+
+    return (
+      await this.client.post("/capes", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+    ).data;
+  }
+
+  async deleteCape(id: string) {
+    await this.client.delete(`/capes/${id}`);
   }
 }

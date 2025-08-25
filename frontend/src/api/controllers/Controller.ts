@@ -1,7 +1,9 @@
-import axios, { Axios } from "axios";
+import axios, { Axios, AxiosInstance } from "axios";
+
+import { refreshTokenRequestIntercepter, refreshTokenResponseIntercepter } from "../..";
 
 export abstract class Controller {
-  protected client: Axios;
+  protected client: AxiosInstance;
 
   constructor(client: Axios, baseURL: string, token: string | null = null) {
     this.client = axios.create({
@@ -9,5 +11,8 @@ export abstract class Controller {
       baseURL: client.defaults.baseURL + baseURL,
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
+
+    this.client.interceptors.request.use(refreshTokenRequestIntercepter);
+    this.client.interceptors.response.use(refreshTokenResponseIntercepter);
   }
 }

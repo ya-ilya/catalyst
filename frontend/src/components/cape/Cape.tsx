@@ -45,7 +45,7 @@ export function Cape(props: CapeProps) {
   return (
     <Card className={`cape ${props.isSelected ? "--selected-cape" : ""}`}>
       <ReactSkinview3d
-        className={`viewer`}
+        className="viewer"
         skinUrl={DEFAULT_SKIN_URL}
         capeUrl={`http://127.0.0.1:3000/api/capes/${props.cape.id}/image`}
         width={220}

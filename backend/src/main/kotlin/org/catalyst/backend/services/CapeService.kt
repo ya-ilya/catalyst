@@ -1,5 +1,6 @@
 package org.catalyst.backend.services
 
+import jakarta.transaction.Transactional
 import org.catalyst.backend.entities.cape.Cape
 import org.catalyst.backend.entities.cape.CapeRepository
 import org.catalyst.backend.entities.user.User
@@ -69,8 +70,15 @@ class CapeService(
         return cape
     }
 
+    @Transactional
     fun deleteCapeById(id: UUID) {
         val cape = getCapeById(id)
+
+        for (user in cape.users) {
+            userService.updateUser(user.apply {
+                this.cape = null
+            })
+        }
 
         deleteCapeImage(cape)
         capeRepository.delete(cape)

@@ -19,6 +19,8 @@
 
 .cape .viewer {
   display: flex;
+  min-width: 220px;
+  min-height: 300px;
 }
 
 .cape .actions {

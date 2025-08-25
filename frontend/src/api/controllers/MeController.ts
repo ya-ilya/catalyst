@@ -49,7 +49,7 @@ export class MeController extends Controller {
   }
 
   async getCape(): Promise<Cape> {
-    return (await this.client.get("/cape")).data;
+    return (await this.client.get("/cape"))?.data;
   }
 
   async getCapeImage(): Promise<Blob> {
