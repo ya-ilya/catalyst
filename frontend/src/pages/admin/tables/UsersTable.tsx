@@ -15,6 +15,9 @@ type UsersTableProps = {
   session: Session;
 };
 
+const MIN_USERNAME_LENGTH = 4;
+const MAX_USERNAME_LENGTH = 32;
+
 export function UsersTable({ adminController, session }: UsersTableProps) {
   const [users, setUsers] = useState<api.User[]>([]);
   const [loading, setLoading] = useState(false);
@@ -51,15 +54,6 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
 
   const handleCreateUser = useCallback(async () => {
     if (!adminController) return;
-
-    if (username.length < 4 || username.length > 32) {
-      showToast({
-        severity: "error",
-        summary: "Error",
-        detail: "Invalid format for username.",
-      });
-      return;
-    }
 
     try {
       const createdUser = await adminController.createUser({
@@ -175,6 +169,7 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
         label="Create"
         icon="pi pi-check"
         onClick={handleCreateUser}
+        disabled={username.length < MIN_USERNAME_LENGTH || username.length > MAX_USERNAME_LENGTH}
       />
     </div>
   );
@@ -229,6 +224,7 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
               id="new-username"
               value={username}
               onChange={(event) => setUsername(event.target.value)}
+              invalid={username.length < MIN_USERNAME_LENGTH || username.length > MAX_USERNAME_LENGTH}
             />
           </div>
           {temporaryPassword && (

@@ -41,3 +41,7 @@
   display: flex;
   align-items: center;
 }
+
+.change-password-dialog .p-field {
+  margin-top: 20px;
+}

@@ -4,7 +4,7 @@ import { AxiosError } from "axios";
 import { Button } from "primereact/button";
 import { Card } from "primereact/card";
 import { Dialog } from "primereact/dialog";
-import { InputText } from "primereact/inputtext";
+import { FloatLabel } from "primereact/floatlabel";
 import { Password } from "primereact/password";
 import { useCallback, useEffect, useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router";
@@ -12,6 +12,9 @@ import { Navigate, useLocation, useNavigate } from "react-router";
 import * as api from "../../api";
 import { Header } from "../../components";
 import { useAuthenticationContext, useToastContext } from "../../contexts";
+
+const MIN_PASSWORD_LENGTH = 8;
+const MAX_PASSWORD_LENGTH = 100;
 
 export function Account() {
   const meController = api.useMeController();
@@ -50,36 +53,6 @@ export function Account() {
 
   const handlePasswordChange = useCallback(async () => {
     if (!meController) return;
-
-    if (newPassword.length < 8) {
-      console.error("New password must be at least 8 characters long!");
-      showToast({
-        severity: "error",
-        summary: "Error",
-        detail: "New password must be at least 8 characters long.",
-      });
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      console.error("New passwords do not match!");
-      showToast({
-        severity: "error",
-        summary: "Error",
-        detail: "New passwords do not match.",
-      });
-      return;
-    }
-
-    if (newPassword == oldPassword) {
-      console.error("New password cannot be the same as the old password!");
-      showToast({
-        severity: "error",
-        summary: "Error",
-        detail: "New password cannot be the same as the old password.",
-      });
-      return;
-    }
 
     try {
       setSession(await meController.changePassword({ oldPassword, newPassword }));
@@ -146,6 +119,12 @@ export function Account() {
         label="Change Password"
         icon="pi pi-check"
         onClick={handlePasswordChange}
+        disabled={
+          newPassword.length < MIN_PASSWORD_LENGTH ||
+          newPassword.length > MAX_PASSWORD_LENGTH ||
+          newPassword === oldPassword ||
+          newPassword !== confirmPassword
+        }
       />
     </div>
   );
@@ -206,6 +185,7 @@ export function Account() {
         </Card>
       </div>
       <Dialog
+        className="change-password-dialog"
         header="Change Password"
         visible={isDialogVisible}
         style={{ maxWidth: "400px", width: "90vw" }}
@@ -214,32 +194,46 @@ export function Account() {
       >
         <div className="p-fluid">
           <div className="p-field">
-            <label htmlFor="old-password">Old Password</label>
-            <Password
-              id="old-password"
-              value={oldPassword}
-              onChange={(event) => setOldPassword(event.target.value)}
-              toggleMask
-              feedback={false}
-            />
+            <FloatLabel>
+              <Password
+                id="old-password"
+                value={oldPassword}
+                onChange={(event) => setOldPassword(event.target.value)}
+                invalid={oldPassword.length < MIN_PASSWORD_LENGTH || oldPassword.length > MAX_PASSWORD_LENGTH}
+                feedback={false}
+                toggleMask
+              />
+              <label htmlFor="old-password">Old Password</label>
+            </FloatLabel>
           </div>
           <div className="p-field">
-            <label htmlFor="new-password">New Password</label>
-            <Password
-              id="new-password"
-              value={newPassword}
-              onChange={(event) => setNewPassword(event.target.value)}
-              toggleMask
-            />
+            <FloatLabel>
+              <Password
+                id="new-password"
+                value={newPassword}
+                onChange={(event) => setNewPassword(event.target.value)}
+                invalid={
+                  newPassword.length < MIN_PASSWORD_LENGTH ||
+                  newPassword.length > MAX_PASSWORD_LENGTH ||
+                  newPassword === oldPassword
+                }
+                toggleMask
+              />
+              <label htmlFor="new-password">New Password</label>
+            </FloatLabel>
           </div>
           <div className="p-field">
-            <label htmlFor="confirm-password">Confirm New Password</label>
-            <InputText
-              id="confirm-password"
-              type="password"
-              value={confirmPassword}
-              onChange={(event) => setConfirmPassword(event.target.value)}
-            />
+            <FloatLabel>
+              <Password
+                id="confirm-password"
+                value={confirmPassword}
+                onChange={(event) => setConfirmPassword(event.target.value)}
+                invalid={newPassword !== confirmPassword}
+                feedback={false}
+                toggleMask
+              />
+              <label htmlFor="confirm-password">Confirm New Password</label>
+            </FloatLabel>
           </div>
         </div>
       </Dialog>

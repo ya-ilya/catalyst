@@ -3,6 +3,7 @@ import "./SignIn.css";
 import { AxiosError } from "axios";
 import { Button } from "primereact/button";
 import { Card } from "primereact/card";
+import { FloatLabel } from "primereact/floatlabel";
 import { InputText } from "primereact/inputtext";
 import { Password } from "primereact/password";
 import { useCallback, useState } from "react";
@@ -11,6 +12,11 @@ import { useNavigate, useSearchParams } from "react-router";
 import * as api from "../../api";
 import { Header } from "../../components";
 import { useAuthenticationContext, useToastContext } from "../../contexts";
+
+const MIN_USERNAME_LENGTH = 4;
+const MAX_USERNAME_LENGTH = 32;
+const MIN_PASSWORD_LENGTH = 8;
+const MAX_PASSWORD_LENGTH = 100;
 
 export function SignIn() {
   const authenticationController = api.useAuthenticationController();
@@ -37,7 +43,7 @@ export function SignIn() {
       console.error("Login failed:", error);
 
       if (error instanceof AxiosError && error.response) {
-        if (error.status == 401 && error.response.data.fields.contains("password")) {
+        if (error.status == 400 && error.response.data.fields.contains("password")) {
           showToast({
             severity: "error",
             summary: "Login Error",
@@ -81,25 +87,28 @@ export function SignIn() {
         >
           <div className="p-fluid">
             <div className="p-field">
-              <label htmlFor="username">Username</label>
-              <InputText
-                id="username"
-                value={username}
-                onChange={(event) => setUsername(event.target.value)}
-              />
+              <FloatLabel>
+                <InputText
+                  id="username"
+                  value={username}
+                  onChange={(event) => setUsername(event.target.value)}
+                  invalid={username.length < MIN_USERNAME_LENGTH || username.length > MAX_USERNAME_LENGTH}
+                />
+                <label htmlFor="username">Username</label>
+              </FloatLabel>
             </div>
-            <div
-              className="p-field"
-              style={{ marginTop: 3 }}
-            >
-              <label htmlFor="password">Password</label>
-              <Password
-                id="password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                toggleMask
-                feedback={false}
-              />
+            <div className="p-field">
+              <FloatLabel>
+                <Password
+                  id="password"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  invalid={password.length < MIN_PASSWORD_LENGTH || password.length > MAX_PASSWORD_LENGTH}
+                  feedback={false}
+                  toggleMask
+                />
+                <label htmlFor="password">Password</label>
+              </FloatLabel>
             </div>
             <div style={{ marginTop: 16 }}>
               <Button
@@ -108,6 +117,12 @@ export function SignIn() {
                 className="w-full"
                 onClick={handleLogin}
                 loading={loading}
+                disabled={
+                  username.length < MIN_USERNAME_LENGTH ||
+                  username.length > MAX_USERNAME_LENGTH ||
+                  password.length < MIN_PASSWORD_LENGTH ||
+                  password.length > MAX_PASSWORD_LENGTH
+                }
               />
             </div>
           </div>

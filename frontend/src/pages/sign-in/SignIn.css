@@ -17,3 +17,7 @@
   max-width: 450px;
   width: 100%;
 }
+
+.signin-card .p-field {
+  margin-top: 20px;
+}

@@ -13,6 +13,11 @@ type CapesTableProps = {
   adminController?: api.AdminController;
 };
 
+const MIN_NAME_LENGTH = 4;
+const MAX_NAME_LENGTH = 32;
+const MIN_DESCRIPTION_LENGTH = 4;
+const MAX_DESCRIPTION_LENGTH = 256;
+
 export function CapesTable({ adminController }: CapesTableProps) {
   const capeController = api.useCapeController();
 
@@ -53,23 +58,6 @@ export function CapesTable({ adminController }: CapesTableProps) {
 
   const handleCreateCape = useCallback(async () => {
     if (!adminController) return;
-
-    if (name.length < 4 || name.length > 32) {
-      showToast({
-        severity: "error",
-        summary: "Error",
-        detail: "Invalid format for name.",
-      });
-      return;
-    }
-
-    if (description.length < 4 || description.length > 256) {
-      showToast({
-        severity: "error",
-        summary: "Error",
-        detail: "Invalid format for description.",
-      });
-    }
 
     try {
       await adminController.createCape(name, description, uploadedCape!);
@@ -178,7 +166,13 @@ export function CapesTable({ adminController }: CapesTableProps) {
         label="Create"
         icon="pi pi-check"
         onClick={handleCreateCape}
-        disabled={!uploadedCape}
+        disabled={
+          name.length < MIN_NAME_LENGTH ||
+          name.length > MAX_NAME_LENGTH ||
+          description.length < MIN_DESCRIPTION_LENGTH ||
+          description.length > MAX_DESCRIPTION_LENGTH ||
+          !uploadedCape
+        }
       />
     </div>
   );
@@ -239,6 +233,7 @@ export function CapesTable({ adminController }: CapesTableProps) {
               id="new-name"
               value={name}
               onChange={(event) => setName(event.target.value)}
+              invalid={name.length < MIN_NAME_LENGTH || name.length > MAX_NAME_LENGTH}
             />
           </div>
           <div
@@ -250,11 +245,12 @@ export function CapesTable({ adminController }: CapesTableProps) {
               id="new-description"
               value={description}
               onChange={(event) => setDescription(event.target.value)}
+              invalid={description.length < MIN_DESCRIPTION_LENGTH || description.length > MAX_DESCRIPTION_LENGTH}
             />
           </div>
           <div
             className="p-field"
-            style={{ marginTop: 6 }}
+            style={{ marginTop: 16 }}
           >
             <FileUpload
               mode="basic"
