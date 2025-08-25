@@ -36,11 +36,6 @@ class MeController(
         return user.configs.map { it.toResponse() }
     }
 
-    @GetMapping("/cape")
-    fun getCape(@AuthenticationPrincipal user: User): CapeResponse {
-        return user.cape?.toResponse() ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "You didn't select cape")
-    }
-
     @GetMapping("/cape/image", produces = ["image/png"])
     fun getCapeImage(@AuthenticationPrincipal user: User): ResponseEntity<ByteArrayResource> {
         if (user.cape == null) {

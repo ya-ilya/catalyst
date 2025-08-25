@@ -1,6 +1,5 @@
 import "./Capes.css";
 
-import { AxiosError } from "axios";
 import { useCallback, useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router";
 
@@ -24,19 +23,15 @@ export function Capes() {
     if (!meController) return;
 
     try {
-      const cape = await meController.getCape();
-      setSelectedCape(cape);
+      const cape = await meController.getUser();
+      setSelectedCape(cape.cape ?? null);
     } catch (error) {
-      if (error instanceof AxiosError && error.status == 404) {
-        setSelectedCape(null);
-      } else {
-        console.error("Failed to fetch selected cape: ", error);
-        showToast({
-          severity: "error",
-          summary: "Error",
-          detail: "Failed to fetch selected cape.",
-        });
-      }
+      console.error("Failed to fetch selected cape: ", error);
+      showToast({
+        severity: "error",
+        summary: "Error",
+        detail: "Failed to fetch selected cape.",
+      });
     }
   }, [meController]);
 

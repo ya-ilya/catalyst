@@ -56,12 +56,12 @@
   font-style: bold;
 }
 
-.admin-content .admin-table .admin-table-header .image {
-  width: 128px;
-}
-
 .admin-content .admin-table .admin-table-header .actions {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.admin-content .admin-table .image {
+  width: 128px;
 }

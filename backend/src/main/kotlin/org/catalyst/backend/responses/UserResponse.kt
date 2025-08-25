@@ -8,5 +8,6 @@ class UserResponse(
     val username: String,
     val isAdmin: Boolean,
     val isPasswordChangeRequired: Boolean,
+    val cape: CapeResponse?,
     val createdAt: LocalDateTime
 )

@@ -53,9 +53,10 @@ export function Cape(props: CapeProps) {
         onReady={(params) => {
           params.viewer.controls.enableZoom = false;
           params.viewer.playerWrapper.rotation.y += 3.92699;
-          params.canvasRef.oncontextmenu = () => {
-            setBackEquipment(backEquipment == "cape" ? "elytra" : "cape");
-          };
+          params.canvasRef.addEventListener("contextmenu", (event) => {
+            event.preventDefault();
+            setBackEquipment((backEquipment) => (backEquipment == "Cape" ? "Elytra" : "Cape"));
+          });
           setViewer(params.viewer);
         }}
       />

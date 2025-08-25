@@ -79,6 +79,7 @@ class User(
         username,
         roles.any { it.name == "ROLE_ADMIN" },
         isPasswordChangeRequired,
+        cape?.toResponse(),
         createdAt
     )
 }
