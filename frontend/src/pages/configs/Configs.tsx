@@ -26,36 +26,36 @@ export function Configs() {
 
   const location = useLocation();
 
-  const updateConfigs = useCallback(() => {
-    configController
-      ?.getPublicConfigs()
-      .then((configs) => {
-        setConfigs(configs);
-      })
-      .catch((error) => {
-        console.error("Failed to fetch configs:", error);
-        showToast({
-          severity: "error",
-          summary: "Error",
-          detail: "Failed to fetch configs.",
-        });
+  const updateConfigs = useCallback(async () => {
+    if (!configController) return;
+
+    try {
+      const configs = await configController.getPublicConfigs();
+      setConfigs(configs);
+    } catch (error) {
+      console.error("Failed to fetch configs:", error);
+      showToast({
+        severity: "error",
+        summary: "Error",
+        detail: "Failed to fetch configs.",
       });
+    }
   }, [configController]);
 
-  const updateSubscriptions = useCallback(() => {
-    meControler
-      ?.getSubscriptions()
-      .then((subscriptions) => {
-        setSubscriptions(subscriptions);
-      })
-      .catch((error) => {
-        console.error("Failed to fetch subscriptions:", error);
-        showToast({
-          severity: "error",
-          summary: "Error",
-          detail: "Failed to fetch subscriptions.",
-        });
+  const updateSubscriptions = useCallback(async () => {
+    if (!meControler) return;
+
+    try {
+      const subscriptions = await meControler.getSubscriptions();
+      setSubscriptions(subscriptions);
+    } catch (error) {
+      console.error("Failed to fetch subscriptions:", error);
+      showToast({
+        severity: "error",
+        summary: "Error",
+        detail: "Failed to fetch subscriptions.",
       });
+    }
   }, [meControler]);
 
   useEffect(() => {
@@ -67,80 +67,78 @@ export function Configs() {
   }, [updateSubscriptions]);
 
   const handleSubscribe = useCallback(
-    (config: api.Config) => {
-      if (!configController) {
-        return;
-      }
+    async (config: api.Config) => {
+      if (!configController) return;
 
-      configController
-        .subscribe(config.id)
-        .then(() => {
-          updateSubscriptions();
-          showToast({
-            severity: "success",
-            summary: "Subscribed",
-            detail: "You have successfully subscribed to the config.",
-          });
-        })
-        .catch((error) => {
-          console.error("Failed to subscribe:", error);
-          showToast({
-            severity: "error",
-            summary: "Error",
-            detail: "Failed to subscribe to the config.",
-          });
+      try {
+        await configController.subscribe(config.id);
+        await updateSubscriptions();
+
+        showToast({
+          severity: "success",
+          summary: "Subscribed",
+          detail: "You have successfully subscribed to the config.",
         });
+      } catch (error) {
+        console.error("Failed to subscribe:", error);
+        showToast({
+          severity: "error",
+          summary: "Error",
+          detail: "Failed to subscribe to the config.",
+        });
+      }
     },
-    [configController]
+    [configController, updateSubscriptions]
   );
 
   const handleUnsubscribe = useCallback(
-    (config: api.Config) => {
-      if (!configController) {
-        return;
-      }
+    async (config: api.Config) => {
+      if (!configController) return;
 
-      configController
-        .unsubscribe(config.id)
-        .then(() => {
-          updateSubscriptions();
-          showToast({
-            severity: "success",
-            summary: "Unsubscribed",
-            detail: "You have successfully unsubscribed from the config.",
-          });
-        })
-        .catch((error) => {
-          console.error("Failed to unsubscribe:", error);
-          showToast({
-            severity: "error",
-            summary: "Error",
-            detail: "Failed to unsubscribe from the config.",
-          });
+      try {
+        await configController.unsubscribe(config.id);
+        await updateSubscriptions();
+
+        showToast({
+          severity: "success",
+          summary: "Unsubscribed",
+          detail: "You have successfully unsubscribed from the config.",
         });
+      } catch (error) {
+        console.error("Failed to unsubscribe:", error);
+        showToast({
+          severity: "error",
+          summary: "Error",
+          detail: "Failed to unsubscribe from the config.",
+        });
+      }
     },
-    [configController]
+    [configController, updateSubscriptions]
   );
 
   const handleDelete = useCallback(
-    (config: api.Config) => {
-      configController
-        ?.deleteConfig(config.id)
-        .then(() => {
-          updateConfigs();
-          updateSubscriptions();
-          showToast({
-            severity: "success",
-            summary: "Deleted",
-            detail: "Config has been successfully deleted.",
-          });
-        })
-        .catch((error) => {
-          console.error("Failed to delete config:", error);
-          showToast({ severity: "error", summary: "Error", detail: "Failed to delete the config." });
+    async (config: api.Config) => {
+      if (!configController) return;
+
+      try {
+        await configController.deleteConfig(config.id);
+        await Promise.all([updateConfigs, updateSubscriptions]);
+
+        showToast({
+          severity: "success",
+          summary: "Deleted",
+          detail: "Config has been successfully deleted.",
         });
+      } catch (error) {
+        console.error("Failed to delete config:", error);
+        showToast({
+          severity: "error",
+          summary: "Error",
+          detail: "Failed to delete the config.",
+        });
+      }
     },
-    [configController]
+    [configController, updateConfigs, updateSubscriptions]
   );
 
   const configMapper = useCallback(

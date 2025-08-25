@@ -20,40 +20,40 @@ export function Capes() {
 
   const location = useLocation();
 
-  const updateSelectedCape = useCallback(() => {
-    meController
-      ?.getCape()
-      .then((cape) => {
-        setSelectedCape(cape);
-      })
-      .catch((error) => {
-        if (error instanceof AxiosError && error.status == 404) {
-          setSelectedCape(null);
-        } else {
-          console.error("Failed to fetch selected cape: ", error);
-          showToast({
-            severity: "error",
-            summary: "Error",
-            detail: "Failed to fetch selected cape.",
-          });
-        }
-      });
-  }, [meController]);
+  const updateSelectedCape = useCallback(async () => {
+    if (!meController) return;
 
-  const updateCapes = useCallback(() => {
-    capeController
-      ?.getCapes()
-      .then((capes) => {
-        setCapes(capes);
-      })
-      .catch((error) => {
-        console.error("Failed to fetch capes: ", error);
+    try {
+      const cape = await meController.getCape();
+      setSelectedCape(cape);
+    } catch (error) {
+      if (error instanceof AxiosError && error.status == 404) {
+        setSelectedCape(null);
+      } else {
+        console.error("Failed to fetch selected cape: ", error);
         showToast({
           severity: "error",
           summary: "Error",
-          detail: "Failed to fetch capes.",
+          detail: "Failed to fetch selected cape.",
         });
+      }
+    }
+  }, [meController]);
+
+  const updateCapes = useCallback(async () => {
+    if (!capeController) return;
+
+    try {
+      const capes = await capeController.getCapes();
+      setCapes(capes);
+    } catch (error) {
+      console.error("Failed to fetch capes: ", error);
+      showToast({
+        severity: "error",
+        summary: "Error",
+        detail: "Failed to fetch capes.",
       });
+    }
   }, [capeController]);
 
   useEffect(() => {
@@ -65,51 +65,51 @@ export function Capes() {
   }, [updateCapes]);
 
   const handleSelect = useCallback(
-    (cape: api.Cape) => {
-      capeController
-        ?.select(cape.id)
-        .then(() => {
-          updateCapes();
-          updateSelectedCape();
-          showToast({
-            severity: "success",
-            summary: "Selected",
-            detail: "You have successfully selected the cape.",
-          });
-        })
-        .catch((error) => {
-          console.error("Failed to select cape: ", error);
-          showToast({
-            severity: "error",
-            summary: "Error",
-            detail: "Failed to select cape",
-          });
-        });
-    },
-    [capeController]
-  );
+    async (cape: api.Cape) => {
+      if (!capeController) return;
 
-  const handleUnselect = useCallback(() => {
-    meController
-      ?.unselectCape()
-      .then(() => {
-        updateCapes();
-        updateSelectedCape();
+      try {
+        await capeController.select(cape.id);
+        await updateSelectedCape();
+
         showToast({
           severity: "success",
-          summary: "Unselected",
-          detail: "You have successfully unselected the cape.",
+          summary: "Selected",
+          detail: "You have successfully selected the cape.",
         });
-      })
-      .catch((error) => {
-        console.error("Failed to unselect cape: ", error);
+      } catch (error) {
+        console.error("Failed to select cape: ", error);
         showToast({
           severity: "error",
           summary: "Error",
-          detail: "Failed to unselect cape",
+          detail: "Failed to select cape",
         });
+      }
+    },
+    [capeController, updateSelectedCape]
+  );
+
+  const handleUnselect = useCallback(async () => {
+    if (!meController) return;
+
+    try {
+      await meController.unselectCape();
+      await updateSelectedCape();
+
+      showToast({
+        severity: "success",
+        summary: "Unselected",
+        detail: "You have successfully unselected the cape.",
       });
-  }, [meController]);
+    } catch (error) {
+      console.error("Failed to unselect cape: ", error);
+      showToast({
+        severity: "error",
+        summary: "Error",
+        detail: "Failed to unselect cape",
+      });
+    }
+  }, [meController, updateSelectedCape]);
 
   if (!session) {
     return (

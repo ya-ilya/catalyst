@@ -62,7 +62,7 @@ export async function refreshTokenResponseIntercepter(
   response: AxiosResponse<any, any>
 ): Promise<AxiosResponse<any, any>> {
   if (response.status < 400) {
-    return Promise.resolve(response);
+    return response;
   }
 
   const serializedSession = localStorage.getItem("session");

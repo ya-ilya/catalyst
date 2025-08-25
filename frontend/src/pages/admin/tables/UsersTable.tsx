@@ -25,32 +25,33 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
 
   const [showToast] = useToastContext();
 
-  const fetchUsers = useCallback(() => {
+  const fetchUsers = useCallback(async () => {
+    if (!adminController) return;
+
     setLoading(true);
 
-    adminController
-      ?.getUsers()
-      .then((users) => {
-        setUsers(users);
-      })
-      .catch((error) => {
-        console.error("Failed to fetch users:", error);
-        showToast({
-          severity: "error",
-          summary: "Error",
-          detail: "Failed to fetch users.",
-        });
-      })
-      .finally(() => {
-        setLoading(false);
+    try {
+      const users = await adminController.getUsers();
+      setUsers(users);
+    } catch (error) {
+      console.error("Failed to fetch users:", error);
+      showToast({
+        severity: "error",
+        summary: "Error",
+        detail: "Failed to fetch users.",
       });
+    } finally {
+      setLoading(false);
+    }
   }, [adminController]);
 
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
 
-  const handleCreateUser = useCallback(() => {
+  const handleCreateUser = useCallback(async () => {
+    if (!adminController) return;
+
     if (username.length < 4 || username.length > 32) {
       showToast({
         severity: "error",
@@ -60,63 +61,66 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
       return;
     }
 
-    adminController
-      ?.createUser({ username: username })
-      .then((createdUser) => {
-        setTemporaryPassword(createdUser.temporaryPassword);
-        fetchUsers();
-      })
-      .catch((error) => {
-        console.error("Failed to create user:", error);
-
-        if (error instanceof AxiosError && error.response) {
-          if (error.status === 400) {
-            showToast({
-              severity: "error",
-              summary: "Error",
-              detail: "Invalid format for username.",
-            });
-            return;
-          } else if (error.status === 409) {
-            showToast({
-              severity: "error",
-              summary: "Error",
-              detail: "User with same name already exists.",
-            });
-            return;
-          }
-        }
-
-        showToast({
-          severity: "error",
-          summary: "Error",
-          detail: "Failed to create user.",
-        });
+    try {
+      const createdUser = await adminController.createUser({
+        username: username,
       });
+
+      setTemporaryPassword(createdUser.temporaryPassword);
+      await fetchUsers();
+    } catch (error) {
+      console.error("Failed to create user:", error);
+
+      if (error instanceof AxiosError && error.response) {
+        if (error.status === 400) {
+          showToast({
+            severity: "error",
+            summary: "Error",
+            detail: "Invalid format for username.",
+          });
+          return;
+        } else if (error.status === 409) {
+          showToast({
+            severity: "error",
+            summary: "Error",
+            detail: "User with same name already exists.",
+          });
+          return;
+        }
+      }
+
+      showToast({
+        severity: "error",
+        summary: "Error",
+        detail: "Failed to create user.",
+      });
+    } finally {
+      setIsDialogVisible(false);
+    }
   }, [adminController, username, fetchUsers]);
 
   const handleDeleteUser = useCallback(
-    (userId: string) => {
+    async (userId: string) => {
+      if (!adminController) return;
+
       if (window.confirm("Are you sure you want to delete this user?")) {
-        adminController
-          ?.deleteUser(userId)
-          .then(() => {
-            fetchUsers();
-          })
-          .catch((error) => {
-            console.error("Failed to delete user:", error);
-            showToast({
-              severity: "error",
-              summary: "Error",
-              detail: "Failed to delete user.",
-            });
+        try {
+          await adminController.deleteUser(userId);
+          await fetchUsers();
+        } catch (error) {
+          console.error("Failed to delete user:", error);
+          showToast({
+            severity: "error",
+            summary: "Error",
+            detail: "Failed to delete user.",
           });
+        }
       }
     },
     [adminController, fetchUsers]
   );
 
-  const tableActions = useCallback(
+  const actionsTemplate = useCallback(
     (user: api.User) => {
       return (
         <Button
@@ -207,7 +211,7 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
         />
         <Column
           header="Actions"
-          body={tableActions}
+          body={actionsTemplate}
         />
       </DataTable>
 

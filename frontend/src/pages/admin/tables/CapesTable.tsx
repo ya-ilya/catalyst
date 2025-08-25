@@ -26,32 +26,34 @@ export function CapesTable({ adminController }: CapesTableProps) {
 
   const [showToast] = useToastContext();
 
-  const fetchCapes = useCallback(() => {
+  const fetchCapes = useCallback(async () => {
+    if (!capeController) return;
+
     setLoading(true);
 
-    capeController
-      ?.getCapes()
-      .then((capes) => {
-        setCapes(capes);
-      })
-      .catch((error) => {
-        console.error("Failed to fetch capes:", error);
-        showToast({
-          severity: "error",
-          summary: "Error",
-          detail: "Failed to fetch capes.",
-        });
-      })
-      .finally(() => {
-        setLoading(false);
+    try {
+      const capes = await capeController.getCapes();
+
+      setCapes(capes);
+    } catch (error) {
+      console.error("Failed to fetch capes:", error);
+      showToast({
+        severity: "error",
+        summary: "Error",
+        detail: "Failed to fetch capes.",
       });
+    } finally {
+      setLoading(false);
+    }
   }, [capeController]);
 
   useEffect(() => {
     fetchCapes();
   }, [fetchCapes]);
 
-  const handleCreateCape = useCallback(() => {
+  const handleCreateCape = useCallback(async () => {
+    if (!adminController) return;
+
     if (name.length < 4 || name.length > 32) {
       showToast({
         severity: "error",
@@ -69,49 +71,49 @@ export function CapesTable({ adminController }: CapesTableProps) {
       });
     }
 
-    adminController
-      ?.createCape(name, description, uploadedCape!)
-      .catch(() => {
-        fetchCapes();
-        setIsDialogVisible(false);
-        showToast({
-          severity: "success",
-          summary: "Cape Created",
-          detail: "New cape successfully created",
-        });
-      })
-      .catch((error) => {
-        console.log("Failed to create cape:", error);
-        showToast({
-          severity: "error",
-          summary: "Error",
-          detail: "Failed to create cape.",
-        });
+    try {
+      await adminController.createCape(name, description, uploadedCape!);
+      await fetchCapes();
+
+      showToast({
+        severity: "success",
+        summary: "Cape Created",
+        detail: "New cape successfully created",
       });
+    } catch (error) {
+      console.log("Failed to create cape:", error);
+      showToast({
+        severity: "error",
+        summary: "Error",
+        detail: "Failed to create cape.",
+      });
+    } finally {
+      setIsDialogVisible(false);
+    }
   }, [adminController, name, description, uploadedCape, fetchCapes, setIsDialogVisible]);
 
   const handleDeleteCape = useCallback(
-    (capeId: string) => {
+    async (capeId: string) => {
+      if (!adminController) return;
+
       if (window.confirm("Are you sure you want to delete this cape?")) {
-        adminController
-          ?.deleteCape(capeId)
-          .then(() => {
-            fetchCapes();
-          })
-          .catch((error) => {
-            console.error("Failed to delete cape:", error);
-            showToast({
-              severity: "error",
-              summary: "Error",
-              detail: "Failed to delete cape.",
-            });
+        try {
+          await adminController.deleteCape(capeId);
+          await fetchCapes();
+        } catch (error) {
+          console.error("Failed to delete cape:", error);
+          showToast({
+            severity: "error",
+            summary: "Error",
+            detail: "Failed to delete cape.",
           });
+        }
       }
     },
     [adminController, fetchCapes]
   );
 
-  const tableActions = useCallback(
+  const actionsTemplate = useCallback(
     (cape: api.Cape) => {
       return (
         <Button
@@ -126,6 +128,16 @@ export function CapesTable({ adminController }: CapesTableProps) {
     [handleDeleteCape]
   );
 
+  const imageTemplate = (cape: api.Cape) => {
+    return (
+      <img
+        className="image"
+        src={`http://127.0.0.1:3000/api/capes/${cape.id}/image`}
+        alt={cape.id}
+      />
+    );
+  };
+
   const tableHeader = (
     <div className="admin-table-header">
       <span className="title">Cape Management</span>
@@ -137,6 +149,7 @@ export function CapesTable({ adminController }: CapesTableProps) {
           onClick={() => {
             setName("");
             setDescription("");
+            setUploadedCape(null);
             setIsDialogVisible(true);
           }}
           outlined
@@ -196,6 +209,10 @@ export function CapesTable({ adminController }: CapesTableProps) {
           body={(cape: api.Cape) => cape.id.slice(0, 8)}
         />
         <Column
+          header="Image"
+          body={imageTemplate}
+        />
+        <Column
           field="name"
           header="Name"
         />
@@ -205,7 +222,7 @@ export function CapesTable({ adminController }: CapesTableProps) {
         />
         <Column
           header="Actions"
-          body={tableActions}
+          body={actionsTemplate}
         />
       </DataTable>
       <Dialog

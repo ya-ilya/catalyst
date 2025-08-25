@@ -29,25 +29,27 @@ export function Account() {
   const location = useLocation();
 
   useEffect(() => {
-    meController
-      ?.getUser()
-      .then((user) => {
+    const fetchUser = async () => {
+      if (!meController) return;
+
+      try {
+        const user = await meController.getUser();
         setUser(user);
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error("Failed to fetch user data:", error);
         showToast({
           severity: "error",
           summary: "Error",
           detail: "Failed to fetch user data.",
         });
-      });
+      }
+    };
+
+    fetchUser();
   }, [meController]);
 
   const handlePasswordChange = useCallback(async () => {
-    if (!meController) {
-      return;
-    }
+    if (!meController) return;
 
     if (newPassword.length < 8) {
       console.error("New password must be at least 8 characters long!");

@@ -25,51 +25,50 @@ export function SignIn() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const handleLogin = useCallback(() => {
+  const handleLogin = useCallback(async () => {
     setLoading(true);
 
-    authenticationController
-      .signIn({ username, password })
-      .then((response) => {
-        const redirectTo = searchParams.get("redirectTo");
-        setSession(response);
-        navigate(redirectTo ? decodeURIComponent(redirectTo) : "/");
-      })
-      .catch((error) => {
-        console.error("Login failed:", error);
+    try {
+      const response = await authenticationController.signIn({ username, password });
+      const redirectTo = searchParams.get("redirectTo");
+      setSession(response);
+      navigate(redirectTo ? decodeURIComponent(redirectTo) : "/");
+    } catch (error) {
+      console.error("Login failed:", error);
 
-        if (error instanceof AxiosError && error.response) {
-          if (error.status == 401 && error.response.data.fields.contains("password")) {
-            showToast({
-              severity: "error",
-              summary: "Login Error",
-              detail: "Invalid password.",
-            });
-            return;
-          } else if (error.status == 404) {
-            showToast({
-              severity: "error",
-              summary: "Login Error",
-              detail: "User not found.",
-            });
-            return;
-          } else if (error.status == 400) {
-            showToast({
-              severity: "error",
-              summary: "Login Error",
-              detail: "Invalid username or password.",
-            });
-            return;
-          }
+      if (error instanceof AxiosError && error.response) {
+        if (error.status == 401 && error.response.data.fields.contains("password")) {
+          showToast({
+            severity: "error",
+            summary: "Login Error",
+            detail: "Invalid password.",
+          });
+          return;
+        } else if (error.status == 404) {
+          showToast({
+            severity: "error",
+            summary: "Login Error",
+            detail: "User not found.",
+          });
+          return;
+        } else if (error.status == 400) {
+          showToast({
+            severity: "error",
+            summary: "Login Error",
+            detail: "Invalid username or password.",
+          });
+          return;
         }
+      }
 
-        showToast({
-          severity: "error",
-          summary: "Login Error",
-          detail: "Failed to sign in.",
-        });
-      })
-      .finally(() => setLoading(false));
+      showToast({
+        severity: "error",
+        summary: "Login Error",
+        detail: "Failed to sign in.",
+      });
+    } finally {
+      setLoading(false);
+    }
   }, [username, password, searchParams, authenticationController]);
 
   return (
