@@ -6,7 +6,10 @@ export function useThemeContext() {
   return useContext(ThemeContext);
 }
 
-export const ThemeContext = createContext<[isDarkMode: boolean | null, toggleTheme: () => void]>([null, () => {}]);
+export const ThemeContext = createContext<[isDarkMode: boolean | null, toggleTheme: () => void]>([
+  null,
+  () => {},
+]);
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [isDarkMode, setIsDarkMode] = useLocalStorage(
@@ -22,8 +25,11 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
-    const theme = isDarkMode ? "lara-dark-indigo" : "lara-light-indigo";
-    themeLink.href = `themes/${theme}/theme.css`;
+    const theme = `themes/${isDarkMode ? "lara-dark-indigo" : "lara-light-indigo"}/theme.css`;
+
+    if (!themeLink.href.endsWith(theme)) {
+      themeLink.href = theme;
+    }
 
     document.body.classList.toggle("dark", isDarkMode ?? undefined);
   }, [isDarkMode]);

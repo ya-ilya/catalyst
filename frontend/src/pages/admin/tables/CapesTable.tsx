@@ -3,6 +3,7 @@ import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import { Dialog } from "primereact/dialog";
 import { FileUpload, FileUploadHandlerEvent } from "primereact/fileupload";
+import { FloatLabel } from "primereact/floatlabel";
 import { InputText } from "primereact/inputtext";
 import { useCallback, useEffect, useState } from "react";
 
@@ -160,7 +161,7 @@ export function CapesTable({ adminController }: CapesTableProps) {
         label="Cancel"
         icon="pi pi-times"
         onClick={() => setIsDialogVisible(false)}
-        className="p-button-text"
+        text
       />
       <Button
         label="Create"
@@ -220,33 +221,36 @@ export function CapesTable({ adminController }: CapesTableProps) {
         />
       </DataTable>
       <Dialog
+        className="admin-dialog"
         header="Create New Cape"
         visible={isDialogVisible}
-        style={{ width: "400px" }}
         footer={dialogFooter}
         onHide={() => setIsDialogVisible(false)}
       >
         <div className="p-fluid">
           <div className="p-field">
-            <label htmlFor="new-name">Name</label>
-            <InputText
-              id="new-name"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              invalid={name.length < MIN_NAME_LENGTH || name.length > MAX_NAME_LENGTH}
-            />
+            <FloatLabel>
+              <InputText
+                id="new-name"
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                invalid={name.length < MIN_NAME_LENGTH || name.length > MAX_NAME_LENGTH}
+              />
+              <label htmlFor="new-name">Name</label>
+            </FloatLabel>
           </div>
-          <div
-            className="p-field"
-            style={{ marginTop: 3 }}
-          >
-            <label htmlFor="new-description">Description</label>
-            <InputText
-              id="new-description"
-              value={description}
-              onChange={(event) => setDescription(event.target.value)}
-              invalid={description.length < MIN_DESCRIPTION_LENGTH || description.length > MAX_DESCRIPTION_LENGTH}
-            />
+          <div className="p-field">
+            <FloatLabel>
+              <InputText
+                id="new-description"
+                value={description}
+                onChange={(event) => setDescription(event.target.value)}
+                invalid={
+                  description.length < MIN_DESCRIPTION_LENGTH || description.length > MAX_DESCRIPTION_LENGTH
+                }
+              />
+              <label htmlFor="new-description">Description</label>
+            </FloatLabel>
           </div>
           <div
             className="p-field"

@@ -42,6 +42,11 @@
   align-items: center;
 }
 
+.change-password-dialog {
+  max-width: 400px;
+  width: 90vw;
+}
+
 .change-password-dialog .p-field {
   margin-top: 20px;
 }

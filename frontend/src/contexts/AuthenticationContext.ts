@@ -14,7 +14,7 @@ export class Session {
   constructor(accessToken: string, refreshToken: string, user: User) {
     this.accessToken = accessToken;
     this.refreshToken = refreshToken;
-    this.user = user
+    this.user = user;
   }
 }
 

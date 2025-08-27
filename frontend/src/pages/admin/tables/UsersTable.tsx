@@ -3,6 +3,7 @@ import { Button } from "primereact/button";
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import { Dialog } from "primereact/dialog";
+import { FloatLabel } from "primereact/floatlabel";
 import { InputText } from "primereact/inputtext";
 import { Panel } from "primereact/panel";
 import { useCallback, useEffect, useState } from "react";
@@ -163,7 +164,7 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
         label="Cancel"
         icon="pi pi-times"
         onClick={() => setIsDialogVisible(false)}
-        className="p-button-text"
+        text
       />
       <Button
         label="Create"
@@ -211,21 +212,23 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
       </DataTable>
 
       <Dialog
+        className="admin-dialog"
         header="Create New User"
         visible={isDialogVisible}
-        style={{ width: "400px" }}
         footer={dialogFooter}
         onHide={() => setIsDialogVisible(false)}
       >
         <div className="p-fluid">
           <div className="p-field">
-            <label htmlFor="new-username">Username</label>
-            <InputText
-              id="new-username"
-              value={username}
-              onChange={(event) => setUsername(event.target.value)}
-              invalid={username.length < MIN_USERNAME_LENGTH || username.length > MAX_USERNAME_LENGTH}
-            />
+            <FloatLabel>
+              <InputText
+                id="new-username"
+                value={username}
+                onChange={(event) => setUsername(event.target.value)}
+                invalid={username.length < MIN_USERNAME_LENGTH || username.length > MAX_USERNAME_LENGTH}
+              />
+              <label htmlFor="new-username">Username</label>
+            </FloatLabel>
           </div>
           {temporaryPassword && (
             <div

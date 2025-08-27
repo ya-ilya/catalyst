@@ -2,6 +2,7 @@ import "./Cape.css";
 
 import { Button } from "primereact/button";
 import { Card } from "primereact/card";
+import { Dialog } from "primereact/dialog";
 import { useEffect, useState } from "react";
 import ReactSkinview3d from "react-skinview3d";
 
@@ -9,6 +10,7 @@ import * as api from "../../api";
 
 const DEFAULT_SKIN_URL =
   "http://textures.minecraft.net/texture/cafaa0fac9f1ae898431e8b99c1ba7a200f25d7154fba26490139e94daa366bb";
+const BACK_EQUIPMENTS = ["Cape", "Elytra"];
 
 type CapeProps = {
   cape: api.Cape;
@@ -18,10 +20,9 @@ type CapeProps = {
 };
 
 export function Cape(props: CapeProps) {
+  const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [viewer, setViewer] = useState<any>(null);
-
-  const backEquipments = ["Cape", "Elytra"];
-  const [backEquipment, setBackEquipment] = useState(backEquipments[0]);
+  const [backEquipment, setBackEquipment] = useState(BACK_EQUIPMENTS[0]);
 
   useEffect(() => {
     if (!viewer) {
@@ -42,40 +43,66 @@ export function Cape(props: CapeProps) {
     }
   }, [backEquipment, viewer]);
 
-  return (
-    <Card className={`cape ${props.isSelected ? "--selected-cape" : ""}`}>
-      <ReactSkinview3d
-        className="viewer"
-        skinUrl={DEFAULT_SKIN_URL}
-        capeUrl={`http://127.0.0.1:3000/api/capes/${props.cape.id}/image`}
-        width={220}
-        height={300}
-        onReady={(params) => {
-          params.viewer.controls.enableZoom = false;
-          params.viewer.playerWrapper.rotation.y += 3.92699;
-          params.canvasRef.addEventListener("contextmenu", (event) => {
-            event.preventDefault();
-            setBackEquipment((backEquipment) => (backEquipment == "Cape" ? "Elytra" : "Cape"));
-          });
-          setViewer(params.viewer);
-        }}
+  const dialogFooter = (
+    <div>
+      <Button
+        label="Close"
+        icon="pi pi-times"
+        onClick={() => setIsDialogVisible(false)}
       />
-      <div className="actions">
-        {props.isSelected ? (
+    </div>
+  );
+
+  return (
+    <>
+      <Card className={`cape ${props.isSelected ? "--selected-cape" : ""}`}>
+        <h2 className="title">{props.cape.name}</h2>
+        <ReactSkinview3d
+          className="viewer"
+          skinUrl={DEFAULT_SKIN_URL}
+          capeUrl={`http://127.0.0.1:3000/api/capes/${props.cape.id}/image`}
+          width={250}
+          height={300}
+          onReady={(params) => {
+            params.viewer.controls.enableZoom = false;
+            params.viewer.playerWrapper.rotation.y += 3.92699;
+            params.canvasRef.addEventListener("contextmenu", (event) => {
+              event.preventDefault();
+              setBackEquipment((backEquipment) => (backEquipment == "Cape" ? "Elytra" : "Cape"));
+            });
+            setViewer(params.viewer);
+          }}
+        />
+        <div className="actions">
           <Button
-            icon="pi pi-minus"
-            label="Unselect"
-            onClick={props.unselect}
-            outlined
+            icon="pi pi-info"
+            onClick={() => setIsDialogVisible(true)}
           />
-        ) : (
-          <Button
-            icon="pi pi-plus"
-            label="Select"
-            onClick={props.select}
-          />
-        )}
-      </div>
-    </Card>
+          {props.isSelected ? (
+            <Button
+              icon="pi pi-minus"
+              label="Unselect"
+              onClick={props.unselect}
+              outlined
+            />
+          ) : (
+            <Button
+              icon="pi pi-plus"
+              label="Select"
+              onClick={props.select}
+            />
+          )}
+        </div>
+      </Card>
+      <Dialog
+        className="cape-description-dialog"
+        header={`"${props.cape.name}" cape description`}
+        visible={isDialogVisible}
+        footer={dialogFooter}
+        onHide={() => setIsDialogVisible(false)}
+      >
+        <div className="p-fluid">{props.cape.description}</div>
+      </Dialog>
+    </>
   );
 }

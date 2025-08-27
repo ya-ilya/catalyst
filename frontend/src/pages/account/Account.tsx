@@ -188,7 +188,6 @@ export function Account() {
         className="change-password-dialog"
         header="Change Password"
         visible={isDialogVisible}
-        style={{ maxWidth: "400px", width: "90vw" }}
         footer={dialogFooter}
         onHide={() => setIsDialogVisible(false)}
       >
