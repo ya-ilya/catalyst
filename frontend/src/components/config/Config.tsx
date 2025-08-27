@@ -15,12 +15,14 @@ type ConfigProps = {
 };
 
 export function Config(props: ConfigProps) {
+  const { config, isAuthor, isSubscribed, subscribe, unsubscribe } = props;
+
   return (
     <Card className="config">
       <div className="config-header">
-        <span className="config-name">{props.config.name}</span>
-        <span className="config-author">by {props.config.author.username}</span>
-        <span className="config-id">id: {props.config.id.slice(0, 8)}</span>
+        <span className="config-name">{config.name}</span>
+        <span className="config-author">by {config.author.username}</span>
+        <span className="config-id">id: {config.id.slice(0, 8)}</span>
       </div>
       <div className="config-footer">
         <Button
@@ -29,25 +31,25 @@ export function Config(props: ConfigProps) {
           rounded
           text
         />
-        {!props.isAuthor && props.isSubscribed && (
+        {!isAuthor && isSubscribed && (
           <Button
             icon="pi pi-minus-circle"
             className="p-button-danger p-button-sm"
-            onClick={props.unsubscribe}
+            onClick={unsubscribe}
             rounded
             text
           />
         )}
-        {!props.isSubscribed && (
+        {!isSubscribed && (
           <Button
             icon="pi pi-plus-circle"
             className="add-button p-button-sm"
-            onClick={props.subscribe}
+            onClick={subscribe}
             rounded
             text
           />
         )}
-        {props.isAuthor && (
+        {isAuthor && (
           <Button
             icon="pi pi-trash"
             className="p-button-danger p-button-sm"

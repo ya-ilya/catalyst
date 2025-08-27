@@ -19,7 +19,7 @@ type CapeProps = {
   unselect: () => void;
 };
 
-export function Cape(props: CapeProps) {
+export function Cape({ cape, isSelected, select, unselect }: CapeProps) {
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [viewer, setViewer] = useState<any>(null);
   const [backEquipment, setBackEquipment] = useState(BACK_EQUIPMENTS[0]);
@@ -55,12 +55,12 @@ export function Cape(props: CapeProps) {
 
   return (
     <>
-      <Card className={`cape ${props.isSelected ? "--selected-cape" : ""}`}>
-        <h2 className="title">{props.cape.name}</h2>
+      <Card className={`cape ${isSelected ? "--selected-cape" : ""}`}>
+        <h2 className="title">{cape.name}</h2>
         <ReactSkinview3d
           className="viewer"
           skinUrl={DEFAULT_SKIN_URL}
-          capeUrl={`http://127.0.0.1:3000/api/capes/${props.cape.id}/image`}
+          capeUrl={`http://127.0.0.1:3000/api/capes/${cape.id}/image`}
           width={250}
           height={300}
           onReady={(params) => {
@@ -78,30 +78,30 @@ export function Cape(props: CapeProps) {
             icon="pi pi-info"
             onClick={() => setIsDialogVisible(true)}
           />
-          {props.isSelected ? (
+          {isSelected ? (
             <Button
               icon="pi pi-minus"
               label="Unselect"
-              onClick={props.unselect}
+              onClick={unselect}
               outlined
             />
           ) : (
             <Button
               icon="pi pi-plus"
               label="Select"
-              onClick={props.select}
+              onClick={select}
             />
           )}
         </div>
       </Card>
       <Dialog
         className="cape-description-dialog"
-        header={`"${props.cape.name}" cape description`}
+        header={`"${cape.name}" cape description`}
         visible={isDialogVisible}
         footer={dialogFooter}
         onHide={() => setIsDialogVisible(false)}
       >
-        <div className="p-fluid">{props.cape.description}</div>
+        <div className="p-fluid">{cape.description}</div>
       </Dialog>
     </>
   );
