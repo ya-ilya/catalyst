@@ -8,13 +8,15 @@ import { Controller } from "./Controller";
 
 export function useConfigController() {
   const [session] = useAuthenticationContext();
-  const [configController, setConfigController] = useState(session ? createConfigController(session) : undefined);
+  const [configController, setConfigController] = useState(
+    session ? createConfigController(session) : undefined
+  );
 
   useEffect(() => {
     if (session) {
       setConfigController(createConfigController(session));
     } else {
-      setConfigController(undefined)
+      setConfigController(undefined);
     }
   }, [session]);
 
@@ -46,7 +48,7 @@ export class ConfigController extends Controller {
     return (await this.client.get(`/${id}/files`)).data;
   }
 
-  async getConfigFile(id: string, name: string): Promise<string> {
+  async getConfigFile(id: string, name: string): Promise<string | any> {
     return (await this.client.get(`/${id}/files/${name}`)).data;
   }
 

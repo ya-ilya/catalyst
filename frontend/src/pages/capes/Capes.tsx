@@ -118,19 +118,21 @@ export function Capes() {
   return (
     <div className="capes-container">
       <Header />
-      <div className="capes-content">
-        {capes.map((cape) => {
-          return (
+      {capes.length === 0 ? (
+        <div className="empty-message">No capes available.</div>
+      ) : (
+        <div className="capes-content">
+          {capes.map((cape) => (
             <Cape
               key={cape.id}
               cape={cape}
-              isSelected={cape.id == selectedCape?.id}
+              isSelected={cape.id === selectedCape?.id}
               select={() => handleSelect(cape)}
               unselect={handleUnselect}
             />
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -22,7 +22,8 @@
   background: transparent;
 }
 
-.configs-content .subscriptions {
+.configs-content .subscriptions,
+.configs-content .library {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(200px, 80vw), 1fr));
   gap: 16px;
@@ -30,10 +31,12 @@
   overflow-y: auto;
 }
 
-.configs-content .library {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(200px, 80vw), 1fr));
-  gap: 16px;
-  padding: 16px;
-  overflow-y: auto;
+.configs-content .empty-message,
+.configs-content .empty-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  font-size: 1.5rem;
+  color: var(--text-color-secondary);
 }

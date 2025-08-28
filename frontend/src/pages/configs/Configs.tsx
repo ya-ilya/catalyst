@@ -122,7 +122,8 @@ export function Configs() {
 
       try {
         await configController.deleteConfig(config.id);
-        await Promise.all([updateConfigs, updateSubscriptions]);
+        await updateConfigs();
+        await updateSubscriptions();
 
         showToast({
           severity: "success",
@@ -177,11 +178,25 @@ export function Configs() {
           onTabChange={(event) => setActiveIndex(event.index)}
         />
         {activeIndex === 0 && (
-          <div className="subscriptions">
-            {subscriptions.map((subscription) => configMapper(subscription.id, subscription.config))}
-          </div>
+          <>
+            {subscriptions.length === 0 ? (
+              <div className="empty-message">No subscriptions yet.</div>
+            ) : (
+              <div className="subscriptions">
+                {subscriptions.map((subscription) => configMapper(subscription.id, subscription.config))}
+              </div>
+            )}
+          </>
         )}
-        {activeIndex === 1 && <div className="library">{configs.map((config) => configMapper(config.id, config))}</div>}
+        {activeIndex === 1 && (
+          <>
+            {configs.length === 0 ? (
+              <div className="empty-message">No configs available.</div>
+            ) : (
+              <div className="library">{configs.map((config) => configMapper(config.id, config))}</div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );

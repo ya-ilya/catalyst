@@ -39,3 +39,25 @@
 .config .config-footer .add-button {
   color: var(--green-500);
 }
+
+.config-preview-dialog {
+  max-width: 600px;
+  width: 90vw;
+  max-height: 600px;
+}
+
+.config-preview-dialog .p-tree {
+  overflow-y: auto;
+}
+
+.config-preview-dialog .content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.config-preview-dialog .none-selected {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
