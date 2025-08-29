@@ -1,6 +1,7 @@
 package org.catalyst.backend.configurations
 
 import org.catalyst.backend.configurations.filter.AuthenticationFilter
+import org.catalyst.backend.configurations.filter.RateLimitingFilter
 import org.catalyst.backend.services.UserService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -25,6 +26,7 @@ import org.springframework.web.cors.CorsConfiguration
 class SecurityConfiguration(
     private val userService: UserService,
     private val authenticationFilter: AuthenticationFilter,
+    private val rateLimitingFilter: RateLimitingFilter,
     private val passwordEncoder: PasswordEncoder
 ) {
     @Bean
@@ -58,13 +60,14 @@ class SecurityConfiguration(
             }
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+            .addFilterBefore(rateLimitingFilter, AuthenticationFilter::class.java)
         return http.build()
     }
 
     @Bean
     fun authenticationProvider(): AuthenticationProvider {
         val authenticationProvider = DaoAuthenticationProvider(userService)
-        authenticationProvider.setPasswordEncoder(passwordEncoder)
+        authenticationProvider.passwordEncoder = passwordEncoder
         return authenticationProvider
     }
 }

@@ -39,6 +39,7 @@ export const Config = memo((props: ConfigProps) => {
 
   useEffect(() => {
     const fetchFiles = async () => {
+      if (!isDialogVisible) return;
       if (!configController) return;
 
       try {
@@ -64,7 +65,7 @@ export const Config = memo((props: ConfigProps) => {
     };
 
     fetchFiles();
-  }, [config, configController]);
+  }, [isDialogVisible, config, configController]);
 
   useEffect(() => {
     if (!selectedKey) {
@@ -73,6 +74,7 @@ export const Config = memo((props: ConfigProps) => {
     }
 
     const fetchContent = async () => {
+      if (!isDialogVisible) return;
       if (!configController) return;
 
       try {
@@ -100,7 +102,7 @@ export const Config = memo((props: ConfigProps) => {
     };
 
     fetchContent();
-  }, [config, selectedKey, configController]);
+  }, [isDialogVisible, config, selectedKey, configController]);
 
   const dialogFooter = (
     <div>

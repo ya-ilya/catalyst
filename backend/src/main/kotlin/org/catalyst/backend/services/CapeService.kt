@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.server.ResponseStatusException
+import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.IOException
 import java.util.*
@@ -20,6 +21,13 @@ class CapeService(
     private val capeRepository: CapeRepository,
     private val userService: UserService
 ) {
+    private companion object {
+        val PNG_MAGIC_NUMBERS = byteArrayOf(
+            0x89.toByte(), 0x50.toByte(), 0x4E.toByte(), 0x47.toByte(),
+            0x0D.toByte(), 0x0A.toByte(), 0x1A.toByte(), 0x0A.toByte()
+        )
+    }
+
     @Value($$"${catalyst.capes.directory}")
     private val capesDirectory: String? = null
 
@@ -61,6 +69,14 @@ class CapeService(
     ): Cape {
         if (image.size > 100 * 1024L) {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Too big cape file size")
+        }
+
+        val buffer = ByteArray(PNG_MAGIC_NUMBERS.size)
+        ByteArrayInputStream(image.bytes).use { fis ->
+            val bytesRead = fis.read(buffer)
+            if (bytesRead != PNG_MAGIC_NUMBERS.size || !buffer.contentEquals(PNG_MAGIC_NUMBERS)) {
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Cape image must be in png format")
+            }
         }
 
         val cape = capeRepository.save(
