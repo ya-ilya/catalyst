@@ -10,6 +10,7 @@ import org.catalyst.backend.responses.UserResponse
 import org.catalyst.backend.services.CapeService
 import org.catalyst.backend.services.UserService
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
@@ -41,8 +42,18 @@ class AdminController(
     }
 
     @GetMapping("/users")
-    fun getUsers(): List<UserResponse> {
-        return userService.getUsers().map { it.toResponse() }
+    fun getUsers(
+        @RequestParam(value = "limit", required = false, defaultValue = "10") limit: Int,
+        @RequestParam(value = "offset", required = false, defaultValue = "0") offset: Int,
+    ): ResponseEntity<List<UserResponse>> {
+        val page = userService.getUsers(limit, offset)
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .header("X-Total-Count", page.totalElements.toString())
+            .header("X-Total-Pages", page.totalPages.toString())
+            .header("Access-Control-Expose-Headers", "X-Total-Count,X-Total-Pages")
+            .body(page.content.map { it.toResponse() })
     }
 
     @GetMapping("/users/{id}")

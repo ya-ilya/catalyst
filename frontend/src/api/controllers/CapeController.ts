@@ -34,8 +34,19 @@ export class CapeController extends Controller {
     super(client, "/api/capes", token);
   }
 
-  async getCapes(): Promise<Cape[]> {
-    return (await this.client.get("")).data;
+  async getCapes(limit: number, offset: number): Promise<{ capes: Cape[]; total: number; pages: number }> {
+    const response = await this.client.get("", {
+      params: {
+        limit: limit,
+        offset: offset,
+      },
+    });
+
+    return {
+      capes: response.data,
+      total: parseInt(response.headers["x-total-count"]),
+      pages: parseInt(response.headers["x-total-pages"]),
+    };
   }
 
   async getCapeById(id: string): Promise<Cape> {

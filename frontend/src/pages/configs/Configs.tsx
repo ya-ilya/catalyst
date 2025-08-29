@@ -1,5 +1,6 @@
 import "./Configs.css";
 
+import { Paginator } from "primereact/paginator";
 import { TabMenu } from "primereact/tabmenu";
 import { useCallback, useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router";
@@ -8,12 +9,19 @@ import * as api from "../../api";
 import { Config, Header } from "../../components";
 import { useAuthenticationContext, useToastContext } from "../../contexts";
 
+const MAX_CONFIGS_PER_PAGE = 35;
+
 export function Configs() {
   const meControler = api.useMeController();
   const configController = api.useConfigController();
 
   const [subscriptions, setSubscriptions] = useState<api.Subscription[]>([]);
+  const [subscriptionsPage, setSubscriptionsPage] = useState(0);
+  const [subscriptionsTotal, setSubscriptionsTotal] = useState(0);
+
   const [configs, setConfigs] = useState<api.Config[]>([]);
+  const [configsPage, setConfigsPage] = useState(0);
+  const [configsTotal, setConfigsTotal] = useState(0);
 
   const [activeIndex, setActiveIndex] = useState(0);
   const items = [
@@ -30,8 +38,9 @@ export function Configs() {
     if (!configController) return;
 
     try {
-      const configs = await configController.getPublicConfigs();
+      const { configs, total } = await configController.getPublicConfigs(MAX_CONFIGS_PER_PAGE, configsPage);
       setConfigs(configs);
+      setConfigsTotal(total);
     } catch (error) {
       console.error("Failed to fetch configs:", error);
       showToast({
@@ -40,14 +49,18 @@ export function Configs() {
         detail: "Failed to fetch configs.",
       });
     }
-  }, [configController]);
+  }, [configController, configsPage]);
 
   const updateSubscriptions = useCallback(async () => {
     if (!meControler) return;
 
     try {
-      const subscriptions = await meControler.getSubscriptions();
+      const { subscriptions, total } = await meControler.getSubscriptions(
+        MAX_CONFIGS_PER_PAGE,
+        subscriptionsPage
+      );
       setSubscriptions(subscriptions);
+      setSubscriptionsTotal(total);
     } catch (error) {
       console.error("Failed to fetch subscriptions:", error);
       showToast({
@@ -56,7 +69,7 @@ export function Configs() {
         detail: "Failed to fetch subscriptions.",
       });
     }
-  }, [meControler]);
+  }, [meControler, subscriptionsPage]);
 
   useEffect(() => {
     updateConfigs();
@@ -142,23 +155,6 @@ export function Configs() {
     [configController, updateConfigs, updateSubscriptions]
   );
 
-  const configMapper = useCallback(
-    (key: string, config: api.Config) => {
-      return (
-        <Config
-          key={key}
-          config={config}
-          isAuthor={session !== null && config.author.id === session.user.id}
-          isSubscribed={subscriptions?.some((other) => other.config.id === config.id)}
-          subscribe={() => handleSubscribe(config)}
-          unsubscribe={() => handleUnsubscribe(config)}
-          delete={() => handleDelete(config)}
-        />
-      );
-    },
-    [session, subscriptions, handleSubscribe, handleUnsubscribe, handleDelete]
-  );
-
   if (!session) {
     return (
       <Navigate
@@ -183,7 +179,17 @@ export function Configs() {
               <div className="empty-message">No subscriptions yet.</div>
             ) : (
               <div className="subscriptions">
-                {subscriptions.map((subscription) => configMapper(subscription.id, subscription.config))}
+                {subscriptions.map((subscription) => (
+                  <Config
+                    key={subscription.id}
+                    config={subscription.config}
+                    isAuthor={session !== null && subscription.config.author.id === session.user.id}
+                    isSubscribed={subscriptions?.some((other) => other.config.id === subscription.config.id)}
+                    subscribe={() => handleSubscribe(subscription.config)}
+                    unsubscribe={() => handleUnsubscribe(subscription.config)}
+                    delete={() => handleDelete(subscription.config)}
+                  />
+                ))}
               </div>
             )}
           </>
@@ -193,9 +199,40 @@ export function Configs() {
             {configs.length === 0 ? (
               <div className="empty-message">No configs available.</div>
             ) : (
-              <div className="library">{configs.map((config) => configMapper(config.id, config))}</div>
+              <div className="library">
+                {configs.map((config) => (
+                  <Config
+                    key={config.id}
+                    config={config}
+                    isAuthor={session !== null && config.author.id === session.user.id}
+                    isSubscribed={subscriptions?.some((other) => other.config.id === config.id)}
+                    subscribe={() => handleSubscribe(config)}
+                    unsubscribe={() => handleUnsubscribe(config)}
+                    delete={() => handleDelete(config)}
+                  />
+                ))}
+              </div>
             )}
           </>
+        )}
+        {activeIndex == 0 ? (
+          <Paginator
+            first={subscriptionsPage}
+            rows={MAX_CONFIGS_PER_PAGE}
+            totalRecords={subscriptionsTotal}
+            onPageChange={(event) => {
+              setSubscriptionsPage(event.first);
+            }}
+          />
+        ) : (
+          <Paginator
+            first={configsPage}
+            rows={MAX_CONFIGS_PER_PAGE}
+            totalRecords={configsTotal}
+            onPageChange={(event) => {
+              setConfigsPage(event.first);
+            }}
+          />
         )}
       </div>
     </div>

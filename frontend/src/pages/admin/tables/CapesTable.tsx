@@ -18,12 +18,15 @@ const MIN_NAME_LENGTH = 4;
 const MAX_NAME_LENGTH = 32;
 const MIN_DESCRIPTION_LENGTH = 4;
 const MAX_DESCRIPTION_LENGTH = 256;
+const MAX_CAPES_PER_PAGE = 5;
 
 export function CapesTable({ adminController }: CapesTableProps) {
   const capeController = api.useCapeController();
 
   const [capes, setCapes] = useState<api.Cape[]>([]);
   const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(0);
+  const [total, setTotal] = useState(0);
 
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [name, setName] = useState("");
@@ -38,9 +41,9 @@ export function CapesTable({ adminController }: CapesTableProps) {
     setLoading(true);
 
     try {
-      const capes = await capeController.getCapes();
-
+      const { capes, total } = await capeController.getCapes(MAX_CAPES_PER_PAGE, page);
       setCapes(capes);
+      setTotal(total);
     } catch (error) {
       console.error("Failed to fetch capes:", error);
       showToast({
@@ -51,7 +54,7 @@ export function CapesTable({ adminController }: CapesTableProps) {
     } finally {
       setLoading(false);
     }
-  }, [capeController]);
+  }, [capeController, page]);
 
   useEffect(() => {
     fetchCapes();
@@ -153,8 +156,6 @@ export function CapesTable({ adminController }: CapesTableProps) {
     </div>
   );
 
-  const tableFooter = `In total there are ${capes ? capes.length : 0} capes.`;
-
   const dialogFooter = (
     <div>
       <Button
@@ -191,12 +192,19 @@ export function CapesTable({ adminController }: CapesTableProps) {
     <>
       <DataTable
         header={tableHeader}
-        footer={tableFooter}
         value={capes}
         loading={loading}
         className="admin-table"
         scrollable
         scrollHeight="100%"
+        paginator
+        lazy
+        first={page}
+        rows={MAX_CAPES_PER_PAGE}
+        totalRecords={total}
+        onPage={(event) => {
+          setPage(event.first);
+        }}
       >
         <Column
           field="id"

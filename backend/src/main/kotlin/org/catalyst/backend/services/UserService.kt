@@ -4,6 +4,9 @@ import org.catalyst.backend.entities.user.User
 import org.catalyst.backend.entities.user.UserRepository
 import org.catalyst.backend.entities.user.role.RoleRepository
 import org.catalyst.backend.exceptions.FieldedResponseStatusException
+import org.catalyst.backend.services.pagination.OffsetBasedPageRequest
+import org.springframework.data.domain.Page
+import org.springframework.data.jpa.domain.JpaSort
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -30,8 +33,11 @@ class UserService(
         return userRepository.findByUsername(username)
     }
 
-    fun getUsers(): List<User> {
-        return userRepository.findAll()
+    fun getUsers(
+        limit: Int,
+        offset: Int
+    ): Page<User> {
+        return userRepository.findAll(OffsetBasedPageRequest(offset, limit, JpaSort.by("createdAt")))
     }
 
     fun createUser(

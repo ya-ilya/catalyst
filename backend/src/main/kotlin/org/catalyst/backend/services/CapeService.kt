@@ -4,7 +4,9 @@ import jakarta.transaction.Transactional
 import org.catalyst.backend.entities.cape.Cape
 import org.catalyst.backend.entities.cape.CapeRepository
 import org.catalyst.backend.entities.user.User
+import org.catalyst.backend.services.pagination.OffsetBasedPageRequest
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.data.domain.Page
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
@@ -27,8 +29,11 @@ class CapeService(
             .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "Cape not found") }
     }
 
-    fun getCapes(): List<Cape> {
-        return capeRepository.findAll()
+    fun getCapes(
+        limit: Int,
+        offset: Int
+    ): Page<Cape> {
+        return capeRepository.findAll(OffsetBasedPageRequest(offset, limit))
     }
 
     fun select(id: UUID, user: User) {

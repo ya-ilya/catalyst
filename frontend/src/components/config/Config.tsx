@@ -138,7 +138,7 @@ export const Config = memo((props: ConfigProps) => {
               text
             />
           )}
-          {!isSubscribed && (
+          {!isAuthor && !isSubscribed && (
             <Button
               icon="pi pi-plus-circle"
               className="add-button p-button-sm"

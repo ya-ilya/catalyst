@@ -8,7 +8,9 @@ import { Controller } from "./Controller";
 
 export function useAdminController() {
   const [session] = useAuthenticationContext();
-  const [adminController, setAdminController] = useState(session ? createAdminController(session) : undefined);
+  const [adminController, setAdminController] = useState(
+    session ? createAdminController(session) : undefined
+  );
 
   useEffect(() => {
     if (session) {
@@ -34,8 +36,19 @@ export class AdminController extends Controller {
     super(client, "/api/admin", token);
   }
 
-  async getUsers(): Promise<User[]> {
-    return (await this.client.get("/users")).data;
+  async getUsers(limit: number, offset: number): Promise<{ users: User[]; total: number; pages: number }> {
+    const response = await this.client.get("/users", {
+      params: {
+        limit: limit,
+        offset: offset,
+      },
+    });
+
+    return {
+      users: response.data,
+      total: parseInt(response.headers["x-total-count"]),
+      pages: parseInt(response.headers["x-total-pages"]),
+    };
   }
 
   async getUserById(id: string): Promise<User> {

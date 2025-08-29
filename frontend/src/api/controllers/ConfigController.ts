@@ -40,8 +40,22 @@ export class ConfigController extends Controller {
     return (await this.client.get(`/${id}`)).data;
   }
 
-  async getPublicConfigs(): Promise<Config[]> {
-    return (await this.client.get("")).data;
+  async getPublicConfigs(
+    limit: number,
+    offset: number
+  ): Promise<{ configs: Config[]; total: number; pages: number }> {
+    const response = await this.client.get("", {
+      params: {
+        limit: limit,
+        offset: offset,
+      },
+    });
+
+    return {
+      configs: response.data,
+      total: parseInt(response.headers["x-total-count"]),
+      pages: parseInt(response.headers["x-total-pages"]),
+    };
   }
 
   async getConfigFiles(id: string): Promise<ConfigFile[]> {

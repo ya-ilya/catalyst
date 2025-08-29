@@ -18,10 +18,13 @@ type UsersTableProps = {
 
 const MIN_USERNAME_LENGTH = 4;
 const MAX_USERNAME_LENGTH = 32;
+const MAX_USERS_PER_PAGE = 5;
 
 export function UsersTable({ adminController, session }: UsersTableProps) {
   const [users, setUsers] = useState<api.User[]>([]);
   const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(0);
+  const [total, setTotal] = useState(0);
 
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [username, setUsername] = useState("");
@@ -35,8 +38,9 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
     setLoading(true);
 
     try {
-      const users = await adminController.getUsers();
+      const { users, total } = await adminController.getUsers(MAX_USERS_PER_PAGE, page);
       setUsers(users);
+      setTotal(total);
     } catch (error) {
       console.error("Failed to fetch users:", error);
       showToast({
@@ -47,7 +51,7 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
     } finally {
       setLoading(false);
     }
-  }, [adminController]);
+  }, [adminController, page]);
 
   useEffect(() => {
     fetchUsers();
@@ -156,8 +160,6 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
     </div>
   );
 
-  const tableFooter = `In total there are ${users ? users.length : 0} users.`;
-
   const dialogFooter = (
     <div>
       <Button
@@ -179,12 +181,19 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
     <>
       <DataTable
         header={tableHeader}
-        footer={tableFooter}
         value={users}
         loading={loading}
         className="admin-table"
         scrollable
         scrollHeight="100%"
+        paginator
+        lazy
+        first={page}
+        rows={MAX_USERS_PER_PAGE}
+        totalRecords={total}
+        onPage={(event) => {
+          setPage(event.first);
+        }}
       >
         <Column
           field="id"

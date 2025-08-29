@@ -3,9 +3,13 @@ package org.catalyst.backend.controllers
 import jakarta.validation.Valid
 import org.catalyst.backend.entities.user.User
 import org.catalyst.backend.requests.ChangePasswordRequest
-import org.catalyst.backend.responses.*
+import org.catalyst.backend.responses.AuthenticationResponse
+import org.catalyst.backend.responses.ConfigResponse
+import org.catalyst.backend.responses.SubscriptionResponse
+import org.catalyst.backend.responses.UserResponse
 import org.catalyst.backend.services.AuthenticationService
 import org.catalyst.backend.services.CapeService
+import org.catalyst.backend.services.SubscriptionService
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -19,6 +23,7 @@ import java.io.IOException
 @RequestMapping("/api/me")
 class MeController(
     private val capeService: CapeService,
+    private val subscriptionService: SubscriptionService,
     private val authenticationService: AuthenticationService
 ) {
     @GetMapping
@@ -27,8 +32,19 @@ class MeController(
     }
 
     @GetMapping("/subscriptions")
-    fun getSubscriptions(@AuthenticationPrincipal user: User): List<SubscriptionResponse> {
-        return user.subscriptions.map { it.toResponse() }
+    fun getSubscriptions(
+        @AuthenticationPrincipal user: User,
+        @RequestParam(value = "limit", required = false, defaultValue = "30") limit: Int,
+        @RequestParam(value = "offset", required = false, defaultValue = "0") offset: Int,
+    ): ResponseEntity<List<SubscriptionResponse>> {
+        val page = subscriptionService.findByUser(user, limit, offset)
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .header("X-Total-Count", page.totalElements.toString())
+            .header("X-Total-Pages", page.totalPages.toString())
+            .header("Access-Control-Expose-Headers", "X-Total-Count,X-Total-Pages")
+            .body(page.content.map { it.toResponse() })
     }
 
     @GetMapping("/configs")

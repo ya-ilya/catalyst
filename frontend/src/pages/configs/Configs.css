@@ -25,10 +25,12 @@
 .configs-content .subscriptions,
 .configs-content .library {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(200px, 80vw), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(250px, 80vw), 1fr));
+  grid-template-rows: repeat(auto-fill, 150px);
   gap: 16px;
   padding: 16px;
   overflow-y: auto;
+  height: 100vh;
 }
 
 .configs-content .empty-message,

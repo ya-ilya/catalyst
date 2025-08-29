@@ -38,8 +38,22 @@ export class MeController extends Controller {
     return (await this.client.get("")).data;
   }
 
-  async getSubscriptions(): Promise<Subscription[]> {
-    return (await this.client.get("/subscriptions")).data;
+  async getSubscriptions(
+    limit: number,
+    offset: number
+  ): Promise<{ subscriptions: Subscription[]; total: number; pages: number }> {
+    const response = await this.client.get("/subscriptions", {
+      params: {
+        limit: limit,
+        offset: offset,
+      },
+    });
+
+    return {
+      subscriptions: response.data,
+      total: parseInt(response.headers["x-total-count"]),
+      pages: parseInt(response.headers["x-total-pages"]),
+    };
   }
 
   async getConfigs(): Promise<Config[]> {

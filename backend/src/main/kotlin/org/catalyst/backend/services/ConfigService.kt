@@ -4,8 +4,10 @@ import org.catalyst.backend.entities.config.Config
 import org.catalyst.backend.entities.config.ConfigFile
 import org.catalyst.backend.entities.config.ConfigRepository
 import org.catalyst.backend.entities.subscription.Subscription
-import org.catalyst.backend.entities.subscription.SubscriptionRepository
 import org.catalyst.backend.entities.user.User
+import org.catalyst.backend.services.pagination.OffsetBasedPageRequest
+import org.springframework.data.domain.Page
+import org.springframework.data.jpa.domain.JpaSort
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -17,7 +19,7 @@ import java.util.*
 @Service
 class ConfigService(
     private val configRepository: ConfigRepository,
-    private val subscriptionRepository: SubscriptionRepository
+    private val subscriptionService: SubscriptionService
 ) {
     fun getConfigById(id: UUID): Config {
         return configRepository
@@ -25,8 +27,11 @@ class ConfigService(
             .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "Config not found") }
     }
 
-    fun getPublicConfigs(): List<Config> {
-        return configRepository.findByIsPublicTrue()
+    fun getPublicConfigs(
+        limit: Int,
+        offset: Int
+    ): Page<Config> {
+        return configRepository.findByIsPublicTrue(OffsetBasedPageRequest(offset, limit, JpaSort.by("createdAt")))
     }
 
     fun getConfigForUser(id: UUID, user: User): Config {
@@ -46,11 +51,11 @@ class ConfigService(
             throw ResponseStatusException(HttpStatus.NOT_FOUND, "Configuration not found")
         }
 
-        if (subscriptionRepository.existsByUserAndConfig(user, config)) {
+        if (subscriptionService.existsByUserAndConfig(user, config)) {
             throw ResponseStatusException(HttpStatus.CONFLICT, "You already subscribed to this configuration")
         }
 
-        return subscriptionRepository.save(Subscription(user, config, LocalDateTime.now(ZoneOffset.UTC)))
+        return subscriptionService.createSubscription(user, config)
     }
 
     fun unsubscribe(id: UUID, user: User) {
@@ -60,11 +65,7 @@ class ConfigService(
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot unsubscribe from your own configuration")
         }
 
-        val subscription = subscriptionRepository
-            .findByUserAndConfig(user, config)
-            .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found") }
-
-        subscriptionRepository.delete(subscription)
+        subscriptionService.deleteByUserAndConfig(user, config)
     }
 
     fun createConfig(
@@ -86,13 +87,7 @@ class ConfigService(
             )
         )
 
-        subscriptionRepository.save(
-            Subscription(
-                user,
-                config,
-                date
-            )
-        )
+        subscriptionService.createSubscription(user, config)
 
         return config
     }

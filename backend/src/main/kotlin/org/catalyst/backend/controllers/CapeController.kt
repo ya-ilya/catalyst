@@ -8,10 +8,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.io.IOException
 import java.util.*
@@ -20,8 +17,18 @@ import java.util.*
 @RequestMapping("/api/capes")
 class CapeController(private val capeService: CapeService) {
     @GetMapping
-    fun getCapes(): List<CapeResponse> {
-        return capeService.getCapes().map { it.toResponse() }
+    fun getCapes(
+        @RequestParam(value = "limit", required = false, defaultValue = "10") limit: Int,
+        @RequestParam(value = "offset", required = false, defaultValue = "0") offset: Int,
+    ): ResponseEntity<List<CapeResponse>> {
+        val page = capeService.getCapes(limit, offset)
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .header("X-Total-Count", page.totalElements.toString())
+            .header("X-Total-Pages", page.totalPages.toString())
+            .header("Access-Control-Expose-Headers", "X-Total-Count,X-Total-Pages")
+            .body(page.content.map { it.toResponse() })
     }
 
     @GetMapping("/{id}")
