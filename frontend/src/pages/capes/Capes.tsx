@@ -4,9 +4,12 @@ import { Paginator } from "primereact/paginator";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Navigate, useLocation } from "react-router";
 
+import { useMutation, useQuery } from "@tanstack/react-query";
+
 import * as api from "../../api";
 import { Cape, Header } from "../../components";
 import { useAuthenticationContext, useToastContext } from "../../contexts";
+import { queryClient } from "../../query-config";
 
 const MAX_CAPES_PER_PAGE = 24;
 
@@ -14,10 +17,31 @@ export function Capes() {
   const capeController = api.useCapeController();
   const meController = api.useMeController();
 
-  const [selectedCape, setSelectedCape] = useState<api.Cape | null>(null);
-  const [capes, setCapes] = useState<api.Cape[]>([]);
   const [page, setPage] = useState(0);
-  const [total, setTotal] = useState(0);
+
+  const { data: capesData, error: capesError } = useQuery({
+    queryKey: ["capes", page],
+    queryFn: async () => {
+      if (!capeController) return { capes: [], total: 0 };
+      const response = await capeController.getCapes(MAX_CAPES_PER_PAGE, page);
+      return response;
+    },
+    enabled: !!capeController,
+    placeholderData: (previousData) => previousData,
+  });
+
+  const capes = capesData?.capes ?? [];
+  const total = capesData?.total ?? 0;
+
+  const { data: selectedCape, error: selectedCapeError } = useQuery({
+    queryKey: ["selectedCape"],
+    queryFn: async () => {
+      if (!meController) return null;
+      const user = await meController.getUser();
+      return user.cape ?? null;
+    },
+    enabled: !!meController,
+  });
 
   const [session] = useAuthenticationContext();
   const [showToast] = useToastContext();
@@ -27,110 +51,97 @@ export function Capes() {
 
   const location = useLocation();
 
-  const updateSelectedCape = useCallback(async () => {
-    if (!meController) return;
-
-    try {
-      const cape = await meController.getUser();
-      setSelectedCape(cape.cape ?? null);
-    } catch (error) {
-      console.error("Failed to fetch selected cape: ", error);
-      showToast({
-        severity: "error",
-        summary: "Error",
-        detail: "Failed to fetch selected cape.",
-      });
-    }
-  }, [meController]);
-
-  const updateCapes = useCallback(async () => {
-    if (!capeController) return;
-
-    try {
-      const { capes, total } = await capeController.getCapes(MAX_CAPES_PER_PAGE, page);
-      setCapes(capes);
-      setTotal(total);
-    } catch (error) {
-      console.error("Failed to fetch capes: ", error);
+  useEffect(() => {
+    if (capesError) {
+      console.error("Failed to fetch capes:", capesError);
       showToast({
         severity: "error",
         summary: "Error",
         detail: "Failed to fetch capes.",
       });
     }
-  }, [capeController]);
+  }, [capesError]);
 
   useEffect(() => {
-    updateSelectedCape();
-  }, [updateSelectedCape]);
+    if (selectedCapeError) {
+      console.error("Failed to fetch selected cape: ", selectedCapeError);
+      showToast({
+        severity: "error",
+        summary: "Error",
+        detail: "Failed to fetch selected cape.",
+      });
+    }
+  }, [selectedCapeError]);
 
-  useEffect(() => {
-    updateCapes();
-  }, [updateCapes]);
-
-  const handleSelect = useCallback(
-    async (cape: api.Cape) => {
-      if (!capeController) return;
-
-      try {
-        await capeController.select(cape.id);
-        await updateSelectedCape();
-
-        showToast({
-          severity: "success",
-          summary: "Selected",
-          detail: "You have successfully selected the cape.",
-        });
-      } catch (error) {
-        console.error("Failed to select cape: ", error);
-        showToast({
-          severity: "error",
-          summary: "Error",
-          detail: "Failed to select cape",
-        });
-      }
+  const selectMutation = useMutation({
+    mutationFn: async (cape: api.Cape) => {
+      await capeController!.select(cape.id);
     },
-    [capeController, updateSelectedCape]
-  );
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["selectedCape"] });
+      showToast({
+        severity: "success",
+        summary: "Selected",
+        detail: "You have successfully selected the cape.",
+      });
+    },
+    onError: () => {
+      showToast({
+        severity: "error",
+        summary: "Error",
+        detail: "Failed to select cape.",
+      });
+    },
+  });
 
-  const handleUnselect = useCallback(async () => {
-    if (!meController) return;
-
-    try {
-      await meController.unselectCape();
-      await updateSelectedCape();
-
+  const unselectMutation = useMutation({
+    mutationFn: async () => {
+      await meController!.unselectCape();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["selectedCape"] });
       showToast({
         severity: "success",
         summary: "Unselected",
         detail: "You have successfully unselected the cape.",
       });
-    } catch (error) {
-      console.error("Failed to unselect cape: ", error);
+    },
+    onError: () => {
       showToast({
         severity: "error",
         summary: "Error",
-        detail: "Failed to unselect cape",
+        detail: "Failed to unselect cape.",
       });
+    },
+  });
+
+  const handleSelect = useCallback(
+    (cape: api.Cape) => {
+      if (!capeController) return;
+      selectMutation.mutate(cape);
+    },
+    [capeController, selectMutation]
+  );
+
+  const handleUnselect = useCallback(() => {
+    if (!meController) return;
+    unselectMutation.mutate();
+  }, [meController, unselectMutation]);
+
+  const calculateHeight = useCallback(() => {
+    if (paginator.current && paginator.current.getElement) {
+      const paginatorHeight = paginator.current.getElement()!.getBoundingClientRect().height;
+      setContentHeight(`calc(100vh - ${paginatorHeight}px)`);
     }
-  }, [meController, updateSelectedCape]);
+  }, []);
 
   useEffect(() => {
-    const calculateHeight = () => {
-      if (paginator.current && paginator.current.getElement) {
-        const paginatorHeight = paginator.current.getElement()!.getBoundingClientRect().height;
-        setContentHeight(`calc(100vh - ${paginatorHeight}px)`);
-      }
-    };
-
-    calculateHeight();
-
     window.addEventListener("resize", calculateHeight);
 
     return () => {
       window.removeEventListener("resize", calculateHeight);
     };
-  }, [paginator]);
+  }, []);
 
   if (!session) {
     return (
@@ -147,32 +158,37 @@ export function Capes() {
       {capes.length === 0 ? (
         <div className="empty-message">No capes available.</div>
       ) : (
-        <div
-          className="capes-content"
-          style={{
-            height: contentHeight,
-          }}
-        >
-          {capes.map((cape) => (
-            <Cape
-              key={cape.id}
-              cape={cape}
-              isSelected={cape.id === selectedCape?.id}
-              select={() => handleSelect(cape)}
-              unselect={handleUnselect}
-            />
-          ))}
-        </div>
+        <>
+          <div
+            className="capes-content"
+            style={{
+              height: contentHeight,
+            }}
+          >
+            {capes.map((cape) => (
+              <Cape
+                key={cape.id}
+                cape={cape}
+                isSelected={cape.id === selectedCape?.id}
+                select={() => handleSelect(cape)}
+                unselect={handleUnselect}
+              />
+            ))}
+          </div>
+          <Paginator
+            ref={(node) => {
+              paginator.current = node;
+              calculateHeight();
+            }}
+            first={page}
+            rows={MAX_CAPES_PER_PAGE}
+            totalRecords={total}
+            onPageChange={(event) => {
+              setPage(event.first);
+            }}
+          />
+        </>
       )}
-      <Paginator
-        ref={paginator}
-        first={page}
-        rows={MAX_CAPES_PER_PAGE}
-        totalRecords={total}
-        onPageChange={(event) => {
-          setPage(event.first);
-        }}
-      />
     </div>
   );
 }

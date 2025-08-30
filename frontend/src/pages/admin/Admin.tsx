@@ -1,5 +1,6 @@
 import "./Admin.css";
 
+import { ConfirmDialog } from "primereact/confirmdialog";
 import { Navigate, useLocation } from "react-router";
 
 import * as api from "../../api";
@@ -43,6 +44,7 @@ export function Admin() {
         />
         <CapesTable adminController={adminController} />
       </div>
+      <ConfirmDialog />
     </div>
   );
 }

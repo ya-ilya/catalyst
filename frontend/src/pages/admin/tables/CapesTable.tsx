@@ -1,5 +1,6 @@
 import { Button } from "primereact/button";
 import { Column } from "primereact/column";
+import { confirmDialog } from "primereact/confirmdialog";
 import { DataTable } from "primereact/datatable";
 import { Dialog } from "primereact/dialog";
 import { FileUpload, FileUploadHandlerEvent } from "primereact/fileupload";
@@ -7,8 +8,11 @@ import { FloatLabel } from "primereact/floatlabel";
 import { InputText } from "primereact/inputtext";
 import { useCallback, useEffect, useState } from "react";
 
+import { useMutation, useQuery } from "@tanstack/react-query";
+
 import * as api from "../../../api";
 import { useToastContext } from "../../../contexts";
+import { queryClient } from "../../../query-config";
 
 type CapesTableProps = {
   adminController?: api.AdminController;
@@ -23,10 +27,21 @@ const MAX_CAPES_PER_PAGE = 5;
 export function CapesTable({ adminController }: CapesTableProps) {
   const capeController = api.useCapeController();
 
-  const [capes, setCapes] = useState<api.Cape[]>([]);
-  const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(0);
-  const [total, setTotal] = useState(0);
+
+  const { data, isFetching, error } = useQuery({
+    queryKey: ["tables/capes", page],
+    queryFn: async () => {
+      if (!capeController) return { capes: [], total: 0 };
+      const response = await capeController.getCapes(MAX_CAPES_PER_PAGE, page);
+      return response;
+    },
+    enabled: !!capeController,
+    placeholderData: (previousData) => previousData,
+  });
+
+  const capes = data?.capes ?? [];
+  const total = data?.total ?? 0;
 
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [name, setName] = useState("");
@@ -35,74 +50,85 @@ export function CapesTable({ adminController }: CapesTableProps) {
 
   const [showToast] = useToastContext();
 
-  const fetchCapes = useCallback(async () => {
-    if (!capeController) return;
-
-    setLoading(true);
-
-    try {
-      const { capes, total } = await capeController.getCapes(MAX_CAPES_PER_PAGE, page);
-      setCapes(capes);
-      setTotal(total);
-    } catch (error) {
+  useEffect(() => {
+    if (error) {
       console.error("Failed to fetch capes:", error);
       showToast({
         severity: "error",
         summary: "Error",
         detail: "Failed to fetch capes.",
       });
-    } finally {
-      setLoading(false);
     }
-  }, [capeController, page]);
+  }, [error]);
 
-  useEffect(() => {
-    fetchCapes();
-  }, [fetchCapes]);
-
-  const handleCreateCape = useCallback(async () => {
-    if (!adminController) return;
-
-    try {
-      await adminController.createCape(name, description, uploadedCape!);
-      await fetchCapes();
-
+  const createCapeMutation = useMutation({
+    mutationFn: (newCape: { name: string; description: string; file: Blob }) => {
+      return adminController!.createCape(newCape.name, newCape.description, newCape.file);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tables/capes"] });
       showToast({
         severity: "success",
         summary: "Cape Created",
         detail: "New cape successfully created",
       });
-    } catch (error) {
-      console.log("Failed to create cape:", error);
+      setIsDialogVisible(false);
+    },
+    onError: () => {
       showToast({
         severity: "error",
         summary: "Error",
         detail: "Failed to create cape.",
       });
-    } finally {
-      setIsDialogVisible(false);
-    }
-  }, [adminController, name, description, uploadedCape, fetchCapes, setIsDialogVisible]);
+    },
+  });
+
+  const deleteCapeMutation = useMutation({
+    mutationFn: (capeId: string) => {
+      return adminController!.deleteCape(capeId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tables/capes"] });
+      showToast({
+        severity: "success",
+        summary: "Cape Deleted",
+        detail: "Cape has been successfully deleted.",
+      });
+    },
+    onError: () => {
+      showToast({
+        severity: "error",
+        summary: "Error",
+        detail: "Failed to delete cape.",
+      });
+    },
+  });
+
+  const handleCreateCape = useCallback(() => {
+    if (!adminController || !uploadedCape) return;
+    createCapeMutation.mutate({ name, description, file: uploadedCape });
+  }, [adminController, name, description, uploadedCape, createCapeMutation]);
 
   const handleDeleteCape = useCallback(
-    async (capeId: string) => {
+    (cape: api.Cape) => {
       if (!adminController) return;
-
-      if (window.confirm("Are you sure you want to delete this cape?")) {
-        try {
-          await adminController.deleteCape(capeId);
-          await fetchCapes();
-        } catch (error) {
-          console.error("Failed to delete cape:", error);
-          showToast({
-            severity: "error",
-            summary: "Error",
-            detail: "Failed to delete cape.",
-          });
-        }
-      }
+      deleteCapeMutation.mutate(cape.id);
     },
-    [adminController, fetchCapes]
+    [adminController, deleteCapeMutation]
+  );
+
+  const confirmDeleteCape = useCallback(
+    (cape: api.Cape) => {
+      confirmDialog({
+        message: "Are you sure you want to delete this cape?",
+        header: "Delete Confirmation",
+        icon: "pi pi-info-circle",
+        defaultFocus: "reject",
+        acceptClassName: "p-button-danger",
+        accept: () => handleDeleteCape(cape),
+      });
+    },
+    [handleDeleteCape]
   );
 
   const actionsTemplate = useCallback(
@@ -111,13 +137,13 @@ export function CapesTable({ adminController }: CapesTableProps) {
         <Button
           icon="pi pi-trash"
           className="p-button-danger p-button-sm"
-          onClick={() => handleDeleteCape(cape.id)}
+          onClick={() => confirmDeleteCape(cape)}
           rounded
           text
         />
       );
     },
-    [handleDeleteCape]
+    [confirmDeleteCape]
   );
 
   const imageTemplate = (cape: api.Cape) => {
@@ -148,7 +174,7 @@ export function CapesTable({ adminController }: CapesTableProps) {
         />
         <Button
           icon="pi pi-refresh"
-          onClick={fetchCapes}
+          onClick={() => queryClient.invalidateQueries({ queryKey: ["tables/capes"] })}
           rounded
           raised
         />
@@ -193,7 +219,7 @@ export function CapesTable({ adminController }: CapesTableProps) {
       <DataTable
         header={tableHeader}
         value={capes}
-        loading={loading}
+        loading={isFetching}
         className="admin-table"
         scrollable
         scrollHeight="100%"

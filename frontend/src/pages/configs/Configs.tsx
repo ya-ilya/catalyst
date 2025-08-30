@@ -5,23 +5,50 @@ import { TabMenu } from "primereact/tabmenu";
 import { useCallback, useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router";
 
+import { useMutation, useQuery } from "@tanstack/react-query";
+
 import * as api from "../../api";
 import { Config, Header } from "../../components";
 import { useAuthenticationContext, useToastContext } from "../../contexts";
+import { queryClient } from "../../query-config";
 
 const MAX_CONFIGS_PER_PAGE = 35;
 
 export function Configs() {
-  const meControler = api.useMeController();
+  const meController = api.useMeController();
   const configController = api.useConfigController();
 
-  const [subscriptions, setSubscriptions] = useState<api.Subscription[]>([]);
   const [subscriptionsPage, setSubscriptionsPage] = useState(0);
-  const [subscriptionsTotal, setSubscriptionsTotal] = useState(0);
 
-  const [configs, setConfigs] = useState<api.Config[]>([]);
+  const { data: subscriptionsData, error: subscriptionsError } = useQuery({
+    queryKey: ["subscriptions", subscriptionsPage],
+    queryFn: async () => {
+      if (!meController) return { subscriptions: [], total: 0 };
+      const response = await meController.getSubscriptions(MAX_CONFIGS_PER_PAGE, subscriptionsPage);
+      return response;
+    },
+    enabled: !!meController,
+    placeholderData: (previousData) => previousData,
+  });
+
+  const subscriptions = subscriptionsData?.subscriptions ?? [];
+  const subscriptionsTotal = subscriptionsData?.total ?? 0;
+
   const [configsPage, setConfigsPage] = useState(0);
-  const [configsTotal, setConfigsTotal] = useState(0);
+
+  const { data: configsData, error: configsError } = useQuery({
+    queryKey: ["configs", configsPage],
+    queryFn: async () => {
+      if (!configController) return { configs: [], total: 0 };
+      const response = await configController.getPublicConfigs(MAX_CONFIGS_PER_PAGE, configsPage);
+      return response;
+    },
+    enabled: !!configController,
+    placeholderData: (previousData) => previousData,
+  });
+
+  const configs = configsData?.configs ?? [];
+  const configsTotal = configsData?.total ?? 0;
 
   const [activeIndex, setActiveIndex] = useState(0);
   const items = [
@@ -34,125 +61,117 @@ export function Configs() {
 
   const location = useLocation();
 
-  const updateConfigs = useCallback(async () => {
-    if (!configController) return;
-
-    try {
-      const { configs, total } = await configController.getPublicConfigs(MAX_CONFIGS_PER_PAGE, configsPage);
-      setConfigs(configs);
-      setConfigsTotal(total);
-    } catch (error) {
-      console.error("Failed to fetch configs:", error);
-      showToast({
-        severity: "error",
-        summary: "Error",
-        detail: "Failed to fetch configs.",
-      });
-    }
-  }, [configController, configsPage]);
-
-  const updateSubscriptions = useCallback(async () => {
-    if (!meControler) return;
-
-    try {
-      const { subscriptions, total } = await meControler.getSubscriptions(
-        MAX_CONFIGS_PER_PAGE,
-        subscriptionsPage
-      );
-      setSubscriptions(subscriptions);
-      setSubscriptionsTotal(total);
-    } catch (error) {
-      console.error("Failed to fetch subscriptions:", error);
+  useEffect(() => {
+    if (subscriptionsError) {
+      console.error("Failed to fetch subscriptions:", subscriptionsError);
       showToast({
         severity: "error",
         summary: "Error",
         detail: "Failed to fetch subscriptions.",
       });
     }
-  }, [meControler, subscriptionsPage]);
+  }, [subscriptionsError]);
 
   useEffect(() => {
-    updateConfigs();
-  }, [updateConfigs]);
+    if (configsError) {
+      console.error("Failed to fetch configs:", configsError);
+      showToast({
+        severity: "error",
+        summary: "Error",
+        detail: "Failed to fetch configs.",
+      });
+    }
+  }, [configsError]);
 
-  useEffect(() => {
-    updateSubscriptions();
-  }, [updateSubscriptions]);
+  const subscribeMutation = useMutation({
+    mutationFn: async (config: api.Config) => {
+      await configController!.subscribe(config.id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["subscriptions"] });
+      showToast({
+        severity: "success",
+        summary: "Subscribed",
+        detail: "You have successfully subscribed to the config.",
+      });
+    },
+    onError: (error) => {
+      console.error("Failed to subscribe:", error);
+      showToast({
+        severity: "error",
+        summary: "Error",
+        detail: "Failed to subscribe to the config.",
+      });
+    },
+  });
+
+  const unsubscribeMutation = useMutation({
+    mutationFn: async (config: api.Config) => {
+      await configController!.unsubscribe(config.id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["subscriptions"] });
+      showToast({
+        severity: "success",
+        summary: "Unsubscribed",
+        detail: "You have successfully unsubscribed from the config.",
+      });
+    },
+    onError: (error) => {
+      console.error("Failed to unsubscribe:", error);
+      showToast({
+        severity: "error",
+        summary: "Error",
+        detail: "Failed to unsubscribe from the config.",
+      });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (config: api.Config) => {
+      await configController!.deleteConfig(config.id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["configs"] });
+      queryClient.invalidateQueries({ queryKey: ["subscriptions"] });
+      showToast({
+        severity: "success",
+        summary: "Deleted",
+        detail: "Config has been successfully deleted.",
+      });
+    },
+    onError: (error) => {
+      console.error("Failed to delete config:", error);
+      showToast({
+        severity: "error",
+        summary: "Error",
+        detail: "Failed to delete the config.",
+      });
+    },
+  });
 
   const handleSubscribe = useCallback(
     async (config: api.Config) => {
       if (!configController) return;
-
-      try {
-        await configController.subscribe(config.id);
-        await updateSubscriptions();
-
-        showToast({
-          severity: "success",
-          summary: "Subscribed",
-          detail: "You have successfully subscribed to the config.",
-        });
-      } catch (error) {
-        console.error("Failed to subscribe:", error);
-        showToast({
-          severity: "error",
-          summary: "Error",
-          detail: "Failed to subscribe to the config.",
-        });
-      }
+      subscribeMutation.mutate(config);
     },
-    [configController, updateSubscriptions]
+    [configController, subscribeMutation]
   );
 
   const handleUnsubscribe = useCallback(
     async (config: api.Config) => {
       if (!configController) return;
-
-      try {
-        await configController.unsubscribe(config.id);
-        await updateSubscriptions();
-
-        showToast({
-          severity: "success",
-          summary: "Unsubscribed",
-          detail: "You have successfully unsubscribed from the config.",
-        });
-      } catch (error) {
-        console.error("Failed to unsubscribe:", error);
-        showToast({
-          severity: "error",
-          summary: "Error",
-          detail: "Failed to unsubscribe from the config.",
-        });
-      }
+      unsubscribeMutation.mutate(config);
     },
-    [configController, updateSubscriptions]
+    [configController, unsubscribeMutation]
   );
 
   const handleDelete = useCallback(
     async (config: api.Config) => {
       if (!configController) return;
-
-      try {
-        await configController.deleteConfig(config.id);
-        await updateConfigs();
-        await updateSubscriptions();
-
-        showToast({
-          severity: "success",
-          summary: "Deleted",
-          detail: "Config has been successfully deleted.",
-        });
-      } catch (error) {
-        console.error("Failed to delete config:", error);
-        showToast({
-          severity: "error",
-          summary: "Error",
-          detail: "Failed to delete the config.",
-        });
-      }
+      deleteMutation.mutate(config);
     },
-    [configController, updateConfigs, updateSubscriptions]
+    [configController, deleteMutation]
   );
 
   if (!session) {
@@ -178,19 +197,31 @@ export function Configs() {
             {subscriptions.length === 0 ? (
               <div className="empty-message">No subscriptions yet.</div>
             ) : (
-              <div className="subscriptions">
-                {subscriptions.map((subscription) => (
-                  <Config
-                    key={subscription.id}
-                    config={subscription.config}
-                    isAuthor={session !== null && subscription.config.author.id === session.user.id}
-                    isSubscribed={subscriptions?.some((other) => other.config.id === subscription.config.id)}
-                    subscribe={() => handleSubscribe(subscription.config)}
-                    unsubscribe={() => handleUnsubscribe(subscription.config)}
-                    delete={() => handleDelete(subscription.config)}
-                  />
-                ))}
-              </div>
+              <>
+                <div className="subscriptions">
+                  {subscriptions.map((subscription) => (
+                    <Config
+                      key={subscription.id}
+                      config={subscription.config}
+                      isAuthor={session !== null && subscription.config.author.id === session.user.id}
+                      isSubscribed={subscriptions?.some(
+                        (other) => other.config.id === subscription.config.id
+                      )}
+                      subscribe={() => handleSubscribe(subscription.config)}
+                      unsubscribe={() => handleUnsubscribe(subscription.config)}
+                      delete={() => handleDelete(subscription.config)}
+                    />
+                  ))}
+                </div>
+                <Paginator
+                  first={subscriptionsPage}
+                  rows={MAX_CONFIGS_PER_PAGE}
+                  totalRecords={subscriptionsTotal}
+                  onPageChange={(event) => {
+                    setSubscriptionsPage(event.first);
+                  }}
+                />
+              </>
             )}
           </>
         )}
@@ -199,40 +230,31 @@ export function Configs() {
             {configs.length === 0 ? (
               <div className="empty-message">No configs available.</div>
             ) : (
-              <div className="library">
-                {configs.map((config) => (
-                  <Config
-                    key={config.id}
-                    config={config}
-                    isAuthor={session !== null && config.author.id === session.user.id}
-                    isSubscribed={subscriptions?.some((other) => other.config.id === config.id)}
-                    subscribe={() => handleSubscribe(config)}
-                    unsubscribe={() => handleUnsubscribe(config)}
-                    delete={() => handleDelete(config)}
-                  />
-                ))}
-              </div>
+              <>
+                <div className="library">
+                  {configs.map((config) => (
+                    <Config
+                      key={config.id}
+                      config={config}
+                      isAuthor={session !== null && config.author.id === session.user.id}
+                      isSubscribed={subscriptions?.some((other) => other.config.id === config.id)}
+                      subscribe={() => handleSubscribe(config)}
+                      unsubscribe={() => handleUnsubscribe(config)}
+                      delete={() => handleDelete(config)}
+                    />
+                  ))}
+                </div>
+                <Paginator
+                  first={configsPage}
+                  rows={MAX_CONFIGS_PER_PAGE}
+                  totalRecords={configsTotal}
+                  onPageChange={(event) => {
+                    setConfigsPage(event.first);
+                  }}
+                />
+              </>
             )}
           </>
-        )}
-        {activeIndex == 0 ? (
-          <Paginator
-            first={subscriptionsPage}
-            rows={MAX_CONFIGS_PER_PAGE}
-            totalRecords={subscriptionsTotal}
-            onPageChange={(event) => {
-              setSubscriptionsPage(event.first);
-            }}
-          />
-        ) : (
-          <Paginator
-            first={configsPage}
-            rows={MAX_CONFIGS_PER_PAGE}
-            totalRecords={configsTotal}
-            onPageChange={(event) => {
-              setConfigsPage(event.first);
-            }}
-          />
         )}
       </div>
     </div>

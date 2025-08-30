@@ -1,6 +1,7 @@
 import { AxiosError } from "axios";
 import { Button } from "primereact/button";
 import { Column } from "primereact/column";
+import { confirmDialog } from "primereact/confirmdialog";
 import { DataTable } from "primereact/datatable";
 import { Dialog } from "primereact/dialog";
 import { FloatLabel } from "primereact/floatlabel";
@@ -8,8 +9,11 @@ import { InputText } from "primereact/inputtext";
 import { Panel } from "primereact/panel";
 import { useCallback, useEffect, useState } from "react";
 
+import { useMutation, useQuery } from "@tanstack/react-query";
+
 import * as api from "../../../api";
 import { Session, useToastContext } from "../../../contexts";
+import { queryClient } from "../../../query-config";
 
 type UsersTableProps = {
   adminController?: api.AdminController;
@@ -21,10 +25,21 @@ const MAX_USERNAME_LENGTH = 32;
 const MAX_USERS_PER_PAGE = 5;
 
 export function UsersTable({ adminController, session }: UsersTableProps) {
-  const [users, setUsers] = useState<api.User[]>([]);
-  const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(0);
-  const [total, setTotal] = useState(0);
+
+  const { data, isFetching, error } = useQuery({
+    queryKey: ["tables/users", page],
+    queryFn: async () => {
+      if (!adminController) return { users: [], total: 0 };
+      const response = await adminController.getUsers(MAX_USERS_PER_PAGE, page);
+      return response;
+    },
+    enabled: !!adminController,
+    placeholderData: (previousData) => previousData,
+  });
+
+  const users = data?.users ?? [];
+  const total = data?.total ?? 0;
 
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [username, setUsername] = useState("");
@@ -32,91 +47,93 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
 
   const [showToast] = useToastContext();
 
-  const fetchUsers = useCallback(async () => {
-    if (!adminController) return;
-
-    setLoading(true);
-
-    try {
-      const { users, total } = await adminController.getUsers(MAX_USERS_PER_PAGE, page);
-      setUsers(users);
-      setTotal(total);
-    } catch (error) {
-      console.error("Failed to fetch users:", error);
+  useEffect(() => {
+    if (error) {
+      console.error("Failed to fetch capes:", error);
       showToast({
         severity: "error",
         summary: "Error",
-        detail: "Failed to fetch users.",
+        detail: "Failed to fetch capes.",
       });
-    } finally {
-      setLoading(false);
     }
-  }, [adminController, page]);
+  }, [error]);
 
-  useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
-
-  const handleCreateUser = useCallback(async () => {
-    if (!adminController) return;
-
-    try {
-      const createdUser = await adminController.createUser({
-        username: username,
+  const createUserMutation = useMutation({
+    mutationFn: async (newUsername: string) => {
+      return await adminController!.createUser({ username: newUsername });
+    },
+    onSuccess: (data) => {
+      setTemporaryPassword(data.temporaryPassword);
+      queryClient.invalidateQueries({ queryKey: ["tables/users"] });
+      showToast({
+        severity: "success",
+        summary: "User Created",
+        detail: "User has been successfully created.",
       });
-
-      setTemporaryPassword(createdUser.temporaryPassword);
-      await fetchUsers();
-    } catch (error) {
+      setIsDialogVisible(false);
+    },
+    onError: (error) => {
       console.error("Failed to create user:", error);
-
       if (error instanceof AxiosError && error.response) {
-        if (error.status === 400) {
-          showToast({
-            severity: "error",
-            summary: "Error",
-            detail: "Invalid format for username.",
-          });
+        if (error.response.status === 400) {
+          showToast({ severity: "error", summary: "Error", detail: "Invalid format for username." });
           return;
-        } else if (error.status === 409) {
+        } else if (error.response.status === 409) {
           showToast({
             severity: "error",
             summary: "Error",
-            detail: "User with same name already exists.",
+            detail: "User with the same name already exists.",
           });
           return;
         }
       }
-
-      showToast({
-        severity: "error",
-        summary: "Error",
-        detail: "Failed to create user.",
-      });
-    } finally {
+      showToast({ severity: "error", summary: "Error", detail: "Failed to create user." });
       setIsDialogVisible(false);
-    }
-  }, [adminController, username, fetchUsers]);
+    },
+  });
+
+  const deleteUserMutation = useMutation({
+    mutationFn: async (user: api.User) => {
+      await adminController!.deleteUser(user.id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tables/users"] });
+      showToast({
+        severity: "success",
+        summary: "User Deleted",
+        detail: "User has been successfully deleted.",
+      });
+    },
+    onError: () => {
+      showToast({ severity: "error", summary: "Error", detail: "Failed to delete user." });
+    },
+  });
+
+  const handleCreateUser = useCallback(() => {
+    if (!adminController) return;
+    createUserMutation.mutate(username);
+  }, [adminController, createUserMutation, username]);
 
   const handleDeleteUser = useCallback(
-    async (userId: string) => {
+    (user: api.User) => {
       if (!adminController) return;
-
-      if (window.confirm("Are you sure you want to delete this user?")) {
-        try {
-          await adminController.deleteUser(userId);
-          await fetchUsers();
-        } catch (error) {
-          console.error("Failed to delete user:", error);
-          showToast({
-            severity: "error",
-            summary: "Error",
-            detail: "Failed to delete user.",
-          });
-        }
-      }
+      deleteUserMutation.mutate(user);
     },
-    [adminController, fetchUsers]
+    [adminController, deleteUserMutation]
+  );
+
+  const confirmDeleteUser = useCallback(
+    (user: api.User) => {
+      confirmDialog({
+        message: "Are you sure you want to delete this user?",
+        header: "Delete Confirmation",
+        icon: "pi pi-info-circle",
+        defaultFocus: "reject",
+        acceptClassName: "p-button-danger",
+        accept: () => handleDeleteUser(user),
+      });
+    },
+    [handleDeleteUser]
   );
 
   const actionsTemplate = useCallback(
@@ -125,14 +142,14 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
         <Button
           icon="pi pi-trash"
           className="p-button-danger p-button-sm"
-          onClick={() => handleDeleteUser(user.id)}
+          onClick={() => confirmDeleteUser(user)}
           disabled={user.id === session?.user.id}
           rounded
           text
         />
       );
     },
-    [handleDeleteUser, session]
+    [confirmDeleteUser, session]
   );
 
   const tableHeader = (
@@ -152,7 +169,7 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
         />
         <Button
           icon="pi pi-refresh"
-          onClick={fetchUsers}
+          onClick={() => queryClient.invalidateQueries({ queryKey: ["tables/users"] })}
           rounded
           raised
         />
@@ -182,7 +199,7 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
       <DataTable
         header={tableHeader}
         value={users}
-        loading={loading}
+        loading={isFetching}
         className="admin-table"
         scrollable
         scrollHeight="100%"
@@ -219,7 +236,6 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
           body={actionsTemplate}
         />
       </DataTable>
-
       <Dialog
         className="admin-dialog"
         header="Create New User"
