@@ -1,4 +1,4 @@
-package org.catalyst.backend.configurations.filter
+package org.catalyst.backend.configurations.filters
 
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest

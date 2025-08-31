@@ -16,6 +16,7 @@ import { AuthenticationRoute } from "./routes";
 
 export * from "./axios-config";
 export * from "./i18n-config";
+export * from "./query-config";
 
 const router = createBrowserRouter([
   {
@@ -53,12 +54,12 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <PrimeReactProvider>
-      <ThemeProvider>
-        <ToastProvider>
-          <RouterProvider router={router} />
-        </ToastProvider>
-      </ThemeProvider>
-    </PrimeReactProvider>
+        <ThemeProvider>
+          <ToastProvider>
+            <RouterProvider router={router} />
+          </ToastProvider>
+        </ThemeProvider>
+      </PrimeReactProvider>
     </QueryClientProvider>
   </StrictMode>
 );

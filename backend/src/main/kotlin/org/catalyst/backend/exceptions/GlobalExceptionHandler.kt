@@ -1,5 +1,6 @@
 package org.catalyst.backend.exceptions
 
+import org.catalyst.backend.responses.ErrorResponse
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.AccessDeniedException
@@ -72,10 +73,4 @@ class GlobalExceptionHandler {
             status
         )
     }
-
-    data class ErrorResponse(
-        val status: Int,
-        val message: String? = null,
-        val fields: List<String>? = null
-    )
 }

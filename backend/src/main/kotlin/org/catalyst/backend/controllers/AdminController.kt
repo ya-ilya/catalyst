@@ -1,7 +1,15 @@
 package org.catalyst.backend.controllers
 
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.media.ArraySchema
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Size
+import org.catalyst.backend.configurations.annotations.CommonApiResponses
 import org.catalyst.backend.entities.user.User
 import org.catalyst.backend.requests.CreateUserRequest
 import org.catalyst.backend.responses.CapeResponse
@@ -19,10 +27,12 @@ import org.springframework.web.server.ResponseStatusException
 import java.security.SecureRandom
 import java.util.*
 import kotlin.streams.asSequence
+import io.swagger.v3.oas.annotations.parameters.RequestBody as SwaggerRequestBody
 
 @RestController
 @RequestMapping("/api/admin")
 @PreAuthorize("hasRole('ADMIN')")
+@Tag(name = "Admin", description = "Endpoints for administrator actions")
 class AdminController(
     private val userService: UserService,
     private val capeService: CapeService
@@ -42,9 +52,20 @@ class AdminController(
     }
 
     @GetMapping("/users")
+    @Operation(summary = "Get a list of all users with pagination", description = "Requires ADMIN role")
+    @ApiResponse(
+        responseCode = "200",
+        description = "OK",
+        content = [Content(array = ArraySchema(schema = Schema(implementation = UserResponse::class)))]
+    )
+    @CommonApiResponses
     fun getUsers(
-        @RequestParam(value = "limit", required = false, defaultValue = "10") limit: Int,
-        @RequestParam(value = "offset", required = false, defaultValue = "0") offset: Int,
+        @Parameter(description = "Number of users to return per page")
+        @RequestParam(value = "limit", required = false, defaultValue = "10")
+        limit: Int,
+        @Parameter(description = "Offset for pagination")
+        @RequestParam(value = "offset", required = false, defaultValue = "0")
+        offset: Int,
     ): ResponseEntity<List<UserResponse>> {
         val page = userService.getUsers(limit, offset)
 
@@ -57,12 +78,35 @@ class AdminController(
     }
 
     @GetMapping("/users/{id}")
-    fun getUserById(@PathVariable id: UUID): UserResponse {
+    @Operation(summary = "Get a user by their ID", description = "Requires ADMIN role")
+    @ApiResponse(
+        responseCode = "200",
+        description = "OK",
+        content = [Content(schema = Schema(implementation = UserResponse::class))]
+    )
+    @CommonApiResponses
+    fun getUserById(
+        @Parameter(description = "ID of the user to retrieve")
+        @PathVariable
+        id: UUID
+    ): UserResponse {
         return userService.getUserById(id).toResponse()
     }
 
     @PostMapping("/users")
-    fun createUser(@Valid @RequestBody request: CreateUserRequest): UserCreatedResponse {
+    @Operation(summary = "Create a new user with a temporary password", description = "Requires ADMIN role")
+    @ApiResponse(
+        responseCode = "201",
+        description = "User created",
+        content = [Content(schema = Schema(implementation = UserCreatedResponse::class))]
+    )
+    @CommonApiResponses
+    fun createUser(
+        @Valid
+        @RequestBody
+        @SwaggerRequestBody(description = "User creation request", required = true)
+        request: CreateUserRequest
+    ): UserCreatedResponse {
         val temporaryPassword = generateRandomPassword()
         val user = userService.createUser(
             request.username,
@@ -78,7 +122,17 @@ class AdminController(
     }
 
     @DeleteMapping("/users/{id}")
-    fun deleteUser(@AuthenticationPrincipal user: User, @PathVariable id: UUID) {
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @Operation(summary = "Delete a user by their ID", description = "Requires ADMIN role")
+    @ApiResponse(responseCode = "204", description = "No content (user deleted)")
+    @CommonApiResponses
+    fun deleteUser(
+        @AuthenticationPrincipal
+        user: User,
+        @Parameter(description = "ID of the user to delete")
+        @PathVariable
+        id: UUID
+    ) {
         if (user.id == id) {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot delete self")
         }
@@ -87,10 +141,21 @@ class AdminController(
     }
 
     @PostMapping("/capes", consumes = ["multipart/form-data"])
+    @Operation(summary = "Create a new cape", description = "Requires ADMIN role")
+    @ApiResponse(responseCode = "201", description = "Cape created")
+    @CommonApiResponses
     fun createCape(
-        @RequestParam("name") @Size(min = 4, max = 32) name: String,
-        @RequestParam("description") @Size(min = 4, max = 256) description: String,
-        @RequestParam("image") image: MultipartFile
+        @Parameter(description = "Name of the cape (4-32 characters)")
+        @RequestParam("name")
+        @Size(min = 4, max = 32)
+        name: String,
+        @Parameter(description = "Description of the cape (4-256 characters)")
+        @RequestParam("description")
+        @Size(min = 4, max = 256)
+        description: String,
+        @Parameter(description = "Image file for the cape (PNG)")
+        @RequestParam("image")
+        image: MultipartFile
     ): CapeResponse {
         return capeService.createCape(
             name,
@@ -100,7 +165,15 @@ class AdminController(
     }
 
     @DeleteMapping("/capes/{id}")
-    fun deleteCape(@PathVariable id: UUID) {
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @Operation(summary = "Delete a cape by its ID", description = "Requires ADMIN role")
+    @ApiResponse(responseCode = "204", description = "No content (cape deleted)")
+    @CommonApiResponses
+    fun deleteCape(
+        @Parameter(description = "ID of the cape to delete")
+        @PathVariable
+        id: UUID
+    ) {
         capeService.deleteCapeById(id)
     }
 }

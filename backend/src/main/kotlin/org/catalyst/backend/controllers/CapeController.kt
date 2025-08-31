@@ -1,5 +1,13 @@
 package org.catalyst.backend.controllers
 
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.media.ArraySchema
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.tags.Tag
+import org.catalyst.backend.configurations.annotations.CommonApiResponses
 import org.catalyst.backend.entities.user.User
 import org.catalyst.backend.responses.CapeResponse
 import org.catalyst.backend.services.CapeService
@@ -15,11 +23,30 @@ import java.util.*
 
 @RestController
 @RequestMapping("/api/capes")
+@Tag(name = "Capes", description = "Endpoints for managing capes")
 class CapeController(private val capeService: CapeService) {
     @GetMapping
+    @Operation(summary = "Get a list of all public capes with pagination")
+    @ApiResponse(
+        responseCode = "200",
+        description = "OK",
+        content = [Content(array = ArraySchema(schema = Schema(implementation = CapeResponse::class)))]
+    )
     fun getCapes(
-        @RequestParam(value = "limit", required = false, defaultValue = "10") limit: Int,
-        @RequestParam(value = "offset", required = false, defaultValue = "0") offset: Int,
+        @Parameter(description = "Number of capes to return per page")
+        @RequestParam(
+            value = "limit",
+            required = false,
+            defaultValue = "10"
+        )
+        limit: Int,
+        @Parameter(description = "Offset for pagination")
+        @RequestParam(
+            value = "offset",
+            required = false,
+            defaultValue = "0"
+        )
+        offset: Int,
     ): ResponseEntity<List<CapeResponse>> {
         val page = capeService.getCapes(limit, offset)
 
@@ -32,20 +59,48 @@ class CapeController(private val capeService: CapeService) {
     }
 
     @GetMapping("/{id}")
-    fun getCapeById(@PathVariable id: UUID): CapeResponse {
+    @Operation(summary = "Get a cape by its ID")
+    @ApiResponse(
+        responseCode = "200",
+        description = "OK",
+        content = [Content(schema = Schema(implementation = CapeResponse::class))]
+    )
+    @CommonApiResponses
+    fun getCapeById(
+        @Parameter(description = "ID of the cape to retrieve")
+        @PathVariable
+        id: UUID
+    ): CapeResponse {
         return capeService.getCapeById(id).toResponse()
     }
 
     @GetMapping("/{id}/select")
+    @Operation(summary = "Select a cape for the current user", description = "User must be authenticated")
+    @ApiResponse(responseCode = "200", description = "OK")
+    @CommonApiResponses
     fun select(
-        @AuthenticationPrincipal user: User,
-        @PathVariable id: UUID
+        @AuthenticationPrincipal
+        user: User,
+        @Parameter(description = "ID of the cape to select")
+        @PathVariable
+        id: UUID
     ) {
         capeService.select(id, user)
     }
 
     @GetMapping("/{id}/image", produces = ["image/png"])
-    fun getCapeImage(@PathVariable id: UUID): ResponseEntity<ByteArrayResource> {
+    @Operation(summary = "Get a cape's image by ID")
+    @ApiResponse(
+        responseCode = "200",
+        description = "OK",
+        content = [Content(schema = Schema(type = "string", format = "binary"))]
+    )
+    @CommonApiResponses
+    fun getCapeImage(
+        @Parameter(description = "ID of the cape to get the image for")
+        @PathVariable
+        id: UUID
+    ): ResponseEntity<ByteArrayResource> {
         val image = try {
             capeService.loadCapeImage(id)
         } catch (_: IOException) {

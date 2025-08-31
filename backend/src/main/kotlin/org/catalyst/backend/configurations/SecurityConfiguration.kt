@@ -1,7 +1,7 @@
 package org.catalyst.backend.configurations
 
-import org.catalyst.backend.configurations.filter.AuthenticationFilter
-import org.catalyst.backend.configurations.filter.RateLimitingFilter
+import org.catalyst.backend.configurations.filters.AuthenticationFilter
+import org.catalyst.backend.configurations.filters.RateLimitingFilter
 import org.catalyst.backend.services.UserService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

@@ -10,9 +10,9 @@ import { useCallback, useEffect, useState } from "react";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 
+import { queryClient } from "../../..";
 import * as api from "../../../api";
 import { useToastContext } from "../../../contexts";
-import { queryClient } from "../../../query-config";
 
 type CapesTableProps = {
   adminController?: api.AdminController;
