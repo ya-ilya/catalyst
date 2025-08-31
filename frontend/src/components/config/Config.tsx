@@ -9,100 +9,91 @@ import { memo, useEffect, useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { materialDark, materialLight } from "react-syntax-highlighter/dist/esm/styles/prism";
 
+import { useQuery } from "@tanstack/react-query";
+
 import * as api from "../../api";
 import { useThemeContext, useToastContext } from "../../contexts";
 
 type ConfigProps = {
   config: api.Config;
+  isAdmin: boolean;
   isAuthor: boolean;
   isSubscribed: boolean;
   subscribe: () => void;
   unsubscribe: () => void;
+  togglePublicity: () => void;
   delete: () => void;
 };
 
 export const Config = memo((props: ConfigProps) => {
-  const { config, isAuthor, isSubscribed, subscribe, unsubscribe } = props;
+  const { config, isAdmin, isAuthor, isSubscribed, subscribe, unsubscribe, togglePublicity } = props;
 
   const configController = api.useConfigController();
 
   const [isDialogVisible, setIsDialogVisible] = useState(false);
-  const [nodes, setNodes] = useState<TreeNode[]>([]);
   const [selectedKey, setSelectedKey] = useState("");
 
-  const [contentData, setContentData] = useState<{ type: "plaintext" | "json"; content: string } | null>(
-    null
-  );
+  const { data: nodes, isError: nodesError } = useQuery({
+    queryKey: ["configFiles", config.id],
+    queryFn: async () => {
+      const files = await configController!.getConfigFiles(config.id);
+      return files.map(
+        (file): TreeNode => ({
+          key: file.name,
+          icon: "pi pi-cog",
+          label: file.name,
+        })
+      );
+    },
+    enabled: isDialogVisible && !!configController,
+    staleTime: Infinity,
+  });
+
+  const { data: contentData, error: contentError } = useQuery({
+    queryKey: ["configFileContent", config.id, selectedKey],
+    queryFn: async () => {
+      const response = await configController!.getConfigFile(config.id, selectedKey);
+      if (typeof response === "string") {
+        return {
+          type: "plaintext",
+          content: response,
+        };
+      } else if (typeof response === "object") {
+        return {
+          type: "json",
+          content: JSON.stringify(response, null, 2),
+        };
+      }
+      return null;
+    },
+    enabled: isDialogVisible && !!selectedKey && !!configController,
+    staleTime: Infinity,
+  });
 
   const [isDarkMode] = useThemeContext();
   const [showToast] = useToastContext();
 
   useEffect(() => {
-    const fetchFiles = async () => {
-      if (!isDialogVisible) return;
-      if (!configController) return;
-
-      try {
-        const files = await configController.getConfigFiles(config.id);
-
-        setNodes(
-          files.map((file): TreeNode => {
-            return {
-              key: file.name,
-              icon: "pi pi-cog",
-              label: file.name,
-            };
-          })
-        );
-      } catch (error) {
-        console.error("Failed to fetch config files:", error);
-        showToast({
-          severity: "error",
-          summary: "Error",
-          detail: "Failed to fetch config files.",
-        });
-      }
-    };
-
-    fetchFiles();
-  }, [isDialogVisible, config, configController]);
+    if (contentError) {
+      console.error("Failed to fetch config files:", nodesError);
+      showToast({
+        severity: "error",
+        summary: "Error",
+        detail: "Failed to fetch config files.",
+      });
+    }
+  }, [nodesError]);
 
   useEffect(() => {
-    if (!selectedKey) {
-      setContentData(null);
-      return;
+    if (contentError) {
+      console.log("Failed to fetch config file content:", contentError);
+      showToast({
+        severity: "error",
+        summary: "Error",
+        detail: "Failed to fetch config file content.",
+      });
     }
-
-    const fetchContent = async () => {
-      if (!isDialogVisible) return;
-      if (!configController) return;
-
-      try {
-        const response = await configController.getConfigFile(config.id, selectedKey);
-
-        if (typeof response === "string") {
-          setContentData({
-            type: "plaintext",
-            content: response,
-          });
-        } else if (typeof response === "object") {
-          setContentData({
-            type: "json",
-            content: JSON.stringify(response, null, 2),
-          });
-        }
-      } catch (error) {
-        console.log("Failed to fetch config file content:", error);
-        showToast({
-          severity: "error",
-          summary: "Error",
-          detail: "Failed to fetch config file content.",
-        });
-      }
-    };
-
-    fetchContent();
-  }, [isDialogVisible, config, selectedKey, configController]);
+  }, [contentError]);
 
   const dialogFooter = (
     <div>
@@ -134,8 +125,9 @@ export const Config = memo((props: ConfigProps) => {
           {!isAuthor && isSubscribed && (
             <Button
               icon="pi pi-minus-circle"
-              className="p-button-danger p-button-sm"
+              className="p-button-sm"
               onClick={unsubscribe}
+              severity="danger"
               rounded
               text
             />
@@ -151,9 +143,19 @@ export const Config = memo((props: ConfigProps) => {
           )}
           {isAuthor && (
             <Button
+              icon={`pi ${config.isPublic ? "pi-eye" : "pi-eye-slash"}`}
+              className="p-button-sm"
+              onClick={togglePublicity}
+              rounded
+              text
+            />
+          )}
+          {(isAuthor || isAdmin) && (
+            <Button
               icon="pi pi-trash"
-              className="p-button-danger p-button-sm"
+              className=" p-button-sm"
               onClick={props.delete}
+              severity="danger"
               rounded
               text
             />

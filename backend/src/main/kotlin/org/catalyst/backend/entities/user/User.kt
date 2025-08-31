@@ -47,6 +47,8 @@ class User(
     @GeneratedValue(strategy = GenerationType.UUID)
     val id: UUID? = null
 ) : UserDetails {
+    val isAdmin get() = roles.any { it.name == "ROLE_ADMIN" }
+
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> =
         roles.map { SimpleGrantedAuthority(it.name) }.toMutableList()
 
@@ -77,7 +79,7 @@ class User(
     fun toResponse() = UserResponse(
         id!!,
         username,
-        roles.any { it.name == "ROLE_ADMIN" },
+        isAdmin,
         isPasswordChangeRequired,
         cape?.toResponse(),
         createdAt

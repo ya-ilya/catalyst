@@ -7,10 +7,10 @@ import { Navigate, useLocation } from "react-router";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 
+import { queryClient } from "../..";
 import * as api from "../../api";
 import { Config, Header } from "../../components";
 import { useAuthenticationContext, useToastContext } from "../../contexts";
-import { queryClient } from "../../query-config";
 
 const MAX_CONFIGS_PER_PAGE = 35;
 
@@ -127,6 +127,31 @@ export function Configs() {
     },
   });
 
+  const togglePublicityMutation = useMutation({
+    mutationFn: async (config: api.Config) => {
+      await configController!.updateConfig(config.id, {
+        isPublic: !config.isPublic,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["configs"] });
+      queryClient.invalidateQueries({ queryKey: ["subscriptions"] });
+      showToast({
+        severity: "success",
+        summary: "Publicity toggled",
+        detail: "Config publicity has been successfully toggled.",
+      });
+    },
+    onError: (error) => {
+      console.error("Failed to toggle config publicity:", error);
+      showToast({
+        severity: "error",
+        summary: "Error",
+        detail: "Failed to toggle config publicity.",
+      });
+    },
+  });
+
   const deleteMutation = useMutation({
     mutationFn: async (config: api.Config) => {
       await configController!.deleteConfig(config.id);
@@ -166,6 +191,14 @@ export function Configs() {
     [configController, unsubscribeMutation]
   );
 
+  const handleTogglePublicity = useCallback(
+    async (config: api.Config) => {
+      if (!configController) return;
+      togglePublicityMutation.mutate(config);
+    },
+    [configController, togglePublicityMutation]
+  );
+
   const handleDelete = useCallback(
     async (config: api.Config) => {
       if (!configController) return;
@@ -203,12 +236,14 @@ export function Configs() {
                     <Config
                       key={subscription.id}
                       config={subscription.config}
+                      isAdmin={session !== null && session.user.isAdmin}
                       isAuthor={session !== null && subscription.config.author.id === session.user.id}
                       isSubscribed={subscriptions?.some(
                         (other) => other.config.id === subscription.config.id
                       )}
                       subscribe={() => handleSubscribe(subscription.config)}
                       unsubscribe={() => handleUnsubscribe(subscription.config)}
+                      togglePublicity={() => handleTogglePublicity(subscription.config)}
                       delete={() => handleDelete(subscription.config)}
                     />
                   ))}
@@ -236,10 +271,12 @@ export function Configs() {
                     <Config
                       key={config.id}
                       config={config}
+                      isAdmin={session !== null && session.user.isAdmin}
                       isAuthor={session !== null && config.author.id === session.user.id}
                       isSubscribed={subscriptions?.some((other) => other.config.id === config.id)}
                       subscribe={() => handleSubscribe(config)}
                       unsubscribe={() => handleUnsubscribe(config)}
+                      togglePublicity={() => handleTogglePublicity(config)}
                       delete={() => handleDelete(config)}
                     />
                   ))}

@@ -190,7 +190,7 @@ class ConfigController(private val configService: ConfigService) {
         request: UpdateConfigRequest
     ): ConfigResponse {
         return configService
-            .updateConfig(id, request.name, request.files, user)
+            .updateConfig(id, request.name, request.files, request.isPublic, user)
             .toResponse()
     }
 

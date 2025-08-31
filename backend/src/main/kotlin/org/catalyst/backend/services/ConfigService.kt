@@ -96,6 +96,7 @@ class ConfigService(
         id: UUID,
         name: String?,
         files: List<ConfigFile>?,
+        isPublic: Boolean?,
         user: User
     ): Config {
         val config = getConfigById(id)
@@ -108,6 +109,7 @@ class ConfigService(
             config.apply {
                 this.name = name ?: this.name
                 this.files = files ?: this.files
+                this.isPublic = isPublic ?: this.isPublic
                 this.lastUpdated = LocalDateTime.now(ZoneOffset.UTC)
             }
         )
@@ -117,7 +119,7 @@ class ConfigService(
     fun deleteConfigForUser(id: UUID, user: User) {
         val config = getConfigById(id)
 
-        if (config.author.id != user.id) {
+        if (config.author.id != user.id && !user.isAdmin) {
             throw ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to delete this configuration.")
         }
 

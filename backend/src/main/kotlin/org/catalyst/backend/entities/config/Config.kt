@@ -12,7 +12,7 @@ class Config(
     var name: String,
     @ElementCollection
     var files: List<ConfigFile>,
-    val isPublic: Boolean,
+    var isPublic: Boolean,
     var lastUpdated: LocalDateTime,
     val createdAt: LocalDateTime,
     @ManyToOne

@@ -6,10 +6,10 @@ import { Navigate, useLocation } from "react-router";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 
+import { queryClient } from "../..";
 import * as api from "../../api";
 import { Cape, Header } from "../../components";
 import { useAuthenticationContext, useToastContext } from "../../contexts";
-import { queryClient } from "../../query-config";
 
 const MAX_CAPES_PER_PAGE = 24;
 
