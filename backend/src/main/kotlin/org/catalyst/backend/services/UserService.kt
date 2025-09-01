@@ -35,9 +35,13 @@ class UserService(
 
     fun getUsers(
         limit: Int,
-        offset: Int
+        offset: Int,
+        filter: String?
     ): Page<User> {
-        return userRepository.findAll(OffsetBasedPageRequest(offset, limit, JpaSort.by("createdAt")))
+        return userRepository.findFilteredUsers(
+            filter,
+            OffsetBasedPageRequest(offset, limit, JpaSort.by("createdAt"))
+        )
     }
 
     fun createUser(

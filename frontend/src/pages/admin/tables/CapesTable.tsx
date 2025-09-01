@@ -5,6 +5,9 @@ import { DataTable } from "primereact/datatable";
 import { Dialog } from "primereact/dialog";
 import { FileUpload, FileUploadHandlerEvent } from "primereact/fileupload";
 import { FloatLabel } from "primereact/floatlabel";
+import { useDebounce } from "primereact/hooks";
+import { IconField } from "primereact/iconfield";
+import { InputIcon } from "primereact/inputicon";
 import { InputText } from "primereact/inputtext";
 import { useCallback, useEffect, useState } from "react";
 
@@ -25,15 +28,16 @@ const MAX_DESCRIPTION_LENGTH = 256;
 const MAX_CAPES_PER_PAGE = 5;
 
 export function CapesTable({ adminController }: CapesTableProps) {
+  const [filterValue, debouncedFilterValue, setFilterValue] = useDebounce("", 400);
   const capeController = api.useCapeController();
 
   const [page, setPage] = useState(0);
 
   const { data, isFetching, error } = useQuery({
-    queryKey: ["tables/capes", page],
+    queryKey: ["tables/capes", page, debouncedFilterValue],
     queryFn: async () => {
       if (!capeController) return { capes: [], total: 0 };
-      const response = await capeController.getCapes(MAX_CAPES_PER_PAGE, page);
+      const response = await capeController.getCapes(MAX_CAPES_PER_PAGE, page, debouncedFilterValue);
       return response;
     },
     enabled: !!capeController,
@@ -160,6 +164,14 @@ export function CapesTable({ adminController }: CapesTableProps) {
     <div className="admin-table-header">
       <span className="title">Cape Management</span>
       <div className="actions">
+        <IconField iconPosition="left">
+          <InputIcon className="pi pi-search" />
+          <InputText
+            value={filterValue}
+            onChange={(event) => setFilterValue(event.target.value)}
+            placeholder="Search by name"
+          />
+        </IconField>
         <Button
           label="Create Cape"
           icon="pi pi-plus"

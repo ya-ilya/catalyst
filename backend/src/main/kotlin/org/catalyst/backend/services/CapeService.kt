@@ -39,9 +39,13 @@ class CapeService(
 
     fun getCapes(
         limit: Int,
-        offset: Int
+        offset: Int,
+        filter: String?
     ): Page<Cape> {
-        return capeRepository.findAll(OffsetBasedPageRequest(offset, limit))
+        return capeRepository.findFilteredCapes(
+            filter,
+            OffsetBasedPageRequest(offset, limit)
+        )
     }
 
     fun select(id: UUID, user: User) {

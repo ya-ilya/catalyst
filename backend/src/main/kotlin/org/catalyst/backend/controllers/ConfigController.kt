@@ -29,7 +29,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody as SwaggerRequestBod
 @Tag(name = "Configs", description = "Endpoints for managing configs")
 class ConfigController(private val configService: ConfigService) {
     @GetMapping
-    @Operation(summary = "Get a list of all public configs with pagination")
+    @Operation(summary = "Get a list of all public configs with pagination and filtering")
     @ApiResponse(
         responseCode = "200",
         description = "OK",
@@ -42,8 +42,11 @@ class ConfigController(private val configService: ConfigService) {
         @Parameter(description = "Offset for pagination")
         @RequestParam(value = "offset", required = false, defaultValue = "0")
         offset: Int,
+        @Parameter(description = "Filter configs by name or author")
+        @RequestParam(value = "filter", required = false)
+        filter: String?
     ): ResponseEntity<List<ConfigResponse>> {
-        val page = configService.getPublicConfigs(limit, offset)
+        val page = configService.getPublicConfigs(limit, offset, filter)
 
         return ResponseEntity
             .status(HttpStatus.OK)

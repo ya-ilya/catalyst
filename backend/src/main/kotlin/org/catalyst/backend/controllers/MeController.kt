@@ -49,7 +49,7 @@ class MeController(
     }
 
     @GetMapping("/subscriptions")
-    @Operation(summary = "Get a list of configs the current user is subscribed to, with pagination")
+    @Operation(summary = "Get a list of configs the current user is subscribed to, with pagination and filtering")
     @ApiResponse(
         responseCode = "200",
         description = "OK",
@@ -65,8 +65,11 @@ class MeController(
         @Parameter(description = "Offset for pagination")
         @RequestParam(value = "offset", required = false, defaultValue = "0")
         offset: Int,
+        @Parameter(description = "Filter subscriptions by config name or author name")
+        @RequestParam(value = "filter", required = false)
+        filter: String?
     ): ResponseEntity<List<SubscriptionResponse>> {
-        val page = subscriptionService.findByUser(user, limit, offset)
+        val page = subscriptionService.findByUser(user, limit, offset, filter)
 
         return ResponseEntity
             .status(HttpStatus.OK)

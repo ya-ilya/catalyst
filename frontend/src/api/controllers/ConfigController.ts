@@ -42,12 +42,14 @@ export class ConfigController extends Controller {
 
   async getPublicConfigs(
     limit: number,
-    offset: number
+    offset: number,
+    filter: string
   ): Promise<{ configs: Config[]; total: number; pages: number }> {
     const response = await this.client.get("", {
       params: {
         limit: limit,
         offset: offset,
+        filter: filter,
       },
     });
 

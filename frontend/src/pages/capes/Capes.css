@@ -5,15 +5,38 @@
 }
 
 .capes-content {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(250px, 80vw), 1fr));
-  gap: 16px;
-  padding: 16px;
-  padding-top: 80px;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  box-sizing: border-box;
+  padding-top: 64px;
+  height: 100vh;
 }
 
-.capes-container .empty-message {
+.capes-content .input-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  width: 100%;
+}
+
+.capes-content .input-container .p-inputtext {
+  width: 400px;
+}
+
+.capes-content .capes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(250px, 80vw), 1fr));
+  grid-template-rows: repeat(auto-fill, 400px);
+  gap: 16px;
+  padding: 16px;
+  padding-top: 0px;
+  overflow-y: auto;
+  height: 100vh;
+}
+
+.capes-content .empty-message {
   display: flex;
   align-items: center;
   justify-content: center;

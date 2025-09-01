@@ -29,9 +29,10 @@ class ConfigService(
 
     fun getPublicConfigs(
         limit: Int,
-        offset: Int
+        offset: Int,
+        filter: String?
     ): Page<Config> {
-        return configRepository.findByIsPublicTrue(OffsetBasedPageRequest(offset, limit, JpaSort.by("createdAt")))
+        return configRepository.findFilteredPublicConfigs(filter, OffsetBasedPageRequest(offset, limit, JpaSort.by("createdAt")))
     }
 
     fun getConfigForUser(id: UUID, user: User): Config {

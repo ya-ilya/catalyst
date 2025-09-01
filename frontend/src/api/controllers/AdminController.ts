@@ -36,11 +36,16 @@ export class AdminController extends Controller {
     super(client, "/api/admin", token);
   }
 
-  async getUsers(limit: number, offset: number): Promise<{ users: User[]; total: number; pages: number }> {
+  async getUsers(
+    limit: number,
+    offset: number,
+    filter?: string
+  ): Promise<{ users: User[]; total: number; pages: number }> {
     const response = await this.client.get("/users", {
       params: {
         limit: limit,
         offset: offset,
+        filter: filter,
       },
     });
 

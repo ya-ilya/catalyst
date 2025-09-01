@@ -1,7 +1,11 @@
 import "./Capes.css";
 
+import { useDebounce } from "primereact/hooks";
+import { IconField } from "primereact/iconfield";
+import { InputIcon } from "primereact/inputicon";
+import { InputText } from "primereact/inputtext";
 import { Paginator } from "primereact/paginator";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -17,13 +21,14 @@ export function Capes() {
   const capeController = api.useCapeController();
   const meController = api.useMeController();
 
+  const [filterValue, debouncedFilterValue, setFilterValue] = useDebounce("", 400);
   const [page, setPage] = useState(0);
 
   const { data: capesData, error: capesError } = useQuery({
-    queryKey: ["capes", page],
+    queryKey: ["capes", page, debouncedFilterValue],
     queryFn: async () => {
       if (!capeController) return { capes: [], total: 0 };
-      const response = await capeController.getCapes(MAX_CAPES_PER_PAGE, page);
+      const response = await capeController.getCapes(MAX_CAPES_PER_PAGE, page, debouncedFilterValue);
       return response;
     },
     enabled: !!capeController,
@@ -45,9 +50,6 @@ export function Capes() {
 
   const [session] = useAuthenticationContext();
   const [showToast] = useToastContext();
-
-  const paginator = useRef<Paginator>(null);
-  const [contentHeight, setContentHeight] = useState("100vh");
 
   const location = useLocation();
 
@@ -128,21 +130,6 @@ export function Capes() {
     unselectMutation.mutate();
   }, [meController, unselectMutation]);
 
-  const calculateHeight = useCallback(() => {
-    if (paginator.current && paginator.current.getElement) {
-      const paginatorHeight = paginator.current.getElement()!.getBoundingClientRect().height;
-      setContentHeight(`calc(100vh - ${paginatorHeight}px)`);
-    }
-  }, []);
-
-  useEffect(() => {
-    window.addEventListener("resize", calculateHeight);
-
-    return () => {
-      window.removeEventListener("resize", calculateHeight);
-    };
-  }, []);
-
   if (!session) {
     return (
       <Navigate
@@ -159,34 +146,37 @@ export function Capes() {
         <div className="empty-message">No capes available.</div>
       ) : (
         <>
-          <div
-            className="capes-content"
-            style={{
-              height: contentHeight,
-            }}
-          >
-            {capes.map((cape) => (
-              <Cape
-                key={cape.id}
-                cape={cape}
-                isSelected={cape.id === selectedCape?.id}
-                select={() => handleSelect(cape)}
-                unselect={handleUnselect}
-              />
-            ))}
+          <div className="capes-content">
+            <div className="input-container">
+              <IconField iconPosition="left">
+                <InputIcon className="pi pi-search" />
+                <InputText
+                  value={filterValue}
+                  onChange={(event) => setFilterValue(event.target.value)}
+                  placeholder="Search in capes by name"
+                />
+              </IconField>
+            </div>
+            <div className="capes">
+              {capes.map((cape) => (
+                <Cape
+                  key={cape.id}
+                  cape={cape}
+                  isSelected={cape.id === selectedCape?.id}
+                  select={() => handleSelect(cape)}
+                  unselect={handleUnselect}
+                />
+              ))}
+            </div>
+            <Paginator
+              first={page}
+              rows={MAX_CAPES_PER_PAGE}
+              totalRecords={total}
+              onPageChange={(event) => {
+                setPage(event.first);
+              }}
+            />
           </div>
-          <Paginator
-            ref={(node) => {
-              paginator.current = node;
-              calculateHeight();
-            }}
-            first={page}
-            rows={MAX_CAPES_PER_PAGE}
-            totalRecords={total}
-            onPageChange={(event) => {
-              setPage(event.first);
-            }}
-          />
         </>
       )}
     </div>

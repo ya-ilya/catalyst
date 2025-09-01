@@ -13,9 +13,25 @@
   height: 100vh;
 }
 
+.configs-content .input-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  width: 100%;
+}
+
+.configs-content .input-container .p-inputtext {
+  width: 400px;
+}
+
 .configs-content .p-tabmenu {
   min-height: 55px;
   max-height: 55px;
+}
+
+.configs-content .p-tabmenu-nav {
+  justify-content: center;
 }
 
 .configs-content .p-tabmenu .p-menuitem-link {

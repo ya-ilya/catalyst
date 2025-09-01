@@ -52,7 +52,7 @@ class AdminController(
     }
 
     @GetMapping("/users")
-    @Operation(summary = "Get a list of all users with pagination", description = "Requires ADMIN role")
+    @Operation(summary = "Get a list of all users with pagination and filtering", description = "Requires ADMIN role")
     @ApiResponse(
         responseCode = "200",
         description = "OK",
@@ -66,8 +66,14 @@ class AdminController(
         @Parameter(description = "Offset for pagination")
         @RequestParam(value = "offset", required = false, defaultValue = "0")
         offset: Int,
+        @Parameter(description = "Filter users by ID or username")
+        @RequestParam(
+            value = "filter",
+            required = false
+        )
+        filter: String?,
     ): ResponseEntity<List<UserResponse>> {
-        val page = userService.getUsers(limit, offset)
+        val page = userService.getUsers(limit, offset, filter)
 
         return ResponseEntity
             .status(HttpStatus.OK)

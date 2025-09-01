@@ -21,9 +21,10 @@ class SubscriptionService(private val subscriptionRepository: SubscriptionReposi
             .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found") }
     }
 
-    fun findByUser(user: User, limit: Int, offset: Int): Page<Subscription> {
-        return subscriptionRepository.findByUser(
+    fun findByUser(user: User, limit: Int, offset: Int, filter: String?): Page<Subscription> {
+        return subscriptionRepository.findFilteredByUser(
             user,
+            filter,
             OffsetBasedPageRequest(offset, limit, JpaSort.by("subscribedAt"))
         )
     }

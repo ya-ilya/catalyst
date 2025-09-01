@@ -1,5 +1,9 @@
 import "./Configs.css";
 
+import { useDebounce } from "primereact/hooks";
+import { IconField } from "primereact/iconfield";
+import { InputIcon } from "primereact/inputicon";
+import { InputText } from "primereact/inputtext";
 import { Paginator } from "primereact/paginator";
 import { TabMenu } from "primereact/tabmenu";
 import { useCallback, useEffect, useState } from "react";
@@ -18,13 +22,19 @@ export function Configs() {
   const meController = api.useMeController();
   const configController = api.useConfigController();
 
+  const [subscriptionsFilterValue, debouncedSubscriptionsFilterValue, setSubscriptionsFilterValue] =
+    useDebounce("", 400);
   const [subscriptionsPage, setSubscriptionsPage] = useState(0);
 
   const { data: subscriptionsData, error: subscriptionsError } = useQuery({
-    queryKey: ["subscriptions", subscriptionsPage],
+    queryKey: ["subscriptions", subscriptionsPage, debouncedSubscriptionsFilterValue],
     queryFn: async () => {
       if (!meController) return { subscriptions: [], total: 0 };
-      const response = await meController.getSubscriptions(MAX_CONFIGS_PER_PAGE, subscriptionsPage);
+      const response = await meController.getSubscriptions(
+        MAX_CONFIGS_PER_PAGE,
+        subscriptionsPage,
+        debouncedSubscriptionsFilterValue
+      );
       return response;
     },
     enabled: !!meController,
@@ -34,13 +44,18 @@ export function Configs() {
   const subscriptions = subscriptionsData?.subscriptions ?? [];
   const subscriptionsTotal = subscriptionsData?.total ?? 0;
 
+  const [configsFilterValue, debouncedConfigsFilterValue, setConfigsFilterValue] = useDebounce("", 400);
   const [configsPage, setConfigsPage] = useState(0);
 
   const { data: configsData, error: configsError } = useQuery({
-    queryKey: ["configs", configsPage],
+    queryKey: ["configs", configsPage, debouncedConfigsFilterValue],
     queryFn: async () => {
       if (!configController) return { configs: [], total: 0 };
-      const response = await configController.getPublicConfigs(MAX_CONFIGS_PER_PAGE, configsPage);
+      const response = await configController.getPublicConfigs(
+        MAX_CONFIGS_PER_PAGE,
+        configsPage,
+        debouncedConfigsFilterValue
+      );
       return response;
     },
     enabled: !!configController,
@@ -220,6 +235,24 @@ export function Configs() {
     <div className="configs-container">
       <Header />
       <div className="configs-content">
+        <div className="input-container">
+          <IconField iconPosition="left">
+            <InputIcon className="pi pi-search" />
+            <InputText
+              value={activeIndex === 0 ? subscriptionsFilterValue : configsFilterValue}
+              onChange={(event) => {
+                if (activeIndex === 0) {
+                  setSubscriptionsFilterValue(event.target.value);
+                } else {
+                  setConfigsFilterValue(event.target.value);
+                }
+              }}
+              placeholder={`Search ${
+                activeIndex === 0 ? "in subscriptions" : "in library"
+              } by name or author`}
+            />
+          </IconField>
+        </div>
         <TabMenu
           model={items}
           activeIndex={activeIndex}

@@ -5,6 +5,9 @@ import { confirmDialog } from "primereact/confirmdialog";
 import { DataTable } from "primereact/datatable";
 import { Dialog } from "primereact/dialog";
 import { FloatLabel } from "primereact/floatlabel";
+import { useDebounce } from "primereact/hooks";
+import { IconField } from "primereact/iconfield";
+import { InputIcon } from "primereact/inputicon";
 import { InputText } from "primereact/inputtext";
 import { Panel } from "primereact/panel";
 import { useCallback, useEffect, useState } from "react";
@@ -25,13 +28,14 @@ const MAX_USERNAME_LENGTH = 32;
 const MAX_USERS_PER_PAGE = 5;
 
 export function UsersTable({ adminController, session }: UsersTableProps) {
+  const [filterValue, debouncedFilterValue, setFilterValue] = useDebounce("", 400);
   const [page, setPage] = useState(0);
 
   const { data, isFetching, error } = useQuery({
-    queryKey: ["tables/users", page],
+    queryKey: ["tables/users", page, debouncedFilterValue],
     queryFn: async () => {
       if (!adminController) return { users: [], total: 0 };
-      const response = await adminController.getUsers(MAX_USERS_PER_PAGE, page);
+      const response = await adminController.getUsers(MAX_USERS_PER_PAGE, page, debouncedFilterValue);
       return response;
     },
     enabled: !!adminController,
@@ -156,6 +160,14 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
     <div className="admin-table-header">
       <span className="title">User Management</span>
       <div className="actions">
+        <IconField iconPosition="left">
+          <InputIcon className="pi pi-search" />
+          <InputText
+            value={filterValue}
+            onChange={(event) => setFilterValue(event.target.value)}
+            placeholder="Search by username"
+          />
+        </IconField>
         <Button
           label="Create User"
           icon="pi pi-user-plus"
