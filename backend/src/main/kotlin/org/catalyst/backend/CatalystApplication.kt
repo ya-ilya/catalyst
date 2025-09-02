@@ -5,11 +5,13 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import org.springframework.cache.annotation.EnableCaching
 import org.springframework.core.annotation.Order
 import org.springframework.scheduling.annotation.EnableScheduling
 
 @Order(2)
 @EnableScheduling
+@EnableCaching
 @SpringBootApplication(scanBasePackages = ["org.catalyst.backend"])
 class CatalystApplication(private val userService: UserService) : CommandLineRunner {
     @Value($$"${catalyst.admin.username}")

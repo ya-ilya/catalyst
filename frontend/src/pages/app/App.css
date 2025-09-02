@@ -1,13 +1,3 @@
-.app-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 100vh;
-  padding: 0;
-  padding-top: 64px;
-  box-sizing: border-box;
-}
-
 .app-content {
   display: flex;
   flex-direction: column;

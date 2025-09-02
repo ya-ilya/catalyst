@@ -6,6 +6,9 @@ import org.catalyst.backend.entities.cape.CapeRepository
 import org.catalyst.backend.entities.user.User
 import org.catalyst.backend.services.pagination.OffsetBasedPageRequest
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.Cacheable
+import org.springframework.cache.annotation.Caching
 import org.springframework.data.domain.Page
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -26,6 +29,8 @@ class CapeService(
             0x89.toByte(), 0x50.toByte(), 0x4E.toByte(), 0x47.toByte(),
             0x0D.toByte(), 0x0A.toByte(), 0x1A.toByte(), 0x0A.toByte()
         )
+
+        const val MAX_CAPE_IMAGE_SIZE = 100 * 1024L
     }
 
     @Value($$"${catalyst.capes.directory}")
@@ -37,6 +42,7 @@ class CapeService(
             .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "Cape not found") }
     }
 
+    @Cacheable(value = ["capes"])
     fun getCapes(
         limit: Int,
         offset: Int,
@@ -66,12 +72,13 @@ class CapeService(
         })
     }
 
+    @CacheEvict(value = ["capes"], allEntries = true)
     fun createCape(
         name: String,
         description: String,
         image: MultipartFile
     ): Cape {
-        if (image.size > 100 * 1024L) {
+        if (image.size > MAX_CAPE_IMAGE_SIZE) {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Too big cape file size")
         }
 
@@ -96,6 +103,12 @@ class CapeService(
     }
 
     @Transactional
+    @Caching(
+        evict = [
+            CacheEvict(value = ["capes"], allEntries = true),
+            CacheEvict(value = ["capeImages"], key = "#id")
+        ]
+    )
     fun deleteCapeById(id: UUID) {
         val cape = getCapeById(id)
 
@@ -109,6 +122,7 @@ class CapeService(
         capeRepository.delete(cape)
     }
 
+    @Cacheable(value = ["capeImages"], key = "#id")
     fun loadCapeImage(id: UUID): ByteArray {
         val cape = getCapeById(id)
 

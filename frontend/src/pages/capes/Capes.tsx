@@ -12,7 +12,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { queryClient } from "../..";
 import * as api from "../../api";
-import { Cape, Header } from "../../components";
+import { Cape } from "../../components";
 import { useAuthenticationContext, useToastContext } from "../../contexts";
 
 const MAX_CAPES_PER_PAGE = 24;
@@ -139,46 +139,41 @@ export function Capes() {
     );
   }
 
-  return (
-    <div className="capes-container">
-      <Header />
-      {capes.length === 0 ? (
-        <div className="empty-message">No capes available.</div>
-      ) : (
-        <>
-          <div className="capes-content">
-            <div className="input-container">
-              <IconField iconPosition="left">
-                <InputIcon className="pi pi-search" />
-                <InputText
-                  value={filterValue}
-                  onChange={(event) => setFilterValue(event.target.value)}
-                  placeholder="Search in capes by name"
-                />
-              </IconField>
-            </div>
-            <div className="capes">
-              {capes.map((cape) => (
-                <Cape
-                  key={cape.id}
-                  cape={cape}
-                  isSelected={cape.id === selectedCape?.id}
-                  select={() => handleSelect(cape)}
-                  unselect={handleUnselect}
-                />
-              ))}
-            </div>
-            <Paginator
-              first={page}
-              rows={MAX_CAPES_PER_PAGE}
-              totalRecords={total}
-              onPageChange={(event) => {
-                setPage(event.first);
-              }}
+  return capes.length === 0 ? (
+    <div className="empty-message">No capes available.</div>
+  ) : (
+    <>
+      <div className="capes-content">
+        <div className="input-container">
+          <IconField iconPosition="left">
+            <InputIcon className="pi pi-search" />
+            <InputText
+              value={filterValue}
+              onChange={(event) => setFilterValue(event.target.value)}
+              placeholder="Search in capes by name"
             />
-          </div>
-        </>
-      )}
-    </div>
+          </IconField>
+        </div>
+        <div className="capes">
+          {capes.map((cape) => (
+            <Cape
+              key={cape.id}
+              cape={cape}
+              isSelected={cape.id === selectedCape?.id}
+              select={() => handleSelect(cape)}
+              unselect={handleUnselect}
+            />
+          ))}
+        </div>
+        <Paginator
+          first={page}
+          rows={MAX_CAPES_PER_PAGE}
+          totalRecords={total}
+          onPageChange={(event) => {
+            setPage(event.first);
+          }}
+        />
+      </div>
+    </>
   );
 }

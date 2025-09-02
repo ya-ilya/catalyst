@@ -4,7 +4,6 @@ import { ConfirmDialog } from "primereact/confirmdialog";
 import { Navigate, useLocation } from "react-router";
 
 import * as api from "../../api";
-import { Header } from "../../components";
 import { useAuthenticationContext } from "../../contexts";
 import { CapesTable } from "./tables/CapesTable";
 import { UsersTable } from "./tables/UsersTable";
@@ -35,8 +34,7 @@ export function Admin() {
   }
 
   return (
-    <div className="admin-container">
-      <Header />
+    <>
       <div className="admin-content">
         <UsersTable
           adminController={adminController}
@@ -45,6 +43,6 @@ export function Admin() {
         <CapesTable adminController={adminController} />
       </div>
       <ConfirmDialog />
-    </div>
+    </>
   );
 }

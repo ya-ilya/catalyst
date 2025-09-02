@@ -10,7 +10,6 @@ import { useCallback, useEffect, useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router";
 
 import * as api from "../../api";
-import { Header } from "../../components";
 import { useAuthenticationContext, useToastContext } from "../../contexts";
 
 const MIN_PASSWORD_LENGTH = 8;
@@ -139,8 +138,7 @@ export function Account() {
   }
 
   return (
-    <div className="account-container">
-      <Header />
+    <>
       <div className="account-content">
         <Card
           title="Account"
@@ -236,6 +234,6 @@ export function Account() {
           </div>
         </div>
       </Dialog>
-    </div>
+    </>
   );
 }

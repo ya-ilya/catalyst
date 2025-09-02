@@ -13,7 +13,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { queryClient } from "../..";
 import * as api from "../../api";
-import { Config, Header } from "../../components";
+import { Config } from "../../components";
 import { useAuthenticationContext, useToastContext } from "../../contexts";
 
 const MAX_CONFIGS_PER_PAGE = 35;
@@ -232,101 +232,94 @@ export function Configs() {
   }
 
   return (
-    <div className="configs-container">
-      <Header />
-      <div className="configs-content">
-        <div className="input-container">
-          <IconField iconPosition="left">
-            <InputIcon className="pi pi-search" />
-            <InputText
-              value={activeIndex === 0 ? subscriptionsFilterValue : configsFilterValue}
-              onChange={(event) => {
-                if (activeIndex === 0) {
-                  setSubscriptionsFilterValue(event.target.value);
-                } else {
-                  setConfigsFilterValue(event.target.value);
-                }
-              }}
-              placeholder={`Search ${
-                activeIndex === 0 ? "in subscriptions" : "in library"
-              } by name or author`}
-            />
-          </IconField>
-        </div>
-        <TabMenu
-          model={items}
-          activeIndex={activeIndex}
-          onTabChange={(event) => setActiveIndex(event.index)}
-        />
-        {activeIndex === 0 && (
-          <>
-            {subscriptions.length === 0 ? (
-              <div className="empty-message">No subscriptions yet.</div>
-            ) : (
-              <>
-                <div className="subscriptions">
-                  {subscriptions.map((subscription) => (
-                    <Config
-                      key={subscription.id}
-                      config={subscription.config}
-                      isAdmin={session !== null && session.user.isAdmin}
-                      isAuthor={session !== null && subscription.config.author.id === session.user.id}
-                      isSubscribed={subscriptions?.some(
-                        (other) => other.config.id === subscription.config.id
-                      )}
-                      subscribe={() => handleSubscribe(subscription.config)}
-                      unsubscribe={() => handleUnsubscribe(subscription.config)}
-                      togglePublicity={() => handleTogglePublicity(subscription.config)}
-                      delete={() => handleDelete(subscription.config)}
-                    />
-                  ))}
-                </div>
-                <Paginator
-                  first={subscriptionsPage}
-                  rows={MAX_CONFIGS_PER_PAGE}
-                  totalRecords={subscriptionsTotal}
-                  onPageChange={(event) => {
-                    setSubscriptionsPage(event.first);
-                  }}
-                />
-              </>
-            )}
-          </>
-        )}
-        {activeIndex === 1 && (
-          <>
-            {configs.length === 0 ? (
-              <div className="empty-message">No configs available.</div>
-            ) : (
-              <>
-                <div className="library">
-                  {configs.map((config) => (
-                    <Config
-                      key={config.id}
-                      config={config}
-                      isAdmin={session !== null && session.user.isAdmin}
-                      isAuthor={session !== null && config.author.id === session.user.id}
-                      isSubscribed={subscriptions?.some((other) => other.config.id === config.id)}
-                      subscribe={() => handleSubscribe(config)}
-                      unsubscribe={() => handleUnsubscribe(config)}
-                      togglePublicity={() => handleTogglePublicity(config)}
-                      delete={() => handleDelete(config)}
-                    />
-                  ))}
-                </div>
-                <Paginator
-                  first={configsPage}
-                  rows={MAX_CONFIGS_PER_PAGE}
-                  totalRecords={configsTotal}
-                  onPageChange={(event) => {
-                    setConfigsPage(event.first);
-                  }}
-                />
-              </>
-            )}
-          </>
-        )}
+    <div className="configs-content">
+      <div className="input-container">
+        <IconField iconPosition="left">
+          <InputIcon className="pi pi-search" />
+          <InputText
+            value={activeIndex === 0 ? subscriptionsFilterValue : configsFilterValue}
+            onChange={(event) => {
+              if (activeIndex === 0) {
+                setSubscriptionsFilterValue(event.target.value);
+              } else {
+                setConfigsFilterValue(event.target.value);
+              }
+            }}
+            placeholder={`Search ${activeIndex === 0 ? "in subscriptions" : "in library"} by name or author`}
+          />
+        </IconField>
       </div>
+      <TabMenu
+        model={items}
+        activeIndex={activeIndex}
+        onTabChange={(event) => setActiveIndex(event.index)}
+      />
+      {activeIndex === 0 && (
+        <>
+          {subscriptions.length === 0 ? (
+            <div className="empty-message">No subscriptions yet.</div>
+          ) : (
+            <>
+              <div className="subscriptions">
+                {subscriptions.map((subscription) => (
+                  <Config
+                    key={subscription.id}
+                    config={subscription.config}
+                    isAdmin={session !== null && session.user.isAdmin}
+                    isAuthor={session !== null && subscription.config.author.id === session.user.id}
+                    isSubscribed={subscriptions?.some((other) => other.config.id === subscription.config.id)}
+                    subscribe={() => handleSubscribe(subscription.config)}
+                    unsubscribe={() => handleUnsubscribe(subscription.config)}
+                    togglePublicity={() => handleTogglePublicity(subscription.config)}
+                    delete={() => handleDelete(subscription.config)}
+                  />
+                ))}
+              </div>
+              <Paginator
+                first={subscriptionsPage}
+                rows={MAX_CONFIGS_PER_PAGE}
+                totalRecords={subscriptionsTotal}
+                onPageChange={(event) => {
+                  setSubscriptionsPage(event.first);
+                }}
+              />
+            </>
+          )}
+        </>
+      )}
+      {activeIndex === 1 && (
+        <>
+          {configs.length === 0 ? (
+            <div className="empty-message">No configs available.</div>
+          ) : (
+            <>
+              <div className="library">
+                {configs.map((config) => (
+                  <Config
+                    key={config.id}
+                    config={config}
+                    isAdmin={session !== null && session.user.isAdmin}
+                    isAuthor={session !== null && config.author.id === session.user.id}
+                    isSubscribed={subscriptions?.some((other) => other.config.id === config.id)}
+                    subscribe={() => handleSubscribe(config)}
+                    unsubscribe={() => handleUnsubscribe(config)}
+                    togglePublicity={() => handleTogglePublicity(config)}
+                    delete={() => handleDelete(config)}
+                  />
+                ))}
+              </div>
+              <Paginator
+                first={configsPage}
+                rows={MAX_CONFIGS_PER_PAGE}
+                totalRecords={configsTotal}
+                onPageChange={(event) => {
+                  setConfigsPage(event.first);
+                }}
+              />
+            </>
+          )}
+        </>
+      )}
     </div>
   );
 }

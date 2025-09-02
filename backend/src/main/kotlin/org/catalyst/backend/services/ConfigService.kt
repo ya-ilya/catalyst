@@ -6,6 +6,8 @@ import org.catalyst.backend.entities.config.ConfigRepository
 import org.catalyst.backend.entities.subscription.Subscription
 import org.catalyst.backend.entities.user.User
 import org.catalyst.backend.services.pagination.OffsetBasedPageRequest
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.domain.Page
 import org.springframework.data.jpa.domain.JpaSort
 import org.springframework.http.HttpStatus
@@ -27,12 +29,16 @@ class ConfigService(
             .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "Config not found") }
     }
 
+    @Cacheable(value = ["publicConfigs"])
     fun getPublicConfigs(
         limit: Int,
         offset: Int,
         filter: String?
     ): Page<Config> {
-        return configRepository.findFilteredPublicConfigs(filter, OffsetBasedPageRequest(offset, limit, JpaSort.by("createdAt")))
+        return configRepository.findFilteredPublicConfigs(
+            filter,
+            OffsetBasedPageRequest(offset, limit, JpaSort.by("createdAt"))
+        )
     }
 
     fun getConfigForUser(id: UUID, user: User): Config {
@@ -69,6 +75,7 @@ class ConfigService(
         subscriptionService.deleteByUserAndConfig(user, config)
     }
 
+    @CacheEvict(value = ["publicConfigs"], allEntries = true)
     fun createConfig(
         name: String,
         files: List<ConfigFile>,
@@ -93,6 +100,7 @@ class ConfigService(
         return config
     }
 
+    @CacheEvict(value = ["publicConfigs"], allEntries = true)
     fun updateConfig(
         id: UUID,
         name: String?,
@@ -117,6 +125,7 @@ class ConfigService(
     }
 
     @Transactional
+    @CacheEvict(value = ["publicConfigs"], allEntries = true)
     fun deleteConfigForUser(id: UUID, user: User) {
         val config = getConfigById(id)
 

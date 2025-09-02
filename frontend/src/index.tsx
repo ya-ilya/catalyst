@@ -10,6 +10,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { ToastProvider } from "./contexts/ToastContext";
+import { AppLayout } from "./layouts/AppLayout";
 import { Account, Admin, App, Capes, Configs, SignIn } from "./pages";
 import { queryClient } from "./query-config";
 import { AuthenticationRoute } from "./routes";
@@ -23,28 +24,33 @@ const router = createBrowserRouter([
     element: <AuthenticationRoute />,
     children: [
       {
-        path: "/",
-        element: <App />,
-      },
-      {
-        path: "/capes",
-        element: <Capes />,
-      },
-      {
-        path: "/configs",
-        element: <Configs />,
-      },
-      {
-        path: "/admin",
-        element: <Admin />,
-      },
-      {
-        path: "/account",
-        element: <Account />,
-      },
-      {
-        path: "/sign-in",
-        element: <SignIn />,
+        element: <AppLayout />,
+        children: [
+          {
+            path: "/",
+            element: <App />,
+          },
+          {
+            path: "/capes",
+            element: <Capes />,
+          },
+          {
+            path: "/configs",
+            element: <Configs />,
+          },
+          {
+            path: "/admin",
+            element: <Admin />,
+          },
+          {
+            path: "/account",
+            element: <Account />,
+          },
+          {
+            path: "/sign-in",
+            element: <SignIn />,
+          },
+        ],
       },
     ],
   },

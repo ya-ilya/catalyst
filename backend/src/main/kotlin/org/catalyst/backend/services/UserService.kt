@@ -5,6 +5,8 @@ import org.catalyst.backend.entities.user.UserRepository
 import org.catalyst.backend.entities.user.role.RoleRepository
 import org.catalyst.backend.exceptions.FieldedResponseStatusException
 import org.catalyst.backend.services.pagination.OffsetBasedPageRequest
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.domain.Page
 import org.springframework.data.jpa.domain.JpaSort
 import org.springframework.http.HttpStatus
@@ -33,6 +35,7 @@ class UserService(
         return userRepository.findByUsername(username)
     }
 
+    @Cacheable(value = ["users"])
     fun getUsers(
         limit: Int,
         offset: Int,
@@ -44,6 +47,7 @@ class UserService(
         )
     }
 
+    @CacheEvict(value = ["users"], allEntries = true)
     fun createUser(
         username: String,
         password: String
@@ -71,6 +75,7 @@ class UserService(
         )
     }
 
+    @CacheEvict(value = ["users"], allEntries = true)
     fun createAdmin(
         username: String,
         password: String
@@ -94,14 +99,12 @@ class UserService(
         )
     }
 
+    @CacheEvict(value = ["users"], allEntries = true)
     fun updateUser(user: User): User {
         return userRepository.save(user)
     }
 
-    fun deleteUser(user: User) {
-        userRepository.delete(user)
-    }
-
+    @CacheEvict(value = ["users"], allEntries = true)
     fun deleteUserById(id: UUID) {
         userRepository.deleteById(id)
     }
