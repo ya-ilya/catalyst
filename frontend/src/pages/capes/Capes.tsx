@@ -79,20 +79,26 @@ export function Capes() {
     mutationFn: async (cape: api.Cape) => {
       await capeController!.select(cape.id);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["selectedCape"] });
-      showToast({
-        severity: "success",
-        summary: "Selected",
-        detail: "You have successfully selected the cape.",
-      });
+    onMutate: async (newCape) => {
+      await queryClient.cancelQueries({ queryKey: ["selectedCape"] });
+
+      const previousSelectedCape = queryClient.getQueryData<api.Cape>(["selectedCape"]) ?? null;
+
+      queryClient.setQueryData(["selectedCape"], newCape);
+
+      return { previousSelectedCape };
     },
-    onError: () => {
+    onError: (_error, _newCape, context: { previousSelectedCape: api.Cape | null } | undefined) => {
+      queryClient.setQueryData(["selectedCape"], context?.previousSelectedCape ?? null);
+
       showToast({
         severity: "error",
         summary: "Error",
         detail: "Failed to select cape.",
       });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["selectedCape"] });
     },
   });
 
@@ -100,20 +106,26 @@ export function Capes() {
     mutationFn: async () => {
       await meController!.unselectCape();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["selectedCape"] });
-      showToast({
-        severity: "success",
-        summary: "Unselected",
-        detail: "You have successfully unselected the cape.",
-      });
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ["selectedCape"] });
+
+      const previousSelectedCape = queryClient.getQueryData<api.Cape>(["selectedCape"]) ?? null;
+
+      queryClient.setQueryData(["selectedCape"], null);
+
+      return { previousSelectedCape };
     },
-    onError: () => {
+    onError: (_error, _newCape, context: { previousSelectedCape: api.Cape | null } | undefined) => {
+      queryClient.setQueryData(["selectedCape"], context?.previousSelectedCape ?? null);
+
       showToast({
         severity: "error",
         summary: "Error",
         detail: "Failed to unselect cape.",
       });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["selectedCape"] });
     },
   });
 
