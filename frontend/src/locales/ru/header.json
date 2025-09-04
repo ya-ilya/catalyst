@@ -1,0 +1,10 @@
+{
+  "navigation": {
+    "configs": "Конфиги",
+    "capes": "Плащи",
+    "admin": "Админ"
+  },
+  "auth": {
+    "signIn": "Войти"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "viewer": {
+    "title": "\"{{name}}\" cape description",
+    "actions": {
+      "unselect": "Unselect",
+      "select": "Select"
+    },
+    "dialog": {
+      "close": "Close"
+    }
+  }
+}

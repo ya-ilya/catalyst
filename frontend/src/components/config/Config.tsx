@@ -6,6 +6,7 @@ import { Dialog } from "primereact/dialog";
 import { Tree } from "primereact/tree";
 import { TreeNode } from "primereact/treenode";
 import { memo, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { materialDark, materialLight } from "react-syntax-highlighter/dist/esm/styles/prism";
 
@@ -26,6 +27,7 @@ type ConfigProps = {
 };
 
 export const Config = memo((props: ConfigProps) => {
+  const { t } = useTranslation("config");
   const { config, isAdmin, isAuthor, isSubscribed, subscribe, unsubscribe, togglePublicity } = props;
 
   const configController = api.useConfigController();
@@ -74,31 +76,31 @@ export const Config = memo((props: ConfigProps) => {
   const [showToast] = useToastContext();
 
   useEffect(() => {
-    if (contentError) {
+    if (nodesError) {
       console.error("Failed to fetch config files:", nodesError);
       showToast({
         severity: "error",
-        summary: "Error",
-        detail: "Failed to fetch config files.",
+        summary: t("toasts.errorSummary"),
+        detail: t("toasts.details.failedToFetchFiles"),
       });
     }
-  }, [nodesError]);
+  }, [nodesError, showToast, t]);
 
   useEffect(() => {
     if (contentError) {
       console.log("Failed to fetch config file content:", contentError);
       showToast({
         severity: "error",
-        summary: "Error",
-        detail: "Failed to fetch config file content.",
+        summary: t("toasts.errorSummary"),
+        detail: t("toasts.details.failedToFetchFileContent"),
       });
     }
-  }, [contentError]);
+  }, [contentError, showToast, t]);
 
   const dialogFooter = (
     <div>
       <Button
-        label="Close"
+        label={t("previewDialog.closeButton")}
         icon="pi pi-times"
         style={{ marginTop: 16 }}
         onClick={() => setIsDialogVisible(false)}
@@ -111,8 +113,8 @@ export const Config = memo((props: ConfigProps) => {
       <Card className="config">
         <div className="config-header">
           <span className="config-name">{config.name}</span>
-          <span className="config-author">by {config.author.username}</span>
-          <span className="config-id">id: {config.id.slice(0, 8)}</span>
+          <span className="config-author">{t("card.by", { username: config.author.username })}</span>
+          <span className="config-id">{t("card.id", { id: config.id.slice(0, 8) })}</span>
         </div>
         <div className="config-footer">
           <Button
@@ -164,7 +166,7 @@ export const Config = memo((props: ConfigProps) => {
       </Card>
       <Dialog
         className="config-preview-dialog"
-        header={`"${config.name}" config preview`}
+        header={t("previewDialog.header", { name: config.name })}
         visible={isDialogVisible}
         footer={dialogFooter}
         onHide={() => setIsDialogVisible(false)}
@@ -185,7 +187,7 @@ export const Config = memo((props: ConfigProps) => {
               {contentData.content}
             </SyntaxHighlighter>
           ) : (
-            <div className="none-selected">Select config file to preview</div>
+            <div className="none-selected">{t("previewDialog.noneSelected")}</div>
           )}
         </div>
       </Dialog>

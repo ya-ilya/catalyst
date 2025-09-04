@@ -1,0 +1,21 @@
+{
+  "capesPage": {
+    "noCapes": "No capes available.",
+    "searchPlaceholder": "Search in capes by name"
+  },
+  "toasts": {
+    "errorSummary": "Error",
+    "successSummary": {
+      "selectedCape": "Cape selected",
+      "unselectedCape": "Cape unselected"
+    },
+    "details": {
+      "failedToFetchCapes": "Failed to fetch capes.",
+      "failedToFetchSelectedCape": "Failed to fetch selected cape.",
+      "selectedCape": "You have successfully selected the cape.",
+      "unselectedCape": "You have successfully unselected the cape.",
+      "failedToSelectCape": "Failed to select cape.",
+      "failedToUnselectCape": "Failed to unselect cape."
+    }
+  }
+}

@@ -11,6 +11,7 @@ import { InputIcon } from "primereact/inputicon";
 import { InputText } from "primereact/inputtext";
 import { Panel } from "primereact/panel";
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 
@@ -28,6 +29,8 @@ const MAX_USERNAME_LENGTH = 32;
 const MAX_USERS_PER_PAGE = 5;
 
 export function UsersTable({ adminController, session }: UsersTableProps) {
+  const { t } = useTranslation("admin");
+
   const [filterValue, debouncedFilterValue, setFilterValue] = useDebounce("", 400);
   const [page, setPage] = useState(0);
 
@@ -53,14 +56,14 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
 
   useEffect(() => {
     if (error) {
-      console.error("Failed to fetch capes:", error);
+      console.error("Failed to fetch users:", error);
       showToast({
         severity: "error",
-        summary: "Error",
-        detail: "Failed to fetch capes.",
+        summary: t("toasts.errorSummary"),
+        detail: t("toasts.details.failedToFetchUsers"),
       });
     }
-  }, [error]);
+  }, [error, t, showToast]);
 
   const createUserMutation = useMutation({
     mutationFn: async (newUsername: string) => {
@@ -71,8 +74,8 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
       queryClient.invalidateQueries({ queryKey: ["tables/users"] });
       showToast({
         severity: "success",
-        summary: "User Created",
-        detail: "User has been successfully created.",
+        summary: t("toasts.successSummary.userCreated"),
+        detail: t("toasts.details.userCreated"),
       });
       setIsDialogVisible(false);
     },
@@ -80,18 +83,26 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
       console.error("Failed to create user:", error);
       if (error instanceof AxiosError && error.response) {
         if (error.response.status === 400) {
-          showToast({ severity: "error", summary: "Error", detail: "Invalid format for username." });
+          showToast({
+            severity: "error",
+            summary: t("toasts.errorSummary"),
+            detail: t("toasts.details.invalidUsernameFormat"),
+          });
           return;
         } else if (error.response.status === 409) {
           showToast({
             severity: "error",
-            summary: "Error",
-            detail: "User with the same name already exists.",
+            summary: t("toasts.errorSummary"),
+            detail: t("toasts.details.userAlreadyExists"),
           });
           return;
         }
       }
-      showToast({ severity: "error", summary: "Error", detail: "Failed to create user." });
+      showToast({
+        severity: "error",
+        summary: t("toasts.errorSummary"),
+        detail: t("toasts.details.failedToCreateUser"),
+      });
       setIsDialogVisible(false);
     },
   });
@@ -104,12 +115,16 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
       queryClient.invalidateQueries({ queryKey: ["tables/users"] });
       showToast({
         severity: "success",
-        summary: "User Deleted",
-        detail: "User has been successfully deleted.",
+        summary: t("toasts.successSummary.userDeleted"),
+        detail: t("toasts.details.userDeleted"),
       });
     },
     onError: () => {
-      showToast({ severity: "error", summary: "Error", detail: "Failed to delete user." });
+      showToast({
+        severity: "error",
+        summary: t("toasts.errorSummary"),
+        detail: t("toasts.details.failedToDeleteUser"),
+      });
     },
   });
 
@@ -129,15 +144,15 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
   const confirmDeleteUser = useCallback(
     (user: api.User) => {
       confirmDialog({
-        message: "Are you sure you want to delete this user?",
-        header: "Delete Confirmation",
+        message: t("usersTable.deleteConfirm.message"),
+        header: t("usersTable.deleteConfirm.header"),
         icon: "pi pi-info-circle",
         defaultFocus: "reject",
         acceptClassName: "p-button-danger",
         accept: () => handleDeleteUser(user),
       });
     },
-    [handleDeleteUser]
+    [handleDeleteUser, t]
   );
 
   const actionsTemplate = useCallback(
@@ -158,18 +173,18 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
 
   const tableHeader = (
     <div className="admin-table-header">
-      <span className="title">User Management</span>
+      <span className="title">{t("usersTable.title")}</span>
       <div className="actions">
         <IconField iconPosition="left">
           <InputIcon className="pi pi-search" />
           <InputText
             value={filterValue}
             onChange={(event) => setFilterValue(event.target.value)}
-            placeholder="Search by username"
+            placeholder={t("usersTable.searchPlaceholder")}
           />
         </IconField>
         <Button
-          label="Create User"
+          label={t("usersTable.createButton")}
           icon="pi pi-user-plus"
           className="p-button-sm"
           onClick={() => {
@@ -192,13 +207,13 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
   const dialogFooter = (
     <div>
       <Button
-        label="Cancel"
+        label={t("usersTable.createDialog.cancelButton")}
         icon="pi pi-times"
         onClick={() => setIsDialogVisible(false)}
         text
       />
       <Button
-        label="Create"
+        label={t("usersTable.createDialog.createButton")}
         icon="pi pi-check"
         onClick={handleCreateUser}
         disabled={username.length < MIN_USERNAME_LENGTH || username.length > MAX_USERNAME_LENGTH}
@@ -226,31 +241,33 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
       >
         <Column
           field="id"
-          header="ID"
+          header={t("usersTable.table.id")}
           body={(user: api.User) => user.id.slice(0, 8)}
         />
         <Column
           field="username"
-          header="Username"
+          header={t("usersTable.table.username")}
         />
         <Column
           field="isAdmin"
-          header="Admin"
-          body={(user: api.User) => (user.isAdmin ? "Yes" : "No")}
+          header={t("usersTable.table.admin")}
+          body={(user: api.User) =>
+            user.isAdmin ? t("usersTable.table.adminStatus.yes") : t("usersTable.table.adminStatus.no")
+          }
         />
         <Column
           field="createdAt"
-          header="Joined"
+          header={t("usersTable.table.joined")}
           body={(user: api.User) => new Date(user.createdAt).toLocaleDateString()}
         />
         <Column
-          header="Actions"
+          header={t("usersTable.table.actions")}
           body={actionsTemplate}
         />
       </DataTable>
       <Dialog
         className="admin-dialog"
-        header="Create New User"
+        header={t("usersTable.createDialog.header")}
         visible={isDialogVisible}
         footer={dialogFooter}
         onHide={() => setIsDialogVisible(false)}
@@ -264,7 +281,7 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
                 onChange={(event) => setUsername(event.target.value)}
                 invalid={username.length < MIN_USERNAME_LENGTH || username.length > MAX_USERNAME_LENGTH}
               />
-              <label htmlFor="new-username">Username</label>
+              <label htmlFor="new-username">{t("usersTable.createDialog.usernameLabel")}</label>
             </FloatLabel>
           </div>
           {temporaryPassword && (
@@ -272,7 +289,7 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
               className="p-field"
               style={{ marginTop: 3 }}
             >
-              <Panel header="Temporary Password">
+              <Panel header={t("usersTable.createDialog.temporaryPasswordPanel")}>
                 <p className="m-0 p-0 text-break">{temporaryPassword}</p>
               </Panel>
             </div>

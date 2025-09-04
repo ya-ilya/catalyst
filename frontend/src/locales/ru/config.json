@@ -1,0 +1,20 @@
+{
+  "card": {
+    "by": "от {{username}}",
+    "id": "id: {{id}}",
+    "unselectButton": "Отменить",
+    "selectButton": "Выбрать"
+  },
+  "previewDialog": {
+    "header": "Предпросмотр конфигурации \"{{name}}\"",
+    "closeButton": "Закрыть",
+    "noneSelected": "Выберите файл для предпросмотра"
+  },
+  "toasts": {
+    "errorSummary": "Ошибка",
+    "details": {
+      "failedToFetchFiles": "Не удалось загрузить файлы конфигурации.",
+      "failedToFetchFileContent": "Не удалось загрузить содержимое файла конфигурации."
+    }
+  }
+}

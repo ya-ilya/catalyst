@@ -7,6 +7,7 @@ import { FloatLabel } from "primereact/floatlabel";
 import { InputText } from "primereact/inputtext";
 import { Password } from "primereact/password";
 import { useCallback, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router";
 
 import * as api from "../../api";
@@ -23,6 +24,8 @@ export function SignIn() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const { t } = useTranslation("signIn");
 
   const [, setSession] = useAuthenticationContext();
   const [showToast] = useToastContext();
@@ -42,25 +45,25 @@ export function SignIn() {
       console.error("Login failed:", error);
 
       if (error instanceof AxiosError && error.response) {
-        if (error.status == 400 && error.response.data.fields.contains("password")) {
+        if (error.response.data.fields?.includes("password")) {
           showToast({
             severity: "error",
-            summary: "Login Error",
-            detail: "Invalid password.",
+            summary: t("loginErrors.failedToSignIn"),
+            detail: t("loginErrors.invalidPassword"),
           });
           return;
-        } else if (error.status == 404) {
+        } else if (error.response.status === 404) {
           showToast({
             severity: "error",
-            summary: "Login Error",
-            detail: "User not found.",
+            summary: t("loginErrors.failedToSignIn"),
+            detail: t("loginErrors.userNotFound"),
           });
           return;
-        } else if (error.status == 400) {
+        } else if (error.response.status === 400) {
           showToast({
             severity: "error",
-            summary: "Login Error",
-            detail: "Invalid username or password.",
+            summary: t("loginErrors.failedToSignIn"),
+            detail: t("loginErrors.invalidCredentials"),
           });
           return;
         }
@@ -68,18 +71,18 @@ export function SignIn() {
 
       showToast({
         severity: "error",
-        summary: "Login Error",
-        detail: "Failed to sign in.",
+        summary: t("loginErrors.failedToSignIn"),
+        detail: t("loginErrors.failedToSignIn"),
       });
     } finally {
       setLoading(false);
     }
-  }, [username, password, searchParams, authenticationController]);
+  }, [username, password, searchParams, authenticationController, t, showToast]);
 
   return (
     <div className="signin-content">
       <Card
-        title="Sign In"
+        title={t("signInTitle")}
         className="signin-card"
       >
         <div className="p-fluid">
@@ -91,7 +94,7 @@ export function SignIn() {
                 onChange={(event) => setUsername(event.target.value)}
                 invalid={username.length < MIN_USERNAME_LENGTH || username.length > MAX_USERNAME_LENGTH}
               />
-              <label htmlFor="username">Username</label>
+              <label htmlFor="username">{t("usernameLabel")}</label>
             </FloatLabel>
           </div>
           <div className="p-field">
@@ -104,12 +107,12 @@ export function SignIn() {
                 feedback={false}
                 toggleMask
               />
-              <label htmlFor="password">Password</label>
+              <label htmlFor="password">{t("passwordLabel")}</label>
             </FloatLabel>
           </div>
           <div style={{ marginTop: 16 }}>
             <Button
-              label="Sign In"
+              label={t("signInButton")}
               icon="pi pi-sign-in"
               className="w-full"
               onClick={handleLogin}

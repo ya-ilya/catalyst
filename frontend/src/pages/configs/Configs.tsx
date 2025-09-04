@@ -7,6 +7,7 @@ import { InputText } from "primereact/inputtext";
 import { Paginator } from "primereact/paginator";
 import { TabMenu } from "primereact/tabmenu";
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Navigate, useLocation } from "react-router";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -21,6 +22,8 @@ const MAX_CONFIGS_PER_PAGE = 35;
 export function Configs() {
   const meController = api.useMeController();
   const configController = api.useConfigController();
+
+  const { t } = useTranslation("configs");
 
   const [subscriptionsFilterValue, debouncedSubscriptionsFilterValue, setSubscriptionsFilterValue] =
     useDebounce("", 400);
@@ -67,8 +70,8 @@ export function Configs() {
 
   const [activeIndex, setActiveIndex] = useState(0);
   const items = [
-    { label: "Subscriptions", icon: "pi pi-star" },
-    { label: "Library", icon: "pi pi-th-large" },
+    { label: t("configsPage.subscriptionsTab"), icon: "pi pi-star" },
+    { label: t("configsPage.libraryTab"), icon: "pi pi-th-large" },
   ];
 
   const [session] = useAuthenticationContext();
@@ -81,22 +84,22 @@ export function Configs() {
       console.error("Failed to fetch subscriptions:", subscriptionsError);
       showToast({
         severity: "error",
-        summary: "Error",
-        detail: "Failed to fetch subscriptions.",
+        summary: t("toasts.errorSummary"),
+        detail: t("toasts.details.failedToFetchSubscriptions"),
       });
     }
-  }, [subscriptionsError]);
+  }, [subscriptionsError, t, showToast]);
 
   useEffect(() => {
     if (configsError) {
       console.error("Failed to fetch configs:", configsError);
       showToast({
         severity: "error",
-        summary: "Error",
-        detail: "Failed to fetch configs.",
+        summary: t("toasts.errorSummary"),
+        detail: t("toasts.details.failedToFetchConfigs"),
       });
     }
-  }, [configsError]);
+  }, [configsError, t, showToast]);
 
   const subscribeMutation = useMutation({
     mutationFn: async (config: api.Config) => {
@@ -106,16 +109,16 @@ export function Configs() {
       queryClient.invalidateQueries({ queryKey: ["subscriptions"] });
       showToast({
         severity: "success",
-        summary: "Subscribed",
-        detail: "You have successfully subscribed to the config.",
+        summary: t("toasts.successSummary.subscribed"),
+        detail: t("toasts.details.subscribed"),
       });
     },
     onError: (error) => {
       console.error("Failed to subscribe:", error);
       showToast({
         severity: "error",
-        summary: "Error",
-        detail: "Failed to subscribe to the config.",
+        summary: t("toasts.errorSummary"),
+        detail: t("toasts.details.failedToSubscribe"),
       });
     },
   });
@@ -128,16 +131,16 @@ export function Configs() {
       queryClient.invalidateQueries({ queryKey: ["subscriptions"] });
       showToast({
         severity: "success",
-        summary: "Unsubscribed",
-        detail: "You have successfully unsubscribed from the config.",
+        summary: t("toasts.successSummary.unsubscribed"),
+        detail: t("toasts.details.unsubscribed"),
       });
     },
     onError: (error) => {
       console.error("Failed to unsubscribe:", error);
       showToast({
         severity: "error",
-        summary: "Error",
-        detail: "Failed to unsubscribe from the config.",
+        summary: t("toasts.errorSummary"),
+        detail: t("toasts.details.failedToUnsubscribe"),
       });
     },
   });
@@ -153,16 +156,16 @@ export function Configs() {
       queryClient.invalidateQueries({ queryKey: ["subscriptions"] });
       showToast({
         severity: "success",
-        summary: "Publicity toggled",
-        detail: "Config publicity has been successfully toggled.",
+        summary: t("toasts.successSummary.toggledPublicity"),
+        detail: t("toasts.details.toggledPublicity"),
       });
     },
     onError: (error) => {
       console.error("Failed to toggle config publicity:", error);
       showToast({
         severity: "error",
-        summary: "Error",
-        detail: "Failed to toggle config publicity.",
+        summary: t("toasts.errorSummary"),
+        detail: t("toasts.details.failedToTogglePublicity"),
       });
     },
   });
@@ -176,16 +179,16 @@ export function Configs() {
       queryClient.invalidateQueries({ queryKey: ["subscriptions"] });
       showToast({
         severity: "success",
-        summary: "Deleted",
-        detail: "Config has been successfully deleted.",
+        summary: t("toasts.successSummary.deletedConfig"),
+        detail: t("toasts.details.deletedConfig"),
       });
     },
     onError: (error) => {
       console.error("Failed to delete config:", error);
       showToast({
         severity: "error",
-        summary: "Error",
-        detail: "Failed to delete the config.",
+        summary: t("toasts.errorSummary"),
+        detail: t("toasts.details.failedToDelete"),
       });
     },
   });
@@ -245,7 +248,11 @@ export function Configs() {
                 setConfigsFilterValue(event.target.value);
               }
             }}
-            placeholder={`Search ${activeIndex === 0 ? "in subscriptions" : "in library"} by name or author`}
+            placeholder={
+              activeIndex === 0
+                ? t("configsPage.searchPlaceholderSubscriptions")
+                : t("configsPage.searchPlaceholderLibrary")
+            }
           />
         </IconField>
       </div>
@@ -257,7 +264,7 @@ export function Configs() {
       {activeIndex === 0 && (
         <>
           {subscriptions.length === 0 ? (
-            <div className="empty-message">No subscriptions yet.</div>
+            <div className="empty-message">{t("configsPage.noSubscriptions")}</div>
           ) : (
             <>
               <div className="subscriptions">
@@ -290,7 +297,7 @@ export function Configs() {
       {activeIndex === 1 && (
         <>
           {configs.length === 0 ? (
-            <div className="empty-message">No configs available.</div>
+            <div className="empty-message">{t("configsPage.noConfigs")}</div>
           ) : (
             <>
               <div className="library">

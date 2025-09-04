@@ -1,0 +1,20 @@
+{
+  "card": {
+    "by": "by {{username}}",
+    "id": "id: {{id}}",
+    "unselectButton": "Unselect",
+    "selectButton": "Select"
+  },
+  "previewDialog": {
+    "header": "\"{{name}}\" config preview",
+    "closeButton": "Close",
+    "noneSelected": "Select config file to preview"
+  },
+  "toasts": {
+    "errorSummary": "Error",
+    "details": {
+      "failedToFetchFiles": "Failed to fetch config files.",
+      "failedToFetchFileContent": "Failed to fetch config file content."
+    }
+  }
+}

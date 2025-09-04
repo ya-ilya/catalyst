@@ -6,6 +6,7 @@ import { InputIcon } from "primereact/inputicon";
 import { InputText } from "primereact/inputtext";
 import { Paginator } from "primereact/paginator";
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Navigate, useLocation } from "react-router";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -20,6 +21,8 @@ const MAX_CAPES_PER_PAGE = 24;
 export function Capes() {
   const capeController = api.useCapeController();
   const meController = api.useMeController();
+
+  const { t } = useTranslation("capes");
 
   const [filterValue, debouncedFilterValue, setFilterValue] = useDebounce("", 400);
   const [page, setPage] = useState(0);
@@ -58,22 +61,22 @@ export function Capes() {
       console.error("Failed to fetch capes:", capesError);
       showToast({
         severity: "error",
-        summary: "Error",
-        detail: "Failed to fetch capes.",
+        summary: t("toasts.errorSummary"),
+        detail: t("toasts.details.failedToFetchCapes"),
       });
     }
-  }, [capesError]);
+  }, [capesError, t, showToast]);
 
   useEffect(() => {
     if (selectedCapeError) {
       console.error("Failed to fetch selected cape: ", selectedCapeError);
       showToast({
         severity: "error",
-        summary: "Error",
-        detail: "Failed to fetch selected cape.",
+        summary: t("toasts.errorSummary"),
+        detail: t("toasts.details.failedToFetchSelectedCape"),
       });
     }
-  }, [selectedCapeError]);
+  }, [selectedCapeError, t, showToast]);
 
   const selectMutation = useMutation({
     mutationFn: async (cape: api.Cape) => {
@@ -93,12 +96,17 @@ export function Capes() {
 
       showToast({
         severity: "error",
-        summary: "Error",
-        detail: "Failed to select cape.",
+        summary: t("toasts.errorSummary"),
+        detail: t("toasts.details.failedToSelectCape"),
       });
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["selectedCape"] });
+      showToast({
+        severity: "success",
+        summary: t("toasts.successSummary.selectedCape"),
+        detail: t("toasts.details.selectedCape"),
+      });
     },
   });
 
@@ -120,12 +128,17 @@ export function Capes() {
 
       showToast({
         severity: "error",
-        summary: "Error",
-        detail: "Failed to unselect cape.",
+        summary: t("toasts.errorSummary"),
+        detail: t("toasts.details.failedToUnselectCape"),
       });
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["selectedCape"] });
+      showToast({
+        severity: "success",
+        summary: t("toasts.successSummary.unselectedCape"),
+        detail: t("toasts.details.unselectedCape"),
+      });
     },
   });
 
@@ -152,7 +165,7 @@ export function Capes() {
   }
 
   return capes.length === 0 ? (
-    <div className="empty-message">No capes available.</div>
+    <div className="empty-message">{t("capesPage.noCapes")}</div>
   ) : (
     <>
       <div className="capes-content">
@@ -162,7 +175,7 @@ export function Capes() {
             <InputText
               value={filterValue}
               onChange={(event) => setFilterValue(event.target.value)}
-              placeholder="Search in capes by name"
+              placeholder={t("capesPage.searchPlaceholder")}
             />
           </IconField>
         </div>

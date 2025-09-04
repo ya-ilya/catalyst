@@ -1,0 +1,34 @@
+{
+  "accountPage": {
+    "title": "Аккаунт",
+    "passwordChangeWarning": "Требуется смена пароля!",
+    "info": {
+      "username": "Имя пользователя:",
+      "joined": "Присоединился:"
+    },
+    "changePasswordButton": "Сменить пароль",
+    "logoutButton": "Выйти"
+  },
+  "changePasswordDialog": {
+    "header": "Сменить пароль",
+    "oldPasswordLabel": "Старый пароль",
+    "newPasswordLabel": "Новый пароль",
+    "confirmNewPasswordLabel": "Подтвердите новый пароль",
+    "cancelButton": "Отмена",
+    "changePasswordButton": "Сменить пароль"
+  },
+  "toasts": {
+    "errorSummary": "Ошибка",
+    "successSummary": {
+      "passwordChanged": "Пароль изменён"
+    },
+    "details": {
+      "failedToFetchUser": "Не удалось загрузить данные пользователя.",
+      "passwordChanged": "Ваш пароль был успешно изменён.",
+      "newPasswordSameAsOld": "Новый пароль не может совпадать со старым.",
+      "incorrectOldPassword": "Старый пароль неверный.",
+      "invalidPasswordFormat": "Неверный формат пароля.",
+      "failedToChangePassword": "Не удалось сменить пароль."
+    }
+  }
+}

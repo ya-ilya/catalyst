@@ -1,0 +1,21 @@
+{
+  "capesPage": {
+    "noCapes": "Плащи отсутствуют.",
+    "searchPlaceholder": "Поиск по плащам по имени"
+  },
+  "toasts": {
+    "errorSummary": "Ошибка",
+    "successSummary": {
+      "selectedCape": "Плащ выбран",
+      "unselectedCape": "Плащ не выбран"
+    },
+    "details": {
+      "failedToFetchCapes": "Не удалось загрузить плащи.",
+      "failedToFetchSelectedCape": "Не удалось загрузить выбранный плащ.",
+      "selectedCape": "Вы успешно выбрали плащ.",
+      "unselectedCape": "Вы успешно отменили выбор плаща.",
+      "failedToSelectCape": "Не удалось выбрать плащ.",
+      "failedToUnselectCape": "Не удалось отменить выбор плаща."
+    }
+  }
+}

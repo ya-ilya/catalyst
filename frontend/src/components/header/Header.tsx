@@ -3,11 +3,13 @@ import "./Header.css";
 import { Button } from "primereact/button";
 import { Menubar } from "primereact/menubar";
 import { memo } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 
 import { useAuthenticationContext, useThemeContext } from "../../contexts";
 
 export const Header = memo(() => {
+  const { t } = useTranslation("header");
   const navigate = useNavigate();
 
   const [session] = useAuthenticationContext();
@@ -15,12 +17,12 @@ export const Header = memo(() => {
 
   const items = [
     {
-      label: "Configs",
+      label: t("navigation.configs"),
       icon: "pi pi-cog",
       command: () => navigate("/configs"),
     },
     {
-      label: "Capes",
+      label: t("navigation.capes"),
       icon: (
         <span className="pi p-menuitem-icon">
           <svg
@@ -38,7 +40,7 @@ export const Header = memo(() => {
       command: () => navigate("/capes"),
     },
     {
-      label: "Admin",
+      label: t("navigation.admin"),
       icon: "pi pi-shield",
       visible: session?.user?.isAdmin,
       command: () => navigate("/admin"),
@@ -75,7 +77,7 @@ export const Header = memo(() => {
         />
       ) : (
         <Button
-          label="Sign In"
+          label={t("auth.signIn")}
           icon="pi pi-sign-in"
           onClick={() => navigate("/sign-in")}
           outlined

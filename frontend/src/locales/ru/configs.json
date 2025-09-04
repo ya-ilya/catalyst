@@ -1,0 +1,31 @@
+{
+  "configsPage": {
+    "subscriptionsTab": "Подписки",
+    "libraryTab": "Библиотека",
+    "searchPlaceholderSubscriptions": "Поиск в подписках по имени или автору",
+    "searchPlaceholderLibrary": "Поиск в библиотеке по имени или автору",
+    "noSubscriptions": "Пока нет подписок.",
+    "noConfigs": "Конфигурации отсутствуют."
+  },
+  "toasts": {
+    "errorSummary": "Ошибка",
+    "successSummary": {
+      "subscribed": "Подписка",
+      "unsubscribed": "Отписка",
+      "toggledPublicity": "Публичность изменена",
+      "deletedConfig": "Удалено"
+    },
+    "details": {
+      "failedToFetchSubscriptions": "Не удалось загрузить подписки.",
+      "failedToFetchConfigs": "Не удалось загрузить конфигурации.",
+      "subscribed": "Вы успешно подписались на конфигурацию.",
+      "unsubscribed": "Вы успешно отписались от конфигурации.",
+      "toggledPublicity": "Публичность конфигурации успешно изменена.",
+      "deletedConfig": "Конфигурация успешно удалена.",
+      "failedToSubscribe": "Не удалось подписаться на конфигурацию.",
+      "failedToUnsubscribe": "Не удалось отписаться от конфигурации.",
+      "failedToTogglePublicity": "Не удалось изменить публичность конфигурации.",
+      "failedToDelete": "Не удалось удалить конфигурацию."
+    }
+  }
+}

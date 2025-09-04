@@ -4,6 +4,7 @@ import { Button } from "primereact/button";
 import { Card } from "primereact/card";
 import { Dialog } from "primereact/dialog";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import ReactSkinview3d from "react-skinview3d";
 
 import * as api from "../../api";
@@ -20,6 +21,8 @@ type CapeProps = {
 };
 
 export function Cape({ cape, isSelected, select, unselect }: CapeProps) {
+  const { t } = useTranslation("cape");
+
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [viewer, setViewer] = useState<any>(null);
   const [backEquipment, setBackEquipment] = useState(BACK_EQUIPMENTS[0]);
@@ -46,7 +49,7 @@ export function Cape({ cape, isSelected, select, unselect }: CapeProps) {
   const dialogFooter = (
     <div>
       <Button
-        label="Close"
+        label={t("viewer.dialog.close")}
         icon="pi pi-times"
         onClick={() => setIsDialogVisible(false)}
       />
@@ -81,14 +84,14 @@ export function Cape({ cape, isSelected, select, unselect }: CapeProps) {
           {isSelected ? (
             <Button
               icon="pi pi-minus"
-              label="Unselect"
+              label={t("viewer.actions.unselect")}
               onClick={unselect}
               outlined
             />
           ) : (
             <Button
               icon="pi pi-plus"
-              label="Select"
+              label={t("viewer.actions.select")}
               onClick={select}
             />
           )}
@@ -96,7 +99,7 @@ export function Cape({ cape, isSelected, select, unselect }: CapeProps) {
       </Card>
       <Dialog
         className="cape-description-dialog"
-        header={`"${cape.name}" cape description`}
+        header={t("viewer.title", { name: cape.name })}
         visible={isDialogVisible}
         footer={dialogFooter}
         onHide={() => setIsDialogVisible(false)}

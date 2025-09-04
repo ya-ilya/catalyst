@@ -1,0 +1,16 @@
+{
+  "signInTitle": "Вход",
+  "usernameLabel": "Имя пользователя",
+  "passwordLabel": "Пароль",
+  "signInButton": "Войти",
+  "validationErrors": {
+    "usernameLength": "Имя пользователя должно быть от {{min}} до {{max}} символов.",
+    "passwordLength": "Пароль должен быть от {{min}} до {{max}} символов."
+  },
+  "loginErrors": {
+    "invalidPassword": "Неверный пароль.",
+    "userNotFound": "Пользователь не найден.",
+    "invalidCredentials": "Неверное имя пользователя или пароль.",
+    "failedToSignIn": "Не удалось войти."
+  }
+}

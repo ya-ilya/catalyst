@@ -1,0 +1,16 @@
+{
+  "signInTitle": "Sign In",
+  "usernameLabel": "Username",
+  "passwordLabel": "Password",
+  "signInButton": "Sign In",
+  "validationErrors": {
+    "usernameLength": "Username must be between {{min}} and {{max}} characters.",
+    "passwordLength": "Password must be between {{min}} and {{max}} characters."
+  },
+  "loginErrors": {
+    "invalidPassword": "Invalid password.",
+    "userNotFound": "User not found.",
+    "invalidCredentials": "Invalid username or password.",
+    "failedToSignIn": "Failed to sign in."
+  }
+}

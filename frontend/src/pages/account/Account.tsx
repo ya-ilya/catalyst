@@ -7,6 +7,7 @@ import { Dialog } from "primereact/dialog";
 import { FloatLabel } from "primereact/floatlabel";
 import { Password } from "primereact/password";
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Navigate, useLocation, useNavigate } from "react-router";
 
 import * as api from "../../api";
@@ -17,6 +18,8 @@ const MAX_PASSWORD_LENGTH = 100;
 
 export function Account() {
   const meController = api.useMeController();
+
+  const { t } = useTranslation("account");
 
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [oldPassword, setOldPassword] = useState("");
@@ -41,14 +44,14 @@ export function Account() {
         console.error("Failed to fetch user data:", error);
         showToast({
           severity: "error",
-          summary: "Error",
-          detail: "Failed to fetch user data.",
+          summary: t("toasts.errorSummary"),
+          detail: t("toasts.details.failedToFetchUser"),
         });
       }
     };
 
     fetchUser();
-  }, [meController]);
+  }, [meController, t, showToast]);
 
   const handlePasswordChange = useCallback(async () => {
     if (!meController) return;
@@ -57,34 +60,34 @@ export function Account() {
       setSession(await meController.changePassword({ oldPassword, newPassword }));
       showToast({
         severity: "success",
-        summary: "Password Changed",
-        detail: "Your password has been successfully changed.",
+        summary: t("toasts.successSummary.passwordChanged"),
+        detail: t("toasts.details.passwordChanged"),
       });
     } catch (error) {
       console.error("Failed to change password:", error);
 
       if (error instanceof AxiosError && error.response) {
-        if (error.status == 400 && error.response.data.fields.contains("newPassword")) {
+        if (error.response.data.fields.includes("newPassword")) {
           showToast({
             severity: "error",
-            summary: "Error",
-            detail: "New password cannot be the same as the old password.",
+            summary: t("toasts.errorSummary"),
+            detail: t("toasts.details.newPasswordSameAsOld"),
           });
 
           return;
-        } else if (error.status == 400 && error.response.data.fields.contains("oldPassword")) {
+        } else if (error.response.data.fields.includes("oldPassword")) {
           showToast({
             severity: "error",
-            summary: "Error",
-            detail: "Old password is incorrect.",
+            summary: t("toasts.errorSummary"),
+            detail: t("toasts.details.incorrectOldPassword"),
           });
 
           return;
-        } else if (error.status == 400) {
+        } else if (error.response.status === 400) {
           showToast({
             severity: "error",
-            summary: "Error",
-            detail: "Invalid password format.",
+            summary: t("toasts.errorSummary"),
+            detail: t("toasts.details.invalidPasswordFormat"),
           });
 
           return;
@@ -93,13 +96,13 @@ export function Account() {
 
       showToast({
         severity: "error",
-        summary: "Error",
-        detail: "Failed to change password.",
+        summary: t("toasts.errorSummary"),
+        detail: t("toasts.details.failedToChangePassword"),
       });
     }
 
     setIsDialogVisible(false);
-  }, [meController, oldPassword, newPassword, confirmPassword, setSession]);
+  }, [meController, oldPassword, newPassword, confirmPassword, setSession, showToast, t]);
 
   const handleLogout = useCallback(() => {
     setSession(null);
@@ -109,13 +112,13 @@ export function Account() {
   const dialogFooter = (
     <div>
       <Button
-        label="Cancel"
+        label={t("changePasswordDialog.cancelButton")}
         icon="pi pi-times"
         onClick={() => setIsDialogVisible(false)}
         className="p-button-text"
       />
       <Button
-        label="Change Password"
+        label={t("changePasswordDialog.changePasswordButton")}
         icon="pi pi-check"
         onClick={handlePasswordChange}
         disabled={
@@ -141,7 +144,7 @@ export function Account() {
     <>
       <div className="account-content">
         <Card
-          title="Account"
+          title={t("accountPage.title")}
           className="account-card"
         >
           {user?.isPasswordChangeRequired && (
@@ -150,16 +153,16 @@ export function Account() {
                 className="pi pi-exclamation-triangle"
                 style={{ marginRight: 2 }}
               ></i>
-              <span>Password change is required!</span>
+              <span>{t("accountPage.passwordChangeWarning")}</span>
             </div>
           )}
           <div className="p-grid p-dir-col">
             <div className="p-col">
-              <h5 className="info-label">Username:</h5>
+              <h5 className="info-label">{t("accountPage.info.username")}</h5>
               <p className="info-value">{user?.username}</p>
             </div>
             <div className="p-col">
-              <h5 className="info-label">Joined:</h5>
+              <h5 className="info-label">{t("accountPage.info.joined")}</h5>
               <p className="info-value">{user ? new Date(user?.createdAt).toLocaleDateString() : ""}</p>
             </div>
           </div>
@@ -168,13 +171,13 @@ export function Account() {
             style={{ marginTop: 16 }}
           >
             <Button
-              label="Change Password"
+              label={t("accountPage.changePasswordButton")}
               icon="pi pi-lock"
               className="p-button-warning"
               onClick={() => setIsDialogVisible(true)}
             />
             <Button
-              label="Logout"
+              label={t("accountPage.logoutButton")}
               icon="pi pi-power-off"
               className="p-button-danger"
               onClick={handleLogout}
@@ -184,7 +187,7 @@ export function Account() {
       </div>
       <Dialog
         className="change-password-dialog"
-        header="Change Password"
+        header={t("changePasswordDialog.header")}
         visible={isDialogVisible}
         footer={dialogFooter}
         onHide={() => setIsDialogVisible(false)}
@@ -200,7 +203,7 @@ export function Account() {
                 feedback={false}
                 toggleMask
               />
-              <label htmlFor="old-password">Old Password</label>
+              <label htmlFor="old-password">{t("changePasswordDialog.oldPasswordLabel")}</label>
             </FloatLabel>
           </div>
           <div className="p-field">
@@ -216,7 +219,7 @@ export function Account() {
                 }
                 toggleMask
               />
-              <label htmlFor="new-password">New Password</label>
+              <label htmlFor="new-password">{t("changePasswordDialog.newPasswordLabel")}</label>
             </FloatLabel>
           </div>
           <div className="p-field">
@@ -229,7 +232,7 @@ export function Account() {
                 feedback={false}
                 toggleMask
               />
-              <label htmlFor="confirm-password">Confirm New Password</label>
+              <label htmlFor="confirm-password">{t("changePasswordDialog.confirmNewPasswordLabel")}</label>
             </FloatLabel>
           </div>
         </div>

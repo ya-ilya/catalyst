@@ -10,6 +10,7 @@ import { IconField } from "primereact/iconfield";
 import { InputIcon } from "primereact/inputicon";
 import { InputText } from "primereact/inputtext";
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 
@@ -28,6 +29,8 @@ const MAX_DESCRIPTION_LENGTH = 256;
 const MAX_CAPES_PER_PAGE = 5;
 
 export function CapesTable({ adminController }: CapesTableProps) {
+  const { t } = useTranslation("admin");
+
   const [filterValue, debouncedFilterValue, setFilterValue] = useDebounce("", 400);
   const capeController = api.useCapeController();
 
@@ -59,11 +62,11 @@ export function CapesTable({ adminController }: CapesTableProps) {
       console.error("Failed to fetch capes:", error);
       showToast({
         severity: "error",
-        summary: "Error",
-        detail: "Failed to fetch capes.",
+        summary: t("toasts.errorSummary"),
+        detail: t("toasts.details.failedToFetchCapes"),
       });
     }
-  }, [error]);
+  }, [error, t, showToast]);
 
   const createCapeMutation = useMutation({
     mutationFn: (newCape: { name: string; description: string; file: Blob }) => {
@@ -73,16 +76,16 @@ export function CapesTable({ adminController }: CapesTableProps) {
       queryClient.invalidateQueries({ queryKey: ["tables/capes"] });
       showToast({
         severity: "success",
-        summary: "Cape Created",
-        detail: "New cape successfully created",
+        summary: t("toasts.successSummary.capeCreated"),
+        detail: t("toasts.details.capeCreated"),
       });
       setIsDialogVisible(false);
     },
     onError: () => {
       showToast({
         severity: "error",
-        summary: "Error",
-        detail: "Failed to create cape.",
+        summary: t("toasts.errorSummary"),
+        detail: t("toasts.details.failedToCreateCape"),
       });
     },
   });
@@ -95,15 +98,15 @@ export function CapesTable({ adminController }: CapesTableProps) {
       queryClient.invalidateQueries({ queryKey: ["tables/capes"] });
       showToast({
         severity: "success",
-        summary: "Cape Deleted",
-        detail: "Cape has been successfully deleted.",
+        summary: t("toasts.successSummary.capeDeleted"),
+        detail: t("toasts.details.capeDeleted"),
       });
     },
     onError: () => {
       showToast({
         severity: "error",
-        summary: "Error",
-        detail: "Failed to delete cape.",
+        summary: t("toasts.errorSummary"),
+        detail: t("toasts.details.failedToDeleteCape"),
       });
     },
   });
@@ -124,15 +127,15 @@ export function CapesTable({ adminController }: CapesTableProps) {
   const confirmDeleteCape = useCallback(
     (cape: api.Cape) => {
       confirmDialog({
-        message: "Are you sure you want to delete this cape?",
-        header: "Delete Confirmation",
+        message: t("capesTable.deleteConfirm.message"),
+        header: t("capesTable.deleteConfirm.header"),
         icon: "pi pi-info-circle",
         defaultFocus: "reject",
         acceptClassName: "p-button-danger",
         accept: () => handleDeleteCape(cape),
       });
     },
-    [handleDeleteCape]
+    [handleDeleteCape, t]
   );
 
   const actionsTemplate = useCallback(
@@ -162,18 +165,18 @@ export function CapesTable({ adminController }: CapesTableProps) {
 
   const tableHeader = (
     <div className="admin-table-header">
-      <span className="title">Cape Management</span>
+      <span className="title">{t("capesTable.title")}</span>
       <div className="actions">
         <IconField iconPosition="left">
           <InputIcon className="pi pi-search" />
           <InputText
             value={filterValue}
             onChange={(event) => setFilterValue(event.target.value)}
-            placeholder="Search by name"
+            placeholder={t("capesTable.searchPlaceholder")}
           />
         </IconField>
         <Button
-          label="Create Cape"
+          label={t("capesTable.createButton")}
           icon="pi pi-plus"
           className="p-button-sm"
           onClick={() => {
@@ -197,13 +200,13 @@ export function CapesTable({ adminController }: CapesTableProps) {
   const dialogFooter = (
     <div>
       <Button
-        label="Cancel"
+        label={t("capesTable.createDialog.cancelButton")}
         icon="pi pi-times"
         onClick={() => setIsDialogVisible(false)}
         text
       />
       <Button
-        label="Create"
+        label={t("capesTable.createDialog.createButton")}
         icon="pi pi-check"
         onClick={handleCreateCape}
         disabled={
@@ -246,29 +249,29 @@ export function CapesTable({ adminController }: CapesTableProps) {
       >
         <Column
           field="id"
-          header="ID"
+          header={t("capesTable.table.id")}
           body={(cape: api.Cape) => cape.id.slice(0, 8)}
         />
         <Column
-          header="Image"
+          header={t("capesTable.table.image")}
           body={imageTemplate}
         />
         <Column
           field="name"
-          header="Name"
+          header={t("capesTable.table.name")}
         />
         <Column
           field="description"
-          header="Description"
+          header={t("capesTable.table.description")}
         />
         <Column
-          header="Actions"
+          header={t("capesTable.table.actions")}
           body={actionsTemplate}
         />
       </DataTable>
       <Dialog
         className="admin-dialog"
-        header="Create New Cape"
+        header={t("capesTable.createDialog.header")}
         visible={isDialogVisible}
         footer={dialogFooter}
         onHide={() => setIsDialogVisible(false)}
@@ -282,7 +285,7 @@ export function CapesTable({ adminController }: CapesTableProps) {
                 onChange={(event) => setName(event.target.value)}
                 invalid={name.length < MIN_NAME_LENGTH || name.length > MAX_NAME_LENGTH}
               />
-              <label htmlFor="new-name">Name</label>
+              <label htmlFor="new-name">{t("capesTable.createDialog.nameLabel")}</label>
             </FloatLabel>
           </div>
           <div className="p-field">
@@ -295,7 +298,7 @@ export function CapesTable({ adminController }: CapesTableProps) {
                   description.length < MIN_DESCRIPTION_LENGTH || description.length > MAX_DESCRIPTION_LENGTH
                 }
               />
-              <label htmlFor="new-description">Description</label>
+              <label htmlFor="new-description">{t("capesTable.createDialog.descriptionLabel")}</label>
             </FloatLabel>
           </div>
           <div
@@ -305,7 +308,7 @@ export function CapesTable({ adminController }: CapesTableProps) {
             <FileUpload
               mode="basic"
               name="image"
-              chooseLabel="Choose cape file"
+              chooseLabel={t("capesTable.createDialog.chooseFileButton")}
               uploadHandler={createCapeUploadHandler}
               customUpload
             />

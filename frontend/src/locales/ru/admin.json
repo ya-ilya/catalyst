@@ -1,0 +1,76 @@
+{
+  "capesTable": {
+    "title": "Управление плащами",
+    "searchPlaceholder": "Поиск по имени",
+    "createButton": "Создать плащ",
+    "table": {
+      "id": "ID",
+      "image": "Изображение",
+      "name": "Имя",
+      "description": "Описание",
+      "actions": "Действия"
+    },
+    "deleteConfirm": {
+      "message": "Вы уверены, что хотите удалить этот плащ?",
+      "header": "Подтверждение удаления"
+    },
+    "createDialog": {
+      "header": "Создать новый плащ",
+      "nameLabel": "Имя",
+      "descriptionLabel": "Описание",
+      "chooseFileButton": "Выбрать файл плаща",
+      "cancelButton": "Отмена",
+      "createButton": "Создать"
+    }
+  },
+  "usersTable": {
+    "title": "Управление пользователями",
+    "searchPlaceholder": "Поиск по имени пользователя",
+    "createButton": "Создать пользователя",
+    "table": {
+      "id": "ID",
+      "username": "Имя пользователя",
+      "admin": "Админ",
+      "adminStatus": {
+        "yes": "Да",
+        "no": "Нет"
+      },
+      "joined": "Присоединился",
+      "actions": "Действия"
+    },
+    "deleteConfirm": {
+      "message": "Вы уверены, что хотите удалить этого пользователя?",
+      "header": "Подтверждение удаления"
+    },
+    "createDialog": {
+      "header": "Создать нового пользователя",
+      "usernameLabel": "Имя пользователя",
+      "temporaryPasswordPanel": "Временный пароль",
+      "cancelButton": "Отмена",
+      "createButton": "Создать"
+    }
+  },
+  "toasts": {
+    "errorSummary": "Ошибка",
+    "successSummary": {
+      "capeCreated": "Плащ создан",
+      "capeDeleted": "Плащ удален",
+      "userCreated": "Пользователь создан",
+      "userDeleted": "Пользователь удален"
+    },
+    "details": {
+      "failedToFetchCapes": "Не удалось загрузить плащи.",
+      "capeCreated": "Новый плащ успешно создан.",
+      "capeDeleted": "Плащ успешно удален.",
+      "failedToCreateCape": "Не удалось создать плащ.",
+      "failedToDeleteCape": "Не удалось удалить плащ.",
+      "failedToFetchUsers": "Не удалось загрузить пользователей.",
+      "userCreated": "Пользователь успешно создан.",
+      "userDeleted": "Пользователь успешно удален.",
+      "failedToCreateUser": "Не удалось создать пользователя.",
+      "invalidUsernameFormat": "Неверный формат имени пользователя.",
+      "userAlreadyExists": "Пользователь с таким именем уже существует.",
+      "failedToDeleteUser": "Не удалось удалить пользователя."
+    }
+  }
+}

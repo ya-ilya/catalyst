@@ -1,0 +1,34 @@
+{
+  "accountPage": {
+    "title": "Account",
+    "passwordChangeWarning": "Password change is required!",
+    "info": {
+      "username": "Username:",
+      "joined": "Joined:"
+    },
+    "changePasswordButton": "Change Password",
+    "logoutButton": "Logout"
+  },
+  "changePasswordDialog": {
+    "header": "Change Password",
+    "oldPasswordLabel": "Old Password",
+    "newPasswordLabel": "New Password",
+    "confirmNewPasswordLabel": "Confirm New Password",
+    "cancelButton": "Cancel",
+    "changePasswordButton": "Change Password"
+  },
+  "toasts": {
+    "errorSummary": "Error",
+    "successSummary": {
+      "passwordChanged": "Password Changed"
+    },
+    "details": {
+      "failedToFetchUser": "Failed to fetch user data.",
+      "passwordChanged": "Your password has been successfully changed.",
+      "newPasswordSameAsOld": "New password cannot be the same as the old password.",
+      "incorrectOldPassword": "Old password is incorrect.",
+      "invalidPasswordFormat": "Invalid password format.",
+      "failedToChangePassword": "Failed to change password."
+    }
+  }
+}

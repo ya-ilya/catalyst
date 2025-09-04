@@ -1,0 +1,76 @@
+{
+  "capesTable": {
+    "title": "Cape Management",
+    "searchPlaceholder": "Search by name",
+    "createButton": "Create Cape",
+    "table": {
+      "id": "ID",
+      "image": "Image",
+      "name": "Name",
+      "description": "Description",
+      "actions": "Actions"
+    },
+    "deleteConfirm": {
+      "message": "Are you sure you want to delete this cape?",
+      "header": "Delete Confirmation"
+    },
+    "createDialog": {
+      "header": "Create New Cape",
+      "nameLabel": "Name",
+      "descriptionLabel": "Description",
+      "chooseFileButton": "Choose cape file",
+      "cancelButton": "Cancel",
+      "createButton": "Create"
+    }
+  },
+  "usersTable": {
+    "title": "User Management",
+    "searchPlaceholder": "Search by username",
+    "createButton": "Create User",
+    "table": {
+      "id": "ID",
+      "username": "Username",
+      "admin": "Admin",
+      "adminStatus": {
+        "yes": "Yes",
+        "no": "No"
+      },
+      "joined": "Joined",
+      "actions": "Actions"
+    },
+    "deleteConfirm": {
+      "message": "Are you sure you want to delete this user?",
+      "header": "Delete Confirmation"
+    },
+    "createDialog": {
+      "header": "Create New User",
+      "usernameLabel": "Username",
+      "temporaryPasswordPanel": "Temporary Password",
+      "cancelButton": "Cancel",
+      "createButton": "Create"
+    }
+  },
+  "toasts": {
+    "errorSummary": "Error",
+    "successSummary": {
+      "capeCreated": "Cape Created",
+      "capeDeleted": "Cape Deleted",
+      "userCreated": "User Created",
+      "userDeleted": "User Deleted"
+    },
+    "details": {
+      "failedToFetchCapes": "Failed to fetch capes.",
+      "capeCreated": "New cape successfully created.",
+      "capeDeleted": "Cape has been successfully deleted.",
+      "failedToCreateCape": "Failed to create cape.",
+      "failedToDeleteCape": "Failed to delete cape.",
+      "failedToFetchUsers": "Failed to fetch users.",
+      "userCreated": "User has been successfully created.",
+      "userDeleted": "User has been successfully deleted.",
+      "failedToCreateUser": "Failed to create user.",
+      "invalidUsernameFormat": "Invalid format for username.",
+      "userAlreadyExists": "User with the same name already exists.",
+      "failedToDeleteUser": "Failed to delete user."
+    }
+  }
+}

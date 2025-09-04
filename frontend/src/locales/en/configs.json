@@ -1,0 +1,31 @@
+{
+  "configsPage": {
+    "subscriptionsTab": "Subscriptions",
+    "libraryTab": "Library",
+    "searchPlaceholderSubscriptions": "Search in subscriptions by name or author",
+    "searchPlaceholderLibrary": "Search in library by name or author",
+    "noSubscriptions": "No subscriptions yet.",
+    "noConfigs": "No configs available."
+  },
+  "toasts": {
+    "errorSummary": "Error",
+    "successSummary": {
+      "subscribed": "Subscribed",
+      "unsubscribed": "Unsubscribed",
+      "toggledPublicity": "Publicity toggled",
+      "deletedConfig": "Deleted"
+    },
+    "details": {
+      "failedToFetchSubscriptions": "Failed to fetch subscriptions.",
+      "failedToFetchConfigs": "Failed to fetch configs.",
+      "subscribed": "You have successfully subscribed to the config.",
+      "unsubscribed": "You have successfully unsubscribed from the config.",
+      "toggledPublicity": "Config publicity has been successfully toggled.",
+      "deletedConfig": "Config has been successfully deleted.",
+      "failedToSubscribe": "Failed to subscribe to the config.",
+      "failedToUnsubscribe": "Failed to unsubscribe from the config.",
+      "failedToTogglePublicity": "Failed to toggle config publicity.",
+      "failedToDelete": "Failed to delete the config."
+    }
+  }
+}

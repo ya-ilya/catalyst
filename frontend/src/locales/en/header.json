@@ -1,0 +1,10 @@
+{
+  "navigation": {
+    "configs": "Configs",
+    "capes": "Capes",
+    "admin": "Admin"
+  },
+  "auth": {
+    "signIn": "Sign In"
+  }
+}
