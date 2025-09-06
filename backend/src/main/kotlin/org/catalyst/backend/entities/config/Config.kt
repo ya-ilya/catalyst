@@ -8,7 +8,7 @@ import java.time.LocalDateTime
 import java.util.*
 
 @Entity
-class Config(
+class  Config(
     var name: String,
     @ElementCollection
     var files: List<ConfigFile>,

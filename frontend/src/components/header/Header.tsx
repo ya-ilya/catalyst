@@ -1,19 +1,41 @@
 import "./Header.css";
 
+import { GB, RU } from "country-flag-icons/react/3x2";
 import { Button } from "primereact/button";
+import { Dropdown } from "primereact/dropdown";
 import { Menubar } from "primereact/menubar";
-import { memo } from "react";
+import { memo, useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 
 import { useAuthenticationContext, useThemeContext } from "../../contexts";
 
+type LanguageOption = {
+  label: string;
+  value: string;
+};
+
+const LANGUAGE_OPTIONS: LanguageOption[] = [
+  { label: "Русский", value: "ru" },
+  { label: "English", value: "en" },
+];
+
 export const Header = memo(() => {
-  const { t } = useTranslation("header");
+  const { i18n, t } = useTranslation("header");
   const navigate = useNavigate();
+
+  const [language, setLanguage] = useState<"ru" | "en">(i18n.language as "ru" | "en");
 
   const [session] = useAuthenticationContext();
   const [isDarkMode, toggleTheme] = useThemeContext();
+
+  const handleLanguageChange = useCallback(
+    (language: "ru" | "en") => {
+      setLanguage(language);
+      i18n.changeLanguage(language);
+    },
+    [i18n]
+  );
 
   const items = [
     {
@@ -47,6 +69,28 @@ export const Header = memo(() => {
     },
   ];
 
+  const languageValueTemplate = useCallback((option: LanguageOption, props: any) => {
+    if (option) {
+      return (
+        <div className="language-option">
+          {option.value == "en" ? <GB className="flag" /> : <RU className="flag" />}
+          <div className="label">{option.label}</div>
+        </div>
+      );
+    }
+
+    return <span>{props.placeholder}</span>;
+  }, []);
+
+  const languageOptionTemplate = useCallback((option: LanguageOption) => {
+    return (
+      <div className="language-option">
+        {option.value == "en" ? <GB className="flag" /> : <RU className="flag" />}
+        <div className="label">{option.label}</div>
+      </div>
+    );
+  }, []);
+
   const start = (
     <div className="header-start">
       <Button
@@ -60,6 +104,18 @@ export const Header = memo(() => {
   );
   const end = (
     <div className="header-end">
+      <div className="header-language">
+        <Dropdown
+          value={language}
+          options={LANGUAGE_OPTIONS}
+          onChange={(event) => handleLanguageChange(event.value as "ru" | "en")}
+          optionLabel="label"
+          valueTemplate={languageValueTemplate}
+          itemTemplate={languageOptionTemplate}
+          className="header-language-dropdown"
+          placeholder={language.toUpperCase()}
+        />
+      </div>
       <Button
         className="header-button"
         icon={isDarkMode ? "pi pi-sun" : "pi pi-moon"}
