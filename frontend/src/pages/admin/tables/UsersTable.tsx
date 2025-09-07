@@ -160,7 +160,8 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
       return (
         <Button
           icon="pi pi-trash"
-          className="p-button-danger p-button-sm"
+          severity="danger"
+          size="small"
           onClick={() => confirmDeleteUser(user)}
           disabled={user.id === session?.user.id}
           rounded
@@ -186,7 +187,7 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
         <Button
           label={t("usersTable.createButton")}
           icon="pi pi-user-plus"
-          className="p-button-sm"
+          size="small"
           onClick={() => {
             setUsername("");
             setTemporaryPassword(null);

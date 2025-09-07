@@ -12,6 +12,8 @@
     "successSummary": {
       "subscribed": "Подписка",
       "unsubscribed": "Отписка",
+      "tagAdded": "Тег добавлен",
+      "tagRemoved": "Тег удален",
       "toggledPublicity": "Публичность изменена",
       "deletedConfig": "Удалено"
     },
@@ -20,6 +22,10 @@
       "failedToFetchConfigs": "Не удалось загрузить конфигурации.",
       "subscribed": "Вы успешно подписались на конфигурацию.",
       "unsubscribed": "Вы успешно отписались от конфигурации.",
+      "tagAdded": "Тег успешно добавлен.",
+      "failedToAddTag": "Не удалось добавить тег.",
+      "tagRemoved": "Тег успешно удален.",
+      "failedToRemoveTag": "Не удалось удалить тег.",
       "toggledPublicity": "Публичность конфигурации успешно изменена.",
       "deletedConfig": "Конфигурация успешно удалена.",
       "failedToSubscribe": "Не удалось подписаться на конфигурацию.",

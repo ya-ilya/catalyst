@@ -3,15 +3,17 @@ import "./Config.css";
 import { Button } from "primereact/button";
 import { Card } from "primereact/card";
 import { Dialog } from "primereact/dialog";
+import { InputText } from "primereact/inputtext";
 import { Tree } from "primereact/tree";
 import { TreeNode } from "primereact/treenode";
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { materialDark, materialLight } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 import { useQuery } from "@tanstack/react-query";
 
+import { TagButton } from "../";
 import * as api from "../../api";
 import { useThemeContext, useToastContext } from "../../contexts";
 
@@ -23,17 +25,32 @@ type ConfigProps = {
   subscribe: () => void;
   unsubscribe: () => void;
   togglePublicity: () => void;
+  addTag: (tag: string) => void;
+  removeTag: (tag: string) => void;
   delete: () => void;
 };
 
 export const Config = memo((props: ConfigProps) => {
   const { t } = useTranslation("config");
-  const { config, isAdmin, isAuthor, isSubscribed, subscribe, unsubscribe, togglePublicity } = props;
+  const {
+    config,
+    isAdmin,
+    isAuthor,
+    isSubscribed,
+    subscribe,
+    unsubscribe,
+    togglePublicity,
+    removeTag,
+    addTag,
+  } = props;
 
   const configController = api.useConfigController();
 
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [selectedKey, setSelectedKey] = useState("");
+  const [showTagInput, setShowTagInput] = useState(false);
+  const [newTagValue, setNewTagValue] = useState("");
+  const tagInputRef = useRef<HTMLInputElement>(null);
 
   const { data: nodes, isError: nodesError } = useQuery({
     queryKey: ["configFiles", config.id],
@@ -97,6 +114,20 @@ export const Config = memo((props: ConfigProps) => {
     }
   }, [contentError, showToast, t]);
 
+  useEffect(() => {
+    if (showTagInput) {
+      tagInputRef.current?.focus();
+    }
+  }, [showTagInput]);
+
+  const handleAddTag = () => {
+    if (newTagValue.trim() && !config.tags?.includes(newTagValue.trim())) {
+      addTag(newTagValue.trim());
+    }
+    setShowTagInput(false);
+    setNewTagValue("");
+  };
+
   const dialogFooter = (
     <div>
       <Button
@@ -112,14 +143,45 @@ export const Config = memo((props: ConfigProps) => {
     <>
       <Card className="config">
         <div className="config-header">
-          <span className="config-name">{config.name}</span>
-          <span className="config-author">{t("card.by", { username: config.author.username })}</span>
-          <span className="config-id">{t("card.id", { id: config.id.slice(0, 8) })}</span>
+          <div className="meta">
+            <span className="config-name">{config.name}</span>
+            <span className="config-author">{t("card.by", { username: config.author.username })}</span>
+            <span className="config-id">{t("card.id", { id: config.id.slice(0, 8) })}</span>
+          </div>
+          <div className="tags">
+            {config.tags?.map((tag) => (
+              <TagButton
+                key={tag}
+                label={tag}
+                onClick={() => removeTag(tag)}
+              />
+            ))}
+            {(isAuthor || isAdmin) && !showTagInput && (
+              <TagButton
+                icon="pi-plus"
+                onClick={() => setShowTagInput(true)}
+              />
+            )}
+            {(isAuthor || isAdmin) && showTagInput && (
+              <InputText
+                ref={tagInputRef}
+                value={newTagValue}
+                onChange={(e) => setNewTagValue(e.target.value)}
+                onBlur={handleAddTag}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleAddTag();
+                  }
+                }}
+                className="tag-input"
+              />
+            )}
+          </div>
         </div>
         <div className="config-footer">
           <Button
             icon="pi pi-info-circle"
-            className="p-button-sm"
+            size="small"
             onClick={() => setIsDialogVisible(true)}
             rounded
             text
@@ -127,7 +189,7 @@ export const Config = memo((props: ConfigProps) => {
           {!isAuthor && isSubscribed && (
             <Button
               icon="pi pi-minus-circle"
-              className="p-button-sm"
+              size="small"
               onClick={unsubscribe}
               severity="danger"
               rounded
@@ -137,7 +199,8 @@ export const Config = memo((props: ConfigProps) => {
           {!isAuthor && !isSubscribed && (
             <Button
               icon="pi pi-plus-circle"
-              className="add-button p-button-sm"
+              className="add-button"
+              size="small"
               onClick={subscribe}
               rounded
               text
@@ -146,7 +209,7 @@ export const Config = memo((props: ConfigProps) => {
           {isAuthor && (
             <Button
               icon={`pi ${config.isPublic ? "pi-eye" : "pi-eye-slash"}`}
-              className="p-button-sm"
+              size="small"
               onClick={togglePublicity}
               rounded
               text
@@ -155,7 +218,7 @@ export const Config = memo((props: ConfigProps) => {
           {(isAuthor || isAdmin) && (
             <Button
               icon="pi pi-trash"
-              className=" p-button-sm"
+              size="small"
               onClick={props.delete}
               severity="danger"
               rounded

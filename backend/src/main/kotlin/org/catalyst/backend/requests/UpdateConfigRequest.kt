@@ -7,5 +7,6 @@ class UpdateConfigRequest(
     @field:Size(min = 4, max = 32)
     val name: String? = null,
     val files: List<ConfigFile>? = null,
+    val tags: List<String>? = null,
     val isPublic: Boolean?
 )

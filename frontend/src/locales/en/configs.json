@@ -12,6 +12,8 @@
     "successSummary": {
       "subscribed": "Subscribed",
       "unsubscribed": "Unsubscribed",
+      "tagAdded": "Tag added",
+      "tagRemoved": "Tag removed",
       "toggledPublicity": "Publicity toggled",
       "deletedConfig": "Deleted"
     },
@@ -20,6 +22,10 @@
       "failedToFetchConfigs": "Failed to fetch configs.",
       "subscribed": "You have successfully subscribed to the config.",
       "unsubscribed": "You have successfully unsubscribed from the config.",
+      "tagAdded": "Tag successfully added.",
+      "failedToAddTag": "Failed to add tag.",
+      "tagRemoved": "Tag successfully removed.",
+      "failedToRemoveTag": "Failed to remove tag.",
       "toggledPublicity": "Config publicity has been successfully toggled.",
       "deletedConfig": "Config has been successfully deleted.",
       "failedToSubscribe": "Failed to subscribe to the config.",

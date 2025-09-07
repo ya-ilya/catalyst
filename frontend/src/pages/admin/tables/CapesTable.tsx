@@ -143,7 +143,8 @@ export function CapesTable({ adminController }: CapesTableProps) {
       return (
         <Button
           icon="pi pi-trash"
-          className="p-button-danger p-button-sm"
+          severity="danger"
+          size="small"
           onClick={() => confirmDeleteCape(cape)}
           rounded
           text
@@ -178,7 +179,7 @@ export function CapesTable({ adminController }: CapesTableProps) {
         <Button
           label={t("capesTable.createButton")}
           icon="pi pi-plus"
-          className="p-button-sm"
+          size="small"
           onClick={() => {
             setName("");
             setDescription("");

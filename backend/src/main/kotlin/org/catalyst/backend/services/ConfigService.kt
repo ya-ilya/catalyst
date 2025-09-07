@@ -88,6 +88,7 @@ class ConfigService(
             Config(
                 name,
                 files,
+                listOf(),
                 isPublic,
                 date,
                 date,
@@ -104,19 +105,21 @@ class ConfigService(
     fun updateConfig(
         id: UUID,
         name: String?,
+        tags: List<String>?,
         files: List<ConfigFile>?,
         isPublic: Boolean?,
         user: User
     ): Config {
         val config = getConfigById(id)
 
-        if (config.author.id != user.id) {
+        if (config.author.id != user.id && !user.isAdmin) {
             throw ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to edit this configuration")
         }
 
         return configRepository.save(
             config.apply {
                 this.name = name ?: this.name
+                this.tags = tags ?: this.tags
                 this.files = files ?: this.files
                 this.isPublic = isPublic ?: this.isPublic
                 this.lastUpdated = LocalDateTime.now(ZoneOffset.UTC)

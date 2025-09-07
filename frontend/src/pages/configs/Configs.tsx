@@ -145,6 +145,56 @@ export function Configs() {
     },
   });
 
+  const addTagMutation = useMutation({
+    mutationFn: async ({ config, tag }: { config: api.Config; tag: string }) => {
+      await configController!.updateConfig(config.id, {
+        tags: [...(config.tags ?? []), tag],
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["configs"] });
+      queryClient.invalidateQueries({ queryKey: ["subscriptions"] });
+      showToast({
+        severity: "success",
+        summary: t("toasts.successSummary.tagAdded"),
+        detail: t("toasts.details.tagAdded"),
+      });
+    },
+    onError: (error) => {
+      console.error("Failed to add tag:", error);
+      showToast({
+        severity: "error",
+        summary: t("toasts.errorSummary"),
+        detail: t("toasts.details.failedToAddTag"),
+      });
+    },
+  });
+
+  const removeTagMutation = useMutation({
+    mutationFn: async ({ config, tag }: { config: api.Config; tag: string }) => {
+      await configController!.updateConfig(config.id, {
+        tags: config.tags?.filter((other) => other != tag),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["configs"] });
+      queryClient.invalidateQueries({ queryKey: ["subscriptions"] });
+      showToast({
+        severity: "success",
+        summary: t("toasts.successSummary.tagRemoved"),
+        detail: t("toasts.details.tagRemoved"),
+      });
+    },
+    onError: (error) => {
+      console.error("Failed to remove tag:", error);
+      showToast({
+        severity: "error",
+        summary: t("toasts.errorSummary"),
+        detail: t("toasts.details.failedToRemoveTag"),
+      });
+    },
+  });
+
   const togglePublicityMutation = useMutation({
     mutationFn: async (config: api.Config) => {
       await configController!.updateConfig(config.id, {
@@ -217,6 +267,22 @@ export function Configs() {
     [configController, togglePublicityMutation]
   );
 
+  const handleAddTag = useCallback(
+    async (config: api.Config, tag: string) => {
+      if (!configController) return;
+      addTagMutation.mutate({ config, tag });
+    },
+    [configController, addTagMutation]
+  );
+
+  const handleRemoveTag = useCallback(
+    async (config: api.Config, tag: string) => {
+      if (!configController) return;
+      removeTagMutation.mutate({ config, tag });
+    },
+    [configController, removeTagMutation]
+  );
+
   const handleDelete = useCallback(
     async (config: api.Config) => {
       if (!configController) return;
@@ -274,10 +340,12 @@ export function Configs() {
                     config={subscription.config}
                     isAdmin={session !== null && session.user.isAdmin}
                     isAuthor={session !== null && subscription.config.author.id === session.user.id}
-                    isSubscribed={subscriptions?.some((other) => other.config.id === subscription.config.id)}
+                    isSubscribed={true}
                     subscribe={() => handleSubscribe(subscription.config)}
                     unsubscribe={() => handleUnsubscribe(subscription.config)}
                     togglePublicity={() => handleTogglePublicity(subscription.config)}
+                    addTag={(tag: string) => handleAddTag(subscription.config, tag)}
+                    removeTag={(tag: string) => handleRemoveTag(subscription.config, tag)}
                     delete={() => handleDelete(subscription.config)}
                   />
                 ))}
@@ -311,6 +379,8 @@ export function Configs() {
                     subscribe={() => handleSubscribe(config)}
                     unsubscribe={() => handleUnsubscribe(config)}
                     togglePublicity={() => handleTogglePublicity(config)}
+                    addTag={(tag: string) => handleAddTag(config, tag)}
+                    removeTag={(tag: string) => handleRemoveTag(config, tag)}
                     delete={() => handleDelete(config)}
                   />
                 ))}

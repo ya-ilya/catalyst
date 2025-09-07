@@ -14,8 +14,44 @@
 
 .config .config-header {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 4px;
+}
+
+.config .config-header .meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.config .config-header .meta .config-name {
+  font-weight: 700;
+}
+
+.config .config-header .meta .config-author,
+.config .config-header .meta .config-id {
+  font-size: 0.875rem;
+  color: var(--text-color-secondary);
+}
+
+.config .config-header .tags {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-height: 50px;
+  overflow-y: auto;
+}
+
+.config .config-header .tags .tag-input {
+  max-width: 100px;
+  height: 24px;
+  padding: 4px 8px;
+  font-size: 0.75rem;
+}
+
+.config .config-header .tags .p-button .p-button-icon-only {
+  width: 24px;
+  height: 24px;
 }
 
 .config .config-footer {
@@ -23,16 +59,6 @@
   justify-content: flex-end;
   gap: 8px;
   margin-top: 16px;
-}
-
-.config .config-header .config-name {
-  font-weight: 700;
-}
-
-.config .config-header .config-author,
-.config .config-header .config-id {
-  font-size: 0.875rem;
-  color: var(--text-color-secondary);
 }
 
 .config .config-footer .add-button {

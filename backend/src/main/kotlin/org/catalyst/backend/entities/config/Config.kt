@@ -8,10 +8,12 @@ import java.time.LocalDateTime
 import java.util.*
 
 @Entity
-class  Config(
+class Config(
     var name: String,
     @ElementCollection
     var files: List<ConfigFile>,
+    @ElementCollection
+    var tags: List<String>,
     var isPublic: Boolean,
     var lastUpdated: LocalDateTime,
     val createdAt: LocalDateTime,
@@ -31,6 +33,7 @@ class  Config(
     fun toResponse() = ConfigResponse(
         id!!,
         name,
+        tags,
         isPublic,
         author.toResponse(),
         lastUpdated,
