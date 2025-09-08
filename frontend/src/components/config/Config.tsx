@@ -166,10 +166,12 @@ export const Config = memo((props: ConfigProps) => {
               <InputText
                 ref={tagInputRef}
                 value={newTagValue}
-                onChange={(e) => setNewTagValue(e.target.value)}
+                onChange={(event) => setNewTagValue(event.target.value)}
                 onBlur={handleAddTag}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
+                invalid={newTagValue.includes(" ")}
+                onKeyDown={(event) => {
+                  if (newTagValue.includes(" ")) return;
+                  if (event.key === "Enter") {
                     handleAddTag();
                   }
                 }}

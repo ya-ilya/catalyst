@@ -21,11 +21,26 @@ class SubscriptionService(private val subscriptionRepository: SubscriptionReposi
             .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found") }
     }
 
-    fun findByUser(user: User, limit: Int, offset: Int, filter: String?): Page<Subscription> {
+    fun findByUser(
+        user: User,
+        limit: Int,
+        offset: Int,
+        query: String?,
+        author: String?,
+        tags: List<String>?
+    ): Page<Subscription> {
+        val pageable = OffsetBasedPageRequest(offset, limit, JpaSort.by("subscribedAt"))
+
+        val cleanQuery = query?.ifBlank { null }
+        val cleanAuthor = author?.ifBlank { null }
+        val cleanTags = tags?.ifEmpty { null }
+
         return subscriptionRepository.findFilteredByUser(
             user,
-            filter,
-            OffsetBasedPageRequest(offset, limit, JpaSort.by("subscribedAt"))
+            cleanQuery,
+            cleanAuthor,
+            cleanTags,
+            pageable
         )
     }
 

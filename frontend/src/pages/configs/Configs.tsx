@@ -19,6 +19,31 @@ import { useAuthenticationContext, useToastContext } from "../../contexts";
 
 const MAX_CONFIGS_PER_PAGE = 35;
 
+function parseSearchQuery(query: string) {
+  const parsed = {
+    query: "",
+    author: "",
+    tags: [] as string[],
+  };
+
+  const parts = query.split(/\s+/).filter(Boolean);
+  const remainingParts = [];
+
+  for (const part of parts) {
+    if (part.startsWith("author:")) {
+      parsed.author = part.substring("author:".length);
+    } else if (part.startsWith("tags:")) {
+      parsed.tags = part.substring("tags:".length).split(",");
+    } else {
+      remainingParts.push(part);
+    }
+  }
+
+  parsed.query = remainingParts.join(" ");
+
+  return parsed;
+}
+
 export function Configs() {
   const meController = api.useMeController();
   const configController = api.useConfigController();
@@ -33,10 +58,13 @@ export function Configs() {
     queryKey: ["subscriptions", subscriptionsPage, debouncedSubscriptionsFilterValue],
     queryFn: async () => {
       if (!meController) return { subscriptions: [], total: 0 };
+      const parsed = parseSearchQuery(debouncedSubscriptionsFilterValue);
       const response = await meController.getSubscriptions(
         MAX_CONFIGS_PER_PAGE,
         subscriptionsPage,
-        debouncedSubscriptionsFilterValue
+        parsed.query,
+        parsed.author,
+        parsed.tags
       );
       return response;
     },
@@ -54,10 +82,13 @@ export function Configs() {
     queryKey: ["configs", configsPage, debouncedConfigsFilterValue],
     queryFn: async () => {
       if (!configController) return { configs: [], total: 0 };
+      const parsed = parseSearchQuery(debouncedConfigsFilterValue);
       const response = await configController.getPublicConfigs(
         MAX_CONFIGS_PER_PAGE,
         configsPage,
-        debouncedConfigsFilterValue
+        parsed.query,
+        parsed.author,
+        parsed.tags
       );
       return response;
     },

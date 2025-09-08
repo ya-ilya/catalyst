@@ -2,8 +2,8 @@
   "configsPage": {
     "subscriptionsTab": "Подписки",
     "libraryTab": "Библиотека",
-    "searchPlaceholderSubscriptions": "Поиск в подписках по имени или автору",
-    "searchPlaceholderLibrary": "Поиск в библиотеке по имени или автору",
+    "searchPlaceholderSubscriptions": "Поиск в подписках по имени, автору, тегам",
+    "searchPlaceholderLibrary": "Поиск в библиотеке по имени, автору, тегам",
     "noSubscriptions": "Пока нет подписок.",
     "noConfigs": "Конфигурации отсутствуют."
   },

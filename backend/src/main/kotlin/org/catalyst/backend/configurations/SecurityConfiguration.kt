@@ -46,11 +46,13 @@ class SecurityConfiguration(
                     )
                     corsConfiguration.allowedHeaders = listOf("*")
                     corsConfiguration.allowCredentials = true
+                    corsConfiguration.exposedHeaders = listOf("X-Total-Count", "X-Total-Pages")
                     corsConfiguration
                 }
             }
             .authorizeHttpRequests { request ->
                 request
+                    .requestMatchers(HttpMethod.OPTIONS, "/api/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/capes/{id}/image").permitAll()
                     .requestMatchers("/api/**").authenticated()
                     .anyRequest().permitAll()

@@ -41,13 +41,17 @@ export class MeController extends Controller {
   async getSubscriptions(
     limit: number,
     offset: number,
-    filter?: string
+    query: string,
+    author: string,
+    tags: string[]
   ): Promise<{ subscriptions: Subscription[]; total: number; pages: number }> {
     const response = await this.client.get("/subscriptions", {
       params: {
         limit: limit,
         offset: offset,
-        filter: filter,
+        query: query,
+        author: author,
+        tags: tags,
       },
     });
 

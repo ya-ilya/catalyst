@@ -6,20 +6,26 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
 import java.util.*
 
 interface SubscriptionRepository : JpaRepository<Subscription, UUID> {
     @Query("""
         SELECT s FROM Subscription s
+        JOIN s.config c
+        LEFT JOIN c.tags t
         WHERE s.user = :user AND (
-            (:filter IS NULL) OR
-            (LOWER(s.config.name) LIKE LOWER(CONCAT('%', :filter, '%'))) OR
-            (LOWER(s.config.author.username) LIKE LOWER(CONCAT('%', :filter, '%')))
+            (:query IS NULL OR LOWER(c.name) LIKE LOWER(CONCAT('%', :query, '%'))) AND
+            (:author IS NULL OR LOWER(c.author.username) LIKE LOWER(CONCAT('%', :author, '%'))) AND
+            (:tags IS NULL OR LOWER(t) IN :tags)
         )
+        GROUP BY s.id
     """)
     fun findFilteredByUser(
-        user: User,
-        filter: String?,
+        @Param("user") user: User,
+        @Param("query") query: String?,
+        @Param("author") author: String?,
+        @Param("tags") tags: List<String>?,
         pageable: Pageable
     ): Page<Subscription>
 

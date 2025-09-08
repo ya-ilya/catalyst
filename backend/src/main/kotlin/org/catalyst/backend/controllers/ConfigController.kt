@@ -42,11 +42,17 @@ class ConfigController(private val configService: ConfigService) {
         @Parameter(description = "Offset for pagination")
         @RequestParam(value = "offset", required = false, defaultValue = "0")
         offset: Int,
-        @Parameter(description = "Filter configs by name or author")
-        @RequestParam(value = "filter", required = false)
-        filter: String?
+        @Parameter(description = "Filter by config name")
+        @RequestParam(value = "query", required = false)
+        query: String?,
+        @Parameter(description = "Filter by author username")
+        @RequestParam(value = "author", required = false)
+        author: String?,
+        @Parameter(description = "Filter by tags")
+        @RequestParam(value = "tags", required = false)
+        tags: List<String>?
     ): ResponseEntity<List<ConfigResponse>> {
-        val page = configService.getPublicConfigs(limit, offset, filter)
+        val page = configService.getPublicConfigs(limit, offset, query, author, tags)
 
         return ResponseEntity
             .status(HttpStatus.OK)

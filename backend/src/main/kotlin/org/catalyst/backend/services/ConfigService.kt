@@ -33,11 +33,21 @@ class ConfigService(
     fun getPublicConfigs(
         limit: Int,
         offset: Int,
-        filter: String?
+        query: String?,
+        author: String?,
+        tags: List<String>?
     ): Page<Config> {
+        val pageable = OffsetBasedPageRequest(offset, limit, JpaSort.by("createdAt"))
+
+        val cleanQuery = query?.ifBlank { null }
+        val cleanAuthor = author?.ifBlank { null }
+        val cleanTags = tags?.ifEmpty { null }
+
         return configRepository.findFilteredPublicConfigs(
-            filter,
-            OffsetBasedPageRequest(offset, limit, JpaSort.by("createdAt"))
+            cleanQuery,
+            cleanAuthor,
+            cleanTags,
+            pageable
         )
     }
 
@@ -114,6 +124,10 @@ class ConfigService(
 
         if (config.author.id != user.id && !user.isAdmin) {
             throw ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to edit this configuration")
+        }
+
+        if (tags?.any { it.contains(" ") } == true) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Tag cannot contains space character")
         }
 
         return configRepository.save(

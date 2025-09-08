@@ -2,8 +2,8 @@
   "configsPage": {
     "subscriptionsTab": "Subscriptions",
     "libraryTab": "Library",
-    "searchPlaceholderSubscriptions": "Search in subscriptions by name or author",
-    "searchPlaceholderLibrary": "Search in library by name or author",
+    "searchPlaceholderSubscriptions": "Search in subscriptions by name, author, tags",
+    "searchPlaceholderLibrary": "Search in library by name, author, tags",
     "noSubscriptions": "No subscriptions yet.",
     "noConfigs": "No configs available."
   },

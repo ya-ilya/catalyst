@@ -65,11 +65,17 @@ class MeController(
         @Parameter(description = "Offset for pagination")
         @RequestParam(value = "offset", required = false, defaultValue = "0")
         offset: Int,
-        @Parameter(description = "Filter subscriptions by config name or author name")
-        @RequestParam(value = "filter", required = false)
-        filter: String?
+        @Parameter(description = "Filter subscriptions by config name")
+        @RequestParam(value = "query", required = false)
+        query: String?,
+        @Parameter(description = "Filter subscriptions by config author username")
+        @RequestParam(value = "author", required = false)
+        author: String?,
+        @Parameter(description = "Filter subscriptions by config tags")
+        @RequestParam(value = "tags", required = false)
+        tags: List<String>?
     ): ResponseEntity<List<SubscriptionResponse>> {
-        val page = subscriptionService.findByUser(user, limit, offset, filter)
+        val page = subscriptionService.findByUser(user, limit, offset, query, author, tags)
 
         return ResponseEntity
             .status(HttpStatus.OK)
