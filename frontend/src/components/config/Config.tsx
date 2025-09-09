@@ -154,6 +154,7 @@ export const Config = memo((props: ConfigProps) => {
                 key={tag}
                 label={tag}
                 onClick={() => removeTag(tag)}
+                disabled={!isAuthor}
               />
             ))}
             {(isAuthor || isAdmin) && !showTagInput && (

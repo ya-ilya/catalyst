@@ -77,7 +77,6 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
         summary: t("toasts.successSummary.userCreated"),
         detail: t("toasts.details.userCreated"),
       });
-      setIsDialogVisible(false);
     },
     onError: (error) => {
       console.error("Failed to create user:", error);
