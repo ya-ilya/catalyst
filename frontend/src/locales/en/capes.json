@@ -1,7 +1,11 @@
 {
   "capesPage": {
     "noCapes": "No capes available.",
-    "searchPlaceholder": "Search in capes by name"
+    "searchPlaceholder": "Search in capes by name",
+    "sortBy": {
+      "placeholder": "Sort By",
+      "name": "By name"
+    }
   },
   "toasts": {
     "errorSummary": "Error",

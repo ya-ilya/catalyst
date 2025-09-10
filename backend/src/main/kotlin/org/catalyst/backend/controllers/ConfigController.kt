@@ -29,7 +29,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody as SwaggerRequestBod
 @Tag(name = "Configs", description = "Endpoints for managing configs")
 class ConfigController(private val configService: ConfigService) {
     @GetMapping
-    @Operation(summary = "Get a list of all public configs with pagination and filtering")
+    @Operation(summary = "Get a list of all public configs with pagination, filtering and sorting")
     @ApiResponse(
         responseCode = "200",
         description = "OK",
@@ -50,9 +50,12 @@ class ConfigController(private val configService: ConfigService) {
         author: String?,
         @Parameter(description = "Filter by tags")
         @RequestParam(value = "tags", required = false)
-        tags: List<String>?
+        tags: List<String>?,
+        @Parameter(description = "Field to sort by (e.g., createdAt, name, author.username)")
+        @RequestParam(value = "sortBy", required = false, defaultValue = "createdAt")
+        sortBy: String?
     ): ResponseEntity<List<ConfigResponse>> {
-        val page = configService.getPublicConfigs(limit, offset, query, author, tags)
+        val page = configService.getPublicConfigs(limit, offset, query, author, tags, sortBy)
 
         return ResponseEntity
             .status(HttpStatus.OK)

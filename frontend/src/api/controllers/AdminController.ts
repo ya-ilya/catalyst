@@ -39,13 +39,15 @@ export class AdminController extends Controller {
   async getUsers(
     limit: number,
     offset: number,
-    filter?: string
+    filter?: string,
+    sortBy?: string,
   ): Promise<{ users: User[]; total: number; pages: number }> {
     const response = await this.client.get("/users", {
       params: {
         limit: limit,
         offset: offset,
         filter: filter,
+        sortBy: sortBy,
       },
     });
 

@@ -39,11 +39,17 @@ class UserService(
     fun getUsers(
         limit: Int,
         offset: Int,
-        filter: String?
+        filter: String?,
+        sortBy: String?
     ): Page<User> {
+        val sortField = when (sortBy) {
+            "username" -> "username"
+            else -> "createdAt"
+        }
+
         return userRepository.findFilteredUsers(
             filter,
-            OffsetBasedPageRequest(offset, limit, JpaSort.by("createdAt"))
+            OffsetBasedPageRequest(offset, limit, JpaSort.by(sortField))
         )
     }
 

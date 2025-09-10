@@ -35,9 +35,16 @@ class ConfigService(
         offset: Int,
         query: String?,
         author: String?,
-        tags: List<String>?
+        tags: List<String>?,
+        sortBy: String?
     ): Page<Config> {
-        val pageable = OffsetBasedPageRequest(offset, limit, JpaSort.by("createdAt"))
+        val sortField = when (sortBy) {
+            "name" -> "name"
+            "author.username" -> "author.username"
+            else -> "createdAt"
+        }
+
+        val pageable = OffsetBasedPageRequest(offset, limit, JpaSort.by(sortField))
 
         val cleanQuery = query?.ifBlank { null }
         val cleanAuthor = author?.ifBlank { null }

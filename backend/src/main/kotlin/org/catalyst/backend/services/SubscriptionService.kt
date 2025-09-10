@@ -27,9 +27,16 @@ class SubscriptionService(private val subscriptionRepository: SubscriptionReposi
         offset: Int,
         query: String?,
         author: String?,
-        tags: List<String>?
+        tags: List<String>?,
+        sortBy: String?
     ): Page<Subscription> {
-        val pageable = OffsetBasedPageRequest(offset, limit, JpaSort.by("subscribedAt"))
+        val sortField = when (sortBy) {
+            "config.name" -> "config.name"
+            "config.author.username" -> "config.author.username"
+            else -> "subscribedAt"
+        }
+
+        val pageable = OffsetBasedPageRequest(offset, limit, JpaSort.by(sortField))
 
         val cleanQuery = query?.ifBlank { null }
         val cleanAuthor = author?.ifBlank { null }

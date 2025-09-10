@@ -37,13 +37,15 @@ export class CapeController extends Controller {
   async getCapes(
     limit: number,
     offset: number,
-    filter?: string
+    filter?: string,
+    sortBy?: string
   ): Promise<{ capes: Cape[]; total: number; pages: number }> {
     const response = await this.client.get("", {
       params: {
         limit: limit,
         offset: offset,
         filter: filter,
+        sortBy: sortBy,
       },
     });
 

@@ -43,9 +43,10 @@ export class ConfigController extends Controller {
   async getPublicConfigs(
     limit: number,
     offset: number,
-    query: string,
-    author: string,
-    tags: string[]
+    query?: string,
+    author?: string,
+    tags?: string[],
+    sortBy?: string
   ): Promise<{ configs: Config[]; total: number; pages: number }> {
     const response = await this.client.get("", {
       params: {
@@ -54,6 +55,7 @@ export class ConfigController extends Controller {
         query: query,
         author: author,
         tags: tags,
+        sortBy: sortBy,
       },
     });
 

@@ -1,5 +1,6 @@
 import "./Capes.css";
 
+import { Dropdown } from "primereact/dropdown";
 import { useDebounce } from "primereact/hooks";
 import { IconField } from "primereact/iconfield";
 import { InputIcon } from "primereact/inputicon";
@@ -24,14 +25,22 @@ export function Capes() {
 
   const { t } = useTranslation("capes");
 
+  const SORT_OPTIONS = [{ label: t("capesPage.sortBy.name"), value: "name" }];
+
   const [filterValue, debouncedFilterValue, setFilterValue] = useDebounce("", 400);
+  const [sortValue, setSortValue] = useState<"name">();
   const [page, setPage] = useState(0);
 
   const { data: capesData, error: capesError } = useQuery({
-    queryKey: ["capes", page, debouncedFilterValue],
+    queryKey: ["capes", page, debouncedFilterValue, sortValue],
     queryFn: async () => {
       if (!capeController) return { capes: [], total: 0 };
-      const response = await capeController.getCapes(MAX_CAPES_PER_PAGE, page, debouncedFilterValue);
+      const response = await capeController.getCapes(
+        MAX_CAPES_PER_PAGE,
+        page,
+        debouncedFilterValue,
+        sortValue
+      );
       return response;
     },
     enabled: !!capeController,
@@ -170,6 +179,13 @@ export function Capes() {
     <>
       <div className="capes-content">
         <div className="input-container">
+          <Dropdown
+            value={sortValue}
+            options={SORT_OPTIONS}
+            onChange={(event) => setSortValue(event.value)}
+            placeholder={t("capesPage.sortBy.placeholder")}
+            showClear
+          />
           <IconField iconPosition="left">
             <InputIcon className="pi pi-search" />
             <InputText

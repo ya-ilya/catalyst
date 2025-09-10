@@ -5,7 +5,16 @@
     "searchPlaceholderSubscriptions": "Поиск в подписках по имени, автору, тегам",
     "searchPlaceholderLibrary": "Поиск в библиотеке по имени, автору, тегам",
     "noSubscriptions": "Пока нет подписок.",
-    "noConfigs": "Конфигурации отсутствуют."
+    "noConfigs": "Конфигурации отсутствуют.",
+    "sortBy": {
+      "placeholder": "Сортировать по",
+      "subscribedAt": "По дате подписки",
+      "configName": "По названию конфигурации",
+      "configAuthor": "По автору конфигурации",
+      "createdAt": "По дате создания",
+      "name": "По названию",
+      "author": "По автору"
+    }
   },
   "toasts": {
     "errorSummary": "Ошибка",

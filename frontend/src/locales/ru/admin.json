@@ -3,6 +3,11 @@
     "title": "Управление плащами",
     "searchPlaceholder": "Поиск по имени",
     "createButton": "Создать плащ",
+    "sortBy": {
+      "placeholder": "Сортировать по",
+      "createdAt": "По дате создания",
+      "name": "По названию"
+    },
     "table": {
       "id": "ID",
       "image": "Изображение",
@@ -27,6 +32,11 @@
     "title": "Управление пользователями",
     "searchPlaceholder": "Поиск по имени пользователя",
     "createButton": "Создать пользователя",
+    "sortBy": {
+      "placeholder": "Сортировать по",
+      "createdAt": "По дате создания",
+      "username": "По имени пользователя"
+    },
     "table": {
       "id": "ID",
       "username": "Имя пользователя",

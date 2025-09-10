@@ -5,7 +5,16 @@
     "searchPlaceholderSubscriptions": "Search in subscriptions by name, author, tags",
     "searchPlaceholderLibrary": "Search in library by name, author, tags",
     "noSubscriptions": "No subscriptions yet.",
-    "noConfigs": "No configs available."
+    "noConfigs": "No configs available.",
+    "sortBy": {
+      "placeholder": "Sort By",
+      "subscribedAt": "By subscribed date",
+      "configName": "By config name",
+      "configAuthor": "By config author",
+      "createdAt": "By creation date",
+      "name": "By name",
+      "author": "By author"
+    }
   },
   "toasts": {
     "errorSummary": "Error",

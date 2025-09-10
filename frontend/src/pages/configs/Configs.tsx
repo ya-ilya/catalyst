@@ -1,5 +1,6 @@
 import "./Configs.css";
 
+import { Dropdown } from "primereact/dropdown";
 import { useDebounce } from "primereact/hooks";
 import { IconField } from "primereact/iconfield";
 import { InputIcon } from "primereact/inputicon";
@@ -50,12 +51,21 @@ export function Configs() {
 
   const { t } = useTranslation("configs");
 
+  const SUBSCRIPTIONS_SORT_OPTIONS = [
+    { label: t("configsPage.sortBy.subscribedAt"), value: "subscribedAt" },
+    { label: t("configsPage.sortBy.configName"), value: "config.name" },
+    { label: t("configsPage.sortBy.configAuthor"), value: "config.author.username" },
+  ];
+
   const [subscriptionsFilterValue, debouncedSubscriptionsFilterValue, setSubscriptionsFilterValue] =
     useDebounce("", 400);
+  const [subscriptionsSortValue, setSubscriptionsSortValue] = useState<
+    "subscribedAt" | "config.name" | "config.author.username"
+  >("subscribedAt");
   const [subscriptionsPage, setSubscriptionsPage] = useState(0);
 
   const { data: subscriptionsData, error: subscriptionsError } = useQuery({
-    queryKey: ["subscriptions", subscriptionsPage, debouncedSubscriptionsFilterValue],
+    queryKey: ["subscriptions", subscriptionsPage, debouncedSubscriptionsFilterValue, subscriptionsSortValue],
     queryFn: async () => {
       if (!meController) return { subscriptions: [], total: 0 };
       const parsed = parseSearchQuery(debouncedSubscriptionsFilterValue);
@@ -64,7 +74,8 @@ export function Configs() {
         subscriptionsPage,
         parsed.query,
         parsed.author,
-        parsed.tags
+        parsed.tags,
+        subscriptionsSortValue
       );
       return response;
     },
@@ -75,11 +86,20 @@ export function Configs() {
   const subscriptions = subscriptionsData?.subscriptions ?? [];
   const subscriptionsTotal = subscriptionsData?.total ?? 0;
 
+  const CONFIGS_SORT_OPTIONS = [
+    { label: t("configsPage.sortBy.createdAt"), value: "createdAt" },
+    { label: t("configsPage.sortBy.name"), value: "name" },
+    { label: t("configsPage.sortBy.author"), value: "author.username" },
+  ];
+
   const [configsFilterValue, debouncedConfigsFilterValue, setConfigsFilterValue] = useDebounce("", 400);
+  const [configsSortValue, setConfigsSortValue] = useState<"createdAt" | "name" | "author.username">(
+    "createdAt"
+  );
   const [configsPage, setConfigsPage] = useState(0);
 
   const { data: configsData, error: configsError } = useQuery({
-    queryKey: ["configs", configsPage, debouncedConfigsFilterValue],
+    queryKey: ["configs", configsPage, debouncedConfigsFilterValue, configsSortValue],
     queryFn: async () => {
       if (!configController) return { configs: [], total: 0 };
       const parsed = parseSearchQuery(debouncedConfigsFilterValue);
@@ -88,7 +108,8 @@ export function Configs() {
         configsPage,
         parsed.query,
         parsed.author,
-        parsed.tags
+        parsed.tags,
+        configsSortValue
       );
       return response;
     },
@@ -334,6 +355,19 @@ export function Configs() {
   return (
     <div className="configs-content">
       <div className="input-container">
+        <Dropdown
+          value={activeIndex === 0 ? subscriptionsSortValue : configsSortValue}
+          options={activeIndex === 0 ? SUBSCRIPTIONS_SORT_OPTIONS : CONFIGS_SORT_OPTIONS}
+          onChange={(event) => {
+            if (activeIndex === 0) {
+              setSubscriptionsSortValue(event.value);
+            } else {
+              setConfigsSortValue(event.value);
+            }
+          }}
+          placeholder={t("configsPage.sortBy.placeholder")}
+          showClear
+        />
         <IconField iconPosition="left">
           <InputIcon className="pi pi-search" />
           <InputText

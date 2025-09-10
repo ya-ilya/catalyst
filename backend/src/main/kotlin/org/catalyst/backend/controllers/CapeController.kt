@@ -26,7 +26,7 @@ import java.util.*
 @Tag(name = "Capes", description = "Endpoints for managing capes")
 class CapeController(private val capeService: CapeService) {
     @GetMapping
-    @Operation(summary = "Get a list of all public capes with pagination and filtering")
+    @Operation(summary = "Get a list of all public capes with pagination, filtering and sorting")
     @ApiResponse(
         responseCode = "200",
         description = "OK",
@@ -53,8 +53,14 @@ class CapeController(private val capeService: CapeService) {
             required = false
         )
         filter: String?,
+        @Parameter(description = "Field to sort by (e.g., name)")
+        @RequestParam(
+            value = "sortBy",
+            required = false
+        )
+        sortBy: String?
     ): ResponseEntity<List<CapeResponse>> {
-        val page = capeService.getCapes(limit, offset, filter)
+        val page = capeService.getCapes(limit, offset, filter, sortBy)
 
         return ResponseEntity
             .status(HttpStatus.OK)

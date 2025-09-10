@@ -3,6 +3,7 @@ import { Column } from "primereact/column";
 import { confirmDialog } from "primereact/confirmdialog";
 import { DataTable } from "primereact/datatable";
 import { Dialog } from "primereact/dialog";
+import { Dropdown } from "primereact/dropdown";
 import { FileUpload, FileUploadHandlerEvent } from "primereact/fileupload";
 import { FloatLabel } from "primereact/floatlabel";
 import { useDebounce } from "primereact/hooks";
@@ -31,16 +32,24 @@ const MAX_CAPES_PER_PAGE = 5;
 export function CapesTable({ adminController }: CapesTableProps) {
   const { t } = useTranslation("admin");
 
+  const SORT_OPTIONS = [{ label: t("capesTable.sortBy.name"), value: "name" }];
+
   const [filterValue, debouncedFilterValue, setFilterValue] = useDebounce("", 400);
+  const [sortValue, setSortValue] = useState<"name">();
   const capeController = api.useCapeController();
 
   const [page, setPage] = useState(0);
 
   const { data, isFetching, error } = useQuery({
-    queryKey: ["tables/capes", page, debouncedFilterValue],
+    queryKey: ["tables/capes", page, debouncedFilterValue, sortValue],
     queryFn: async () => {
       if (!capeController) return { capes: [], total: 0 };
-      const response = await capeController.getCapes(MAX_CAPES_PER_PAGE, page, debouncedFilterValue);
+      const response = await capeController.getCapes(
+        MAX_CAPES_PER_PAGE,
+        page,
+        debouncedFilterValue,
+        sortValue
+      );
       return response;
     },
     enabled: !!capeController,
@@ -168,6 +177,13 @@ export function CapesTable({ adminController }: CapesTableProps) {
     <div className="admin-table-header">
       <span className="title">{t("capesTable.title")}</span>
       <div className="actions">
+        <Dropdown
+          value={sortValue}
+          options={SORT_OPTIONS}
+          onChange={(event) => setSortValue(event.value)}
+          placeholder={t("capesTable.sortBy.placeholder")}
+          showClear
+        />
         <IconField iconPosition="left">
           <InputIcon className="pi pi-search" />
           <InputText

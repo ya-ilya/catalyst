@@ -10,6 +10,7 @@ import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.cache.annotation.Caching
 import org.springframework.data.domain.Page
+import org.springframework.data.jpa.domain.JpaSort
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
@@ -46,11 +47,23 @@ class CapeService(
     fun getCapes(
         limit: Int,
         offset: Int,
-        filter: String?
+        filter: String?,
+        sortBy: String?
     ): Page<Cape> {
+        val sortField = when (sortBy) {
+            "name" -> "name"
+            else -> null
+        }
+
+        val pageable = OffsetBasedPageRequest(
+            offset,
+            limit,
+            if (sortField != null) JpaSort.by(sortField) else JpaSort.unsorted()
+        )
+
         return capeRepository.findFilteredCapes(
             filter,
-            OffsetBasedPageRequest(offset, limit)
+            pageable
         )
     }
 

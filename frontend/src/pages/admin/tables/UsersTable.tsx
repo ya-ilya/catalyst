@@ -4,6 +4,7 @@ import { Column } from "primereact/column";
 import { confirmDialog } from "primereact/confirmdialog";
 import { DataTable } from "primereact/datatable";
 import { Dialog } from "primereact/dialog";
+import { Dropdown } from "primereact/dropdown";
 import { FloatLabel } from "primereact/floatlabel";
 import { useDebounce } from "primereact/hooks";
 import { IconField } from "primereact/iconfield";
@@ -31,14 +32,25 @@ const MAX_USERS_PER_PAGE = 5;
 export function UsersTable({ adminController, session }: UsersTableProps) {
   const { t } = useTranslation("admin");
 
+  const SORT_OPTIONS = [
+    { label: t("usersTable.sortBy.createdAt"), value: "createdAt" },
+    { label: t("usersTable.sortBy.username"), value: "username" },
+  ];
+
   const [filterValue, debouncedFilterValue, setFilterValue] = useDebounce("", 400);
+  const [sortValue, setSortValue] = useState<"createdAt" | "username">("createdAt");
   const [page, setPage] = useState(0);
 
   const { data, isFetching, error } = useQuery({
-    queryKey: ["tables/users", page, debouncedFilterValue],
+    queryKey: ["tables/users", page, debouncedFilterValue, sortValue],
     queryFn: async () => {
       if (!adminController) return { users: [], total: 0 };
-      const response = await adminController.getUsers(MAX_USERS_PER_PAGE, page, debouncedFilterValue);
+      const response = await adminController.getUsers(
+        MAX_USERS_PER_PAGE,
+        page,
+        debouncedFilterValue,
+        sortValue
+      );
       return response;
     },
     enabled: !!adminController,
@@ -175,6 +187,13 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
     <div className="admin-table-header">
       <span className="title">{t("usersTable.title")}</span>
       <div className="actions">
+        <Dropdown
+          value={sortValue}
+          options={SORT_OPTIONS}
+          onChange={(event) => setSortValue(event.value)}
+          placeholder={t("usersTable.sortBy.placeholder")}
+          showClear
+        />
         <IconField iconPosition="left">
           <InputIcon className="pi pi-search" />
           <InputText

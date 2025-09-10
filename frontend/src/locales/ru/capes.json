@@ -1,7 +1,11 @@
 {
   "capesPage": {
     "noCapes": "Плащи отсутствуют.",
-    "searchPlaceholder": "Поиск по плащам по имени"
+    "searchPlaceholder": "Поиск по плащам по имени",
+    "sortBy": {
+      "placeholder": "Сортировать по",
+      "name": "По названию"
+    }
   },
   "toasts": {
     "errorSummary": "Ошибка",

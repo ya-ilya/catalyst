@@ -41,9 +41,10 @@ export class MeController extends Controller {
   async getSubscriptions(
     limit: number,
     offset: number,
-    query: string,
-    author: string,
-    tags: string[]
+    query?: string,
+    author?: string,
+    tags?: string[],
+    sortBy?: string
   ): Promise<{ subscriptions: Subscription[]; total: number; pages: number }> {
     const response = await this.client.get("/subscriptions", {
       params: {
@@ -52,6 +53,7 @@ export class MeController extends Controller {
         query: query,
         author: author,
         tags: tags,
+        sortBy: sortBy,
       },
     });
 
