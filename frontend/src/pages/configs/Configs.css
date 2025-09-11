@@ -14,14 +14,31 @@
   padding: 16px;
   width: 100%;
   gap: 8px;
+  max-width: fit-content;
+  margin: 0 auto;
 }
 
 .configs-content .input-container .p-dropdown {
-  width: 150px;
+  width: 180px;
 }
 
 .configs-content .input-container .p-inputtext {
-  width: 200px;
+  width: 250px;
+}
+
+@media (max-width: 768px) {
+  .configs-content .input-container {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 16px;
+    max-width: 100%;
+  }
+
+  .configs-content .input-container .p-dropdown,
+  .configs-content .input-container .p-inputtext {
+    width: 100%;
+    box-sizing: border-box;
+  }
 }
 
 .configs-content .p-tabmenu {
