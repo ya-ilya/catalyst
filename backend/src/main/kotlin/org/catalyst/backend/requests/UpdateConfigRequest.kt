@@ -8,5 +8,5 @@ class UpdateConfigRequest(
     val name: String? = null,
     val files: List<ConfigFile>? = null,
     val tags: List<String>? = null,
-    val isPublic: Boolean?
+    val isPublic: Boolean? = null
 )

@@ -151,7 +151,7 @@ class CapeService(
 
     private fun saveCapeImage(cape: Cape, image: MultipartFile) {
         val file = File("${capesDirectory}/${cape.id}.png")
-        file.mkdirs()
+        file.parentFile.mkdirs()
         image.transferTo(file)
     }
 

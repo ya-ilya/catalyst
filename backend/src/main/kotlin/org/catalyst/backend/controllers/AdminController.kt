@@ -113,6 +113,7 @@ class AdminController(
         content = [Content(schema = Schema(implementation = UserCreatedResponse::class))]
     )
     @CommonApiResponses
+    @ResponseStatus(HttpStatus.CREATED)
     fun createUser(
         @Valid
         @RequestBody
@@ -156,6 +157,7 @@ class AdminController(
     @Operation(summary = "Create a new cape", description = "Requires ADMIN role")
     @ApiResponse(responseCode = "201", description = "Cape created")
     @CommonApiResponses
+    @ResponseStatus(HttpStatus.CREATED)
     fun createCape(
         @Parameter(description = "Name of the cape (4-32 characters)")
         @RequestParam("name")

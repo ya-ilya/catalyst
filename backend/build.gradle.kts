@@ -31,10 +31,22 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.bouncycastle:bcpkix-jdk18on:1.81")
 	implementation("io.jsonwebtoken:jjwt:0.12.5")
+
+	testImplementation("org.junit.jupiter:junit-jupiter-engine")
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("org.springframework.security:spring-security-test")
+	testImplementation("org.testcontainers:junit-jupiter")
+	testImplementation("org.testcontainers:mysql")
+	testImplementation("io.mockk:mockk:1.14.6")
+	testImplementation(kotlin("test-junit5"))
 }
 
 kotlin {
 	compilerOptions {
 		freeCompilerArgs.addAll("-Xjsr305=strict")
 	}
+}
+
+tasks.test {
+	useJUnitPlatform()
 }
