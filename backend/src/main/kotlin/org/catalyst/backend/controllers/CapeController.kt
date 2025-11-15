@@ -9,8 +9,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.catalyst.backend.configurations.annotations.CommonApiResponses
 import org.catalyst.backend.entities.user.User
-import org.catalyst.backend.responses.CapeResponse
 import org.catalyst.backend.services.CapeService
+import org.catalyst.common.responses.CapeResponse
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType

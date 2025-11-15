@@ -8,7 +8,8 @@ import org.springframework.data.repository.query.Param
 import java.util.*
 
 interface ConfigRepository : JpaRepository<Config, UUID> {
-    @Query("""
+    @Query(
+        """
         SELECT c FROM Config c
         LEFT JOIN c.tags t
         WHERE c.isPublic = true AND (
@@ -17,7 +18,8 @@ interface ConfigRepository : JpaRepository<Config, UUID> {
             (:tags IS NULL or LOWER(t) IN :tags)
         )
         GROUP BY c.id
-    """)
+    """
+    )
     fun findFilteredPublicConfigs(
         @Param("query") query: String?,
         @Param("author") author: String?,

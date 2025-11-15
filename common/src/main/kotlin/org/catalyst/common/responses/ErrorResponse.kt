@@ -1,6 +1,6 @@
-package org.catalyst.backend.responses
+package org.catalyst.common.responses
 
-class ErrorResponse(
+data class ErrorResponse(
     val status: Int,
     val message: String? = null,
     val fields: List<String>? = null

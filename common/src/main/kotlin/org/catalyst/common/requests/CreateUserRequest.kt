@@ -1,8 +1,8 @@
-package org.catalyst.backend.requests
+package org.catalyst.common.requests
 
 import jakarta.validation.constraints.Size
 
-class CreateUserRequest(
+data class CreateUserRequest(
     @field:Size(min = 4, max = 32)
     val username: String
 )

@@ -1,6 +1,6 @@
-package org.catalyst.backend.responses
+package org.catalyst.common.responses
 
-class AuthenticationResponse(
+data class AuthenticationResponse(
     val accessToken: String,
     val refreshToken: String,
     val user: UserResponse

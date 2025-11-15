@@ -5,10 +5,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.catalyst.backend.configurations.annotations.CommonApiResponses
-import org.catalyst.backend.requests.RefreshTokenRequest
-import org.catalyst.backend.requests.SignInRequest
-import org.catalyst.backend.responses.AuthenticationResponse
 import org.catalyst.backend.services.AuthenticationService
+import org.catalyst.common.requests.RefreshTokenRequest
+import org.catalyst.common.requests.SignInRequest
+import org.catalyst.common.responses.AuthenticationResponse
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping

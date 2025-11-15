@@ -31,6 +31,7 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.bouncycastle:bcpkix-jdk18on:1.81")
 	implementation("io.jsonwebtoken:jjwt:0.12.5")
+	implementation(project(":common"))
 
 	testImplementation("org.junit.jupiter:junit-jupiter-engine")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")

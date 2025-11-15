@@ -1,6 +1,6 @@
 package org.catalyst.backend.exceptions
 
-import org.catalyst.backend.responses.ErrorResponse
+import org.catalyst.common.responses.ErrorResponse
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.AccessDeniedException

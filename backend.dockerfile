@@ -6,11 +6,10 @@ WORKDIR /backend
 
 # Copy the project files into the container
 COPY gradle.properties settings.gradle.kts gradlew ./
-COPY backend ./
+COPY backend ./backend
+COPY common ./common
+COPY sdk ./sdk
 COPY startup.backend.sh ./
-
-# Create build directory
-RUN mkdir /backend/backend
 
 # Build the application and cache dependencies
 RUN --mount=type=cache,target=/root/.gradle gradle --no-daemon clean build
@@ -22,7 +21,7 @@ FROM eclipse-temurin:24-jdk-alpine
 RUN mkdir /app
 
 # Copy the built JAR file and startup script
-COPY --from=build /backend/build/libs/*.jar /app/application.jar
+COPY --from=build /backend/backend/build/libs/*.jar /app/application.jar
 COPY --from=build /backend/startup.backend.sh /app/startup.backend.sh
 
 # Make the startup script executable

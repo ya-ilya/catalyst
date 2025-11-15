@@ -5,7 +5,7 @@ import org.catalyst.backend.entities.cape.Cape
 import org.catalyst.backend.entities.config.Config
 import org.catalyst.backend.entities.subscription.Subscription
 import org.catalyst.backend.entities.user.role.Role
-import org.catalyst.backend.responses.UserResponse
+import org.catalyst.common.responses.UserResponse
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails

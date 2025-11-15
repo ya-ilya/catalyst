@@ -10,7 +10,8 @@ import org.springframework.data.repository.query.Param
 import java.util.*
 
 interface SubscriptionRepository : JpaRepository<Subscription, UUID> {
-    @Query("""
+    @Query(
+        """
         SELECT s FROM Subscription s
         JOIN s.config c
         LEFT JOIN c.tags t
@@ -20,7 +21,8 @@ interface SubscriptionRepository : JpaRepository<Subscription, UUID> {
             (:tags IS NULL OR LOWER(t) IN :tags)
         )
         GROUP BY s.id
-    """)
+    """
+    )
     fun findFilteredByUser(
         @Param("user") user: User,
         @Param("query") query: String?,

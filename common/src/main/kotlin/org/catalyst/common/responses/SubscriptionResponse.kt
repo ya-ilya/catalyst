@@ -1,9 +1,9 @@
-package org.catalyst.backend.responses
+package org.catalyst.common.responses
 
 import java.time.LocalDateTime
 import java.util.*
 
-class SubscriptionResponse(
+data class SubscriptionResponse(
     val id: UUID,
     val config: ConfigResponse,
     val subscribedAt: LocalDateTime

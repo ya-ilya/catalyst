@@ -7,7 +7,7 @@ import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.security.Keys
 import org.catalyst.backend.entities.user.User
 import org.catalyst.backend.exceptions.FieldedResponseStatusException
-import org.catalyst.backend.responses.AuthenticationResponse
+import org.catalyst.common.responses.AuthenticationResponse
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken

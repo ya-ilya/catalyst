@@ -2,7 +2,7 @@ package org.catalyst.backend.entities.cape
 
 import jakarta.persistence.*
 import org.catalyst.backend.entities.user.User
-import org.catalyst.backend.responses.CapeResponse
+import org.catalyst.common.responses.CapeResponse
 import java.util.*
 
 @Entity

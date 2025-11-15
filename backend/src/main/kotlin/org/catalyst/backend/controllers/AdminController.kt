@@ -11,12 +11,12 @@ import jakarta.validation.Valid
 import jakarta.validation.constraints.Size
 import org.catalyst.backend.configurations.annotations.CommonApiResponses
 import org.catalyst.backend.entities.user.User
-import org.catalyst.backend.requests.CreateUserRequest
-import org.catalyst.backend.responses.CapeResponse
-import org.catalyst.backend.responses.UserCreatedResponse
-import org.catalyst.backend.responses.UserResponse
 import org.catalyst.backend.services.CapeService
 import org.catalyst.backend.services.UserService
+import org.catalyst.common.requests.CreateUserRequest
+import org.catalyst.common.responses.CapeResponse
+import org.catalyst.common.responses.UserCreatedResponse
+import org.catalyst.common.responses.UserResponse
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize

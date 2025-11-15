@@ -9,14 +9,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.catalyst.backend.configurations.annotations.CommonApiResponses
+import org.catalyst.backend.entities.config.ConfigFile
 import org.catalyst.backend.entities.user.User
-import org.catalyst.backend.requests.CreateConfigRequest
-import org.catalyst.backend.requests.UpdateConfigRequest
-import org.catalyst.backend.responses.ConfigFileResponse
-import org.catalyst.backend.responses.ConfigResponse
-import org.catalyst.backend.responses.ErrorResponse
-import org.catalyst.backend.responses.SubscriptionResponse
 import org.catalyst.backend.services.ConfigService
+import org.catalyst.common.requests.CreateConfigRequest
+import org.catalyst.common.requests.UpdateConfigRequest
+import org.catalyst.common.responses.ConfigFileResponse
+import org.catalyst.common.responses.ConfigResponse
+import org.catalyst.common.responses.ErrorResponse
+import org.catalyst.common.responses.SubscriptionResponse
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -127,7 +128,7 @@ class ConfigController(private val configService: ConfigService) {
             .data
     }
 
-    @GetMapping("/{id}/subscribe")
+    @PostMapping("/{id}/subscribe")
     @Operation(summary = "Subscribe the current user to a config")
     @ApiResponse(
         responseCode = "200",
@@ -145,7 +146,7 @@ class ConfigController(private val configService: ConfigService) {
         return configService.subscribe(id, user).toResponse()
     }
 
-    @GetMapping("/{id}/unsubscribe")
+    @DeleteMapping("/{id}/unsubscribe")
     @Operation(summary = "Unsubscribe the current user from a config")
     @ApiResponse(
         responseCode = "204",
@@ -180,7 +181,12 @@ class ConfigController(private val configService: ConfigService) {
         request: CreateConfigRequest
     ): ConfigResponse {
         return configService
-            .createConfig(request.name, request.files, request.isPublic, user)
+            .createConfig(
+                request.name,
+                request.files.map { ConfigFile(it.name, it.data) },
+                request.isPublic,
+                user
+            )
             .toResponse()
     }
 
@@ -202,7 +208,14 @@ class ConfigController(private val configService: ConfigService) {
         request: UpdateConfigRequest
     ): ConfigResponse {
         return configService
-            .updateConfig(id, request.name, request.tags, request.files, request.isPublic, user)
+            .updateConfig(
+                id,
+                request.name,
+                request.tags,
+                request.files?.map { ConfigFile(it.name, it.data) },
+                request.isPublic,
+                user
+            )
             .toResponse()
     }
 

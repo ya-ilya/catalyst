@@ -1,9 +1,9 @@
-package org.catalyst.backend.responses
+package org.catalyst.common.responses
 
 import java.time.LocalDateTime
 import java.util.*
 
-class UserCreatedResponse(
+data class UserCreatedResponse(
     val id: UUID,
     val username: String,
     val temporaryPassword: String,

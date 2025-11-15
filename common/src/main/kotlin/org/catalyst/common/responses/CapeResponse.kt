@@ -1,8 +1,8 @@
-package org.catalyst.backend.responses
+package org.catalyst.common.responses
 
 import java.util.*
 
-class CapeResponse(
+data class CapeResponse(
     val id: UUID,
     val name: String,
     val description: String

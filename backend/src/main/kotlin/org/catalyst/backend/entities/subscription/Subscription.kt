@@ -3,7 +3,7 @@ package org.catalyst.backend.entities.subscription
 import jakarta.persistence.*
 import org.catalyst.backend.entities.config.Config
 import org.catalyst.backend.entities.user.User
-import org.catalyst.backend.responses.SubscriptionResponse
+import org.catalyst.common.responses.SubscriptionResponse
 import java.time.LocalDateTime
 import java.util.*
 

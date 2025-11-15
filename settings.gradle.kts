@@ -20,5 +20,7 @@ pluginManagement {
 }
 
 include(
-    "backend"
+    "backend",
+    "common",
+    "sdk"
 )

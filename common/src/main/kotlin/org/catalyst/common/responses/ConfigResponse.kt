@@ -1,9 +1,9 @@
-package org.catalyst.backend.responses
+package org.catalyst.common.responses
 
 import java.time.LocalDateTime
 import java.util.*
 
-class ConfigResponse(
+data class ConfigResponse(
     val id: UUID,
     val name: String,
     val tags: List<String>,

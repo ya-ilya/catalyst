@@ -2,7 +2,7 @@ package org.catalyst.backend.entities.config
 
 import jakarta.persistence.Column
 import jakarta.persistence.Embeddable
-import org.catalyst.backend.responses.ConfigFileResponse
+import org.catalyst.common.responses.ConfigFileResponse
 
 @Embeddable
 class ConfigFile(

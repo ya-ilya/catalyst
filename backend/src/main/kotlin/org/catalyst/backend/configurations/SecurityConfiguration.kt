@@ -67,6 +67,7 @@ class SecurityConfiguration(
     }
 
     @Bean
+    @Suppress("UsePropertyAccessSyntax")
     fun authenticationProvider(): AuthenticationProvider {
         val authenticationProvider = DaoAuthenticationProvider(userService)
         authenticationProvider.setPasswordEncoder(passwordEncoder)

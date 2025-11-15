@@ -7,11 +7,13 @@ import org.springframework.data.jpa.repository.Query
 import java.util.*
 
 interface UserRepository : JpaRepository<User, UUID> {
-    @Query("""
+    @Query(
+        """
         SELECT u FROM User u
         WHERE (:filter IS NULL) OR 
         (LOWER(u.username) LIKE LOWER(CONCAT('%', :filter, '%')))
-    """)
+    """
+    )
     fun findFilteredUsers(
         filter: String?,
         pageable: Pageable
