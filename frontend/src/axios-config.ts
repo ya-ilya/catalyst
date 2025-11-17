@@ -9,7 +9,7 @@ function isTokenExpired(token: string): boolean {
 }
 
 export const axiosClient = axios.create({
-  baseURL: "http://127.0.0.1:3000",
+  baseURL: "",
 });
 
 export async function refreshTokenRequestIntercepter(
