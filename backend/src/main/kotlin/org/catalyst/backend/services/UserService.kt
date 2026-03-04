@@ -73,7 +73,7 @@ class UserService(
         return userRepository.save(
             User(
                 username,
-                passwordEncoder.encode(password),
+                passwordEncoder.encode(password)!!,
                 LocalDateTime.now(ZoneOffset.UTC),
                 roles = setOf(userRole),
                 isPasswordChangeRequired = true
@@ -97,7 +97,7 @@ class UserService(
         return userRepository.save(
             User(
                 username,
-                passwordEncoder.encode(password),
+                passwordEncoder.encode(password)!!,
                 LocalDateTime.now(ZoneOffset.UTC),
                 roles = setOf(userRole, adminRole),
                 isPasswordChangeRequired = false

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component
 @Component
 @Order(1)
 class RoleCreator(private val roleRepository: RoleRepository) : CommandLineRunner {
-    override fun run(vararg args: String?) {
+    override fun run(vararg args: String) {
         createRoleIfNotFound("ROLE_USER")
         createRoleIfNotFound("ROLE_ADMIN")
     }

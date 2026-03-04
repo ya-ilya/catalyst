@@ -20,7 +20,7 @@ class CatalystApplication(private val userService: UserService) : CommandLineRun
     @Value($$"${catalyst.admin.password}")
     private val adminPassword: String? = null
 
-    override fun run(vararg args: String?) {
+    override fun run(vararg args: String) {
         if (userService.findUserByUsername(adminUsername!!).isEmpty) {
             userService.createAdmin(
                 adminUsername,

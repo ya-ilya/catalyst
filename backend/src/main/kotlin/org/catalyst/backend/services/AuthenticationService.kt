@@ -90,7 +90,7 @@ class AuthenticationService(
         }
 
         userService.updateUser(user.apply {
-            this.password = passwordEncoder.encode(newPassword)
+            this.password = passwordEncoder.encode(newPassword)!!
             this.isPasswordChangeRequired = false
         })
 
