@@ -182,9 +182,9 @@ class ConfigController(private val configService: ConfigService) {
     ): ConfigResponse {
         return configService
             .createConfig(
-                request.name,
-                request.files.map { ConfigFile(it.name, it.data) },
-                request.isPublic,
+                request.name!!,
+                request.files!!.map { ConfigFile(it.name!!, it.data!!) },
+                request.isPublic!!,
                 user
             )
             .toResponse()
@@ -212,7 +212,7 @@ class ConfigController(private val configService: ConfigService) {
                 id,
                 request.name,
                 request.tags,
-                request.files?.map { ConfigFile(it.name, it.data) },
+                request.files?.map { ConfigFile(it.name!!, it.data!!) },
                 request.isPublic,
                 user
             )

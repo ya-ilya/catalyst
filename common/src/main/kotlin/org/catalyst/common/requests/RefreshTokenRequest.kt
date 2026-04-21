@@ -1,5 +1,8 @@
 package org.catalyst.common.requests
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
 data class RefreshTokenRequest(
-    val refreshToken: String
+    @field:JsonProperty("refreshToken")
+    val refreshToken: String? = null
 )

@@ -122,7 +122,7 @@ class AdminController(
     ): UserCreatedResponse {
         val temporaryPassword = generateRandomPassword()
         val user = userService.createUser(
-            request.username,
+            request.username!!,
             temporaryPassword
         )
 

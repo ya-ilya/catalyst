@@ -29,7 +29,7 @@ class AuthenticationController(private val authenticationService: Authentication
         @SwaggerRequestBody(description = "Sign in request payload", required = true)
         request: SignInRequest
     ): AuthenticationResponse {
-        return authenticationService.signIn(request.username, request.password)
+        return authenticationService.signIn(request.username!!, request.password!!)
     }
 
     @PostMapping("/refreshToken")
@@ -42,6 +42,6 @@ class AuthenticationController(private val authenticationService: Authentication
         @SwaggerRequestBody(description = "Refresh token request payload", required = true)
         request: RefreshTokenRequest
     ): AuthenticationResponse {
-        return authenticationService.refreshToken(request.refreshToken)
+        return authenticationService.refreshToken(request.refreshToken!!)
     }
 }

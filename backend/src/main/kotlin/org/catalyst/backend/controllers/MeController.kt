@@ -148,6 +148,6 @@ class MeController(
         @SwaggerRequestBody(description = "Password change request payload", required = true)
         request: ChangePasswordRequest
     ): AuthenticationResponse {
-        return authenticationService.changePassword(user, request.oldPassword, request.newPassword)
+        return authenticationService.changePassword(user, request.oldPassword!!, request.newPassword!!)
     }
 }
