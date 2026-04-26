@@ -1,3 +1,5 @@
+val catalystVersion: String by project
+
 plugins {
 	id("org.springframework.boot")
 	id("io.spring.dependency-management")
@@ -6,9 +8,12 @@ plugins {
 	kotlin("plugin.spring")
 }
 
+group = "org.catalyst"
+version = catalystVersion
+
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(24)
+		languageVersion = JavaLanguageVersion.of(25)
 	}
 }
 

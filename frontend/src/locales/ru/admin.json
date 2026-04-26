@@ -55,6 +55,7 @@
     "createDialog": {
       "header": "Создать нового пользователя",
       "usernameLabel": "Имя пользователя",
+      "minecraftUuidLabel": "Minecraft UUID",
       "temporaryPasswordPanel": "Временный пароль",
       "cancelButton": "Отмена",
       "createButton": "Создать"

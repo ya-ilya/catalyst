@@ -55,6 +55,7 @@
     "createDialog": {
       "header": "Create New User",
       "usernameLabel": "Username",
+      "minecraftUuidLabel": "Minecraft UUID",
       "temporaryPasswordPanel": "Temporary Password",
       "cancelButton": "Cancel",
       "createButton": "Create"

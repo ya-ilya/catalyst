@@ -9,6 +9,7 @@ import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.domain.Page
 import org.springframework.data.jpa.domain.JpaSort
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -29,6 +30,17 @@ class UserService(
         return userRepository
             .findById(id)
             .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "User not found") }
+    }
+
+    fun getUserByMinecraftUuid(minecraftUuid: UUID): User {
+        return userRepository
+            .findByMinecraftUuid(minecraftUuid)
+            .orElseThrow {
+                ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "User with this Minecraft UUID not found"
+                )
+            }
     }
 
     fun findUserByUsername(username: String): Optional<User> {
@@ -56,7 +68,8 @@ class UserService(
     @CacheEvict(value = ["users"], allEntries = true)
     fun createUser(
         username: String,
-        password: String
+        password: String,
+        minecraftUuid: UUID
     ): User {
         if (findUserByUsername(username).isPresent) {
             throw FieldedResponseStatusException(
@@ -75,6 +88,7 @@ class UserService(
                 username,
                 passwordEncoder.encode(password)!!,
                 LocalDateTime.now(ZoneOffset.UTC),
+                minecraftUuid = minecraftUuid,
                 roles = setOf(userRole),
                 isPasswordChangeRequired = true
             )

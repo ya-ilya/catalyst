@@ -2,6 +2,7 @@ package org.catalyst.sdk.services
 
 import okhttp3.ResponseBody
 import org.catalyst.common.responses.CapeResponse
+import org.catalyst.common.responses.UserProfileResponse
 import retrofit2.Call
 import retrofit2.http.*
 import java.util.*
@@ -25,9 +26,14 @@ interface CapeService {
         @Path("id") id: UUID
     ): Call<Unit>
 
+    @GET("/api/users/{uuid}/profile")
+    fun getUserProfile(
+        @Path("uuid") uuid: UUID
+    ): Call<UserProfileResponse>
+
     @GET("/api/capes/{id}/image")
     @Streaming
     fun getCapeImage(
         @Path("id") id: UUID
-    ): ResponseBody
+    ): Call<ResponseBody>
 }

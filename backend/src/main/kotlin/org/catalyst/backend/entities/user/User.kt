@@ -19,6 +19,7 @@ class User(
     @get:JvmName("passwordField")
     var password: String,
     val createdAt: LocalDateTime,
+    var minecraftUuid: UUID? = null,
     var isPasswordChangeRequired: Boolean = true,
     var refreshToken: String? = null,
     @ManyToOne

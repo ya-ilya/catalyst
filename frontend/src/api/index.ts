@@ -17,3 +17,4 @@ export * from "./controllers/AuthenticationController";
 export * from "./controllers/CapeController";
 export * from "./controllers/ConfigController";
 export * from "./controllers/MeController";
+export * from "./controllers/UserController";

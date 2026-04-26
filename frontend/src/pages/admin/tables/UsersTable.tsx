@@ -62,6 +62,7 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
 
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [username, setUsername] = useState("");
+  const [minecraftUuid, setMinecraftUuid] = useState("");
   const [temporaryPassword, setTemporaryPassword] = useState<string | null>(null);
 
   const [showToast] = useToastContext();
@@ -78,8 +79,8 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
   }, [error, t, showToast]);
 
   const createUserMutation = useMutation({
-    mutationFn: async (newUsername: string) => {
-      return await adminController!.createUser({ username: newUsername });
+    mutationFn: async ({ newUsername, newMinecraftUuid }: { newUsername: string; newMinecraftUuid: string }) => {
+      return await adminController!.createUser({ username: newUsername, minecraftUuid: newMinecraftUuid });
     },
     onSuccess: (data) => {
       setTemporaryPassword(data.temporaryPassword);
@@ -141,8 +142,11 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
 
   const handleCreateUser = useCallback(() => {
     if (!adminController) return;
-    createUserMutation.mutate(username);
-  }, [adminController, createUserMutation, username]);
+    createUserMutation.mutate({
+      newUsername: username,
+      newMinecraftUuid: minecraftUuid,
+    });
+  }, [adminController, createUserMutation, username, minecraftUuid]);
 
   const handleDeleteUser = useCallback(
     (user: api.User) => {
@@ -208,6 +212,7 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
           size="small"
           onClick={() => {
             setUsername("");
+            setMinecraftUuid("");
             setTemporaryPassword(null);
             setIsDialogVisible(true);
           }}
@@ -235,7 +240,8 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
         label={t("usersTable.createDialog.createButton")}
         icon="pi pi-check"
         onClick={handleCreateUser}
-        disabled={username.length < MIN_USERNAME_LENGTH || username.length > MAX_USERNAME_LENGTH}
+        disabled={username.length < MIN_USERNAME_LENGTH || username.length > MAX_USERNAME_LENGTH || minecraftUuid.length !== 36 || temporaryPassword !== null}
+        visible={!temporaryPassword}
       />
     </div>
   );
@@ -299,8 +305,21 @@ export function UsersTable({ adminController, session }: UsersTableProps) {
                 value={username}
                 onChange={(event) => setUsername(event.target.value)}
                 invalid={username.length < MIN_USERNAME_LENGTH || username.length > MAX_USERNAME_LENGTH}
+                disabled={temporaryPassword !== null}
               />
               <label htmlFor="new-username">{t("usersTable.createDialog.usernameLabel")}</label>
+            </FloatLabel>
+          </div>
+          <div className="p-field">
+            <FloatLabel>
+              <InputText
+                id="new-minecraft-uuid"
+                value={minecraftUuid}
+                onChange={(event) => setMinecraftUuid(event.target.value)}
+                invalid={minecraftUuid.length !== 36}
+                disabled={temporaryPassword !== null}
+              />
+              <label htmlFor="new-minecraft-uuid">{t("usersTable.createDialog.minecraftUuidLabel")}</label>
             </FloatLabel>
           </div>
           {temporaryPassword && (

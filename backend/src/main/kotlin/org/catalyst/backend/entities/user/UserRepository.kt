@@ -20,4 +20,5 @@ interface UserRepository : JpaRepository<User, UUID> {
     ): Page<User>
 
     fun findByUsername(username: String): Optional<User>
+    fun findByMinecraftUuid(minecraftUuid: UUID): Optional<User>
 }

@@ -8,6 +8,7 @@ import org.catalyst.sdk.services.AdminService
 import org.catalyst.sdk.services.CapeService
 import org.catalyst.sdk.services.ConfigService
 import org.catalyst.sdk.services.MeService
+import org.catalyst.sdk.services.UserService
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.time.LocalDateTime
@@ -42,4 +43,5 @@ class CatalystApi(
     val capeService: CapeService = retrofit.create(CapeService::class.java)
     val configService: ConfigService = retrofit.create(ConfigService::class.java)
     val meService: MeService = retrofit.create(MeService::class.java)
+    val userService: UserService = retrofit.create(UserService::class.java)
 }

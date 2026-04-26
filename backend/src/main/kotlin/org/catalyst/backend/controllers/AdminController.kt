@@ -123,7 +123,8 @@ class AdminController(
         val temporaryPassword = generateRandomPassword()
         val user = userService.createUser(
             request.username!!,
-            temporaryPassword
+            temporaryPassword,
+            request.minecraftUuid!!
         )
 
         return UserCreatedResponse(

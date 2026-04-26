@@ -68,6 +68,7 @@ class UserServiceTest {
     fun `createUser should save user with ROLE_USER when username is unique`() {
         val username = "newUser"
         val password = "password123"
+        val minecraftUuid = UUID.randomUUID()
         val encodedPassword = "encodedPassword"
         val userRole = Role("ROLE_USER", id = 1L)
 
@@ -76,7 +77,7 @@ class UserServiceTest {
         every { passwordEncoder.encode(password) } returns encodedPassword
         every { userRepository.save(any()) } answers { firstArg() }
 
-        val result = userService.createUser(username, password)
+        val result = userService.createUser(username, password, minecraftUuid)
 
         assertEquals(username, result.username)
         assertEquals(encodedPassword, result.password)
@@ -98,7 +99,7 @@ class UserServiceTest {
         every { userRepository.findByUsername("existingUser") } returns Optional.of(existingUser)
 
         val exception = assertThrows<FieldedResponseStatusException> {
-            userService.createUser("existingUser", "password")
+            userService.createUser("existingUser", "password", UUID.randomUUID())
         }
         assertEquals(HttpStatus.CONFLICT, exception.statusCode)
         verify(exactly = 0) { userRepository.save(any()) }
@@ -110,7 +111,7 @@ class UserServiceTest {
         every { roleRepository.findByName("ROLE_USER") } returns Optional.empty()
 
         assertThrows<IllegalStateException> {
-            userService.createUser("anyUser", "password")
+            userService.createUser("anyUser", "password", UUID.randomUUID())
         }
     }
 

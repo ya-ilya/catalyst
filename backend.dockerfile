@@ -1,5 +1,5 @@
 # Stage 1: Build the Gradle application
-FROM gradle:jdk24-alpine AS build
+FROM gradle:jdk25-alpine AS build
 
 # Create app directory
 WORKDIR /backend
@@ -15,7 +15,7 @@ COPY startup.backend.sh ./
 RUN --mount=type=cache,target=/root/.gradle gradle --no-daemon clean build
 
 # Stage 3: Create the final image
-FROM eclipse-temurin:24-jdk-alpine
+FROM eclipse-temurin:25-jdk-alpine
 
 # Create app directory
 RUN mkdir /app
